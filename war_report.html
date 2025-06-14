@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>War Earnings Report</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .war-info {
+            background-color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .war-info h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        table.war_report {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #ddd;
+        }
+        table.war_report th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 14px;
+            border-bottom: 2px solid #5a6fd8;
+            border-right: 1px solid #5a6fd8;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+        table.war_report th:last-child {
+            border-right: none;
+        }
+        table.war_report th:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6b5b95 100%);
+        }
+        table.war_report th::after {
+            content: ' ↕';
+            font-size: 10px;
+            opacity: 0.7;
+        }
+        table.war_report th.sort-asc::after {
+            content: ' ↑';
+            opacity: 1;
+        }
+        table.war_report th.sort-desc::after {
+            content: ' ↓';
+            opacity: 1;
+        }
+        table.war_report td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #e0e0e0;
+            border-right: 1px solid #e0e0e0;
+            font-size: 13px;
+        }
+        table.war_report td:last-child {
+            border-right: none;
+        }
+        table.war_report tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        table.war_report tr:hover {
+            background-color: #e3f2fd;
+            transition: background-color 0.2s;
+        }
+        table.war_report td:nth-child(3), 
+        table.war_report td:nth-child(4),
+        table.war_report td:nth-child(5),
+        table.war_report td:nth-child(6) {
+            text-align: right;
+        }
+        .stats-summary {
+            display: flex;
+            justify-content: space-around;
+            background-color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .stat-box {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+        .faction-section {
+            margin-bottom: 30px;
+        }
+        .faction-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎯 EPIC Mafia War Earnings Report</h1>
+        <p>War ID: 26833</p>
+    </div>
+    
+    <div class="war-info">
+        <h3>War Information</h3>
+        <p><strong>Period:</strong> 2025-06-12 22:00:00 to 2025-06-14 12:35:30</p>
+        <p><strong>Duration:</strong> 38.6 hours</p>
+    </div>
+    
+    <div class="stats-summary">
+        <div class="stat-box">
+            <div class="stat-number">3410</div>
+            <div class="stat-label">Our Attacks</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">36,185</div>
+            <div class="stat-label">Our Score</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">2769</div>
+            <div class="stat-label">Enemy Attacks</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">23,593</div>
+            <div class="stat-label">Enemy Score</div>
+        </div>
+    </div>
+    
+    <div class="war-info">
+        <h3>Faction Matchup</h3>
+        <p><strong>EPIC Mafia:</strong> 36,185 points (3410 attacks)</p>
+        <p><strong>House of Dragonborn:</strong> 23,593 points (2769 attacks)</p>
+    </div>
+
+    
+        <div class="faction-section">
+            <h3>🏆 EPIC Mafia Members</h3>
+            <table class="dataframe war_report" id="our_faction_table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Members</th>
+      <th>Level</th>
+      <th>Attacks</th>
+      <th>Score</th>
+      <th>Avg score/hit</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Monst3rous</td>
+      <td>69</td>
+      <td>140</td>
+      <td>2,742.01</td>
+      <td>19.59</td>
+    </tr>
+    <tr>
+      <td>Jlamb</td>
+      <td>52</td>
+      <td>195</td>
+      <td>2,367.69</td>
+      <td>12.14</td>
+    </tr>
+    <tr>
+      <td>daprinceomar</td>
+      <td>90</td>
+      <td>150</td>
+      <td>2,280.95</td>
+      <td>15.21</td>
+    </tr>
+    <tr>
+      <td>RipTheJacker</td>
+      <td>100</td>
+      <td>185</td>
+      <td>1,901.20</td>
+      <td>10.28</td>
+    </tr>
+    <tr>
+      <td>FuzzyRight1</td>
+      <td>74</td>
+      <td>142</td>
+      <td>1,752.39</td>
+      <td>12.34</td>
+    </tr>
+    <tr>
+      <td>JetBean</td>
+      <td>89</td>
+      <td>95</td>
+      <td>1,449.79</td>
+      <td>15.26</td>
+    </tr>
+    <tr>
+      <td>Shindig7</td>
+      <td>35</td>
+      <td>115</td>
+      <td>1,410.44</td>
+      <td>12.26</td>
+    </tr>
+    <tr>
+      <td>CheJ</td>
+      <td>42</td>
+      <td>103</td>
+      <td>1,212.44</td>
+      <td>11.77</td>
+    </tr>
+    <tr>
+      <td>Caz27</td>
+      <td>24</td>
+      <td>97</td>
+      <td>1,055.57</td>
+      <td>10.88</td>
+    </tr>
+    <tr>
+      <td>slooj</td>
+      <td>69</td>
+      <td>93</td>
+      <td>984.72</td>
+      <td>10.59</td>
+    </tr>
+    <tr>
+      <td>Renderhp</td>
+      <td>50</td>
+      <td>86</td>
+      <td>977.48</td>
+      <td>11.37</td>
+    </tr>
+    <tr>
+      <td>kirb</td>
+      <td>89</td>
+      <td>87</td>
+      <td>950.24</td>
+      <td>10.92</td>
+    </tr>
+    <tr>
+      <td>Southie</td>
+      <td>92</td>
+      <td>77</td>
+      <td>944.93</td>
+      <td>12.27</td>
+    </tr>
+    <tr>
+      <td>neonred</td>
+      <td>60</td>
+      <td>70</td>
+      <td>861.28</td>
+      <td>12.30</td>
+    </tr>
+    <tr>
+      <td>Cyb3rpunkx</td>
+      <td>95</td>
+      <td>86</td>
+      <td>758.87</td>
+      <td>8.82</td>
+    </tr>
+    <tr>
+      <td>SlayersApex</td>
+      <td>20</td>
+      <td>82</td>
+      <td>741.27</td>
+      <td>9.04</td>
+    </tr>
+    <tr>
+      <td>DarthBelloq</td>
+      <td>93</td>
+      <td>74</td>
+      <td>671.18</td>
+      <td>9.07</td>
+    </tr>
+    <tr>
+      <td>hells_nells</td>
+      <td>90</td>
+      <td>52</td>
+      <td>659.32</td>
+      <td>12.68</td>
+    </tr>
+    <tr>
+      <td>Elswicka</td>
+      <td>69</td>
+      <td>59</td>
+      <td>624.22</td>
+      <td>10.58</td>
+    </tr>
+    <tr>
+      <td>Leadeatinmaniac</td>
+      <td>35</td>
+      <td>61</td>
+      <td>543.72</td>
+      <td>8.91</td>
+    </tr>
+    <tr>
+      <td>SoulHunter8</td>
+      <td>25</td>
+      <td>50</td>
+      <td>512.83</td>
+      <td>10.26</td>
+    </tr>
+    <tr>
+      <td>HeartsPrincess</td>
+      <td>92</td>
+      <td>51</td>
+      <td>505.47</td>
+      <td>9.91</td>
+    </tr>
+    <tr>
+      <td>Aktash</td>
+      <td>28</td>
+      <td>62</td>
+      <td>502.66</td>
+      <td>8.11</td>
+    </tr>
+    <tr>
+      <td>_Moridin_</td>
+      <td>25</td>
+      <td>44</td>
+      <td>498.69</td>
+      <td>11.33</td>
+    </tr>
+    <tr>
+      <td>Blnko</td>
+      <td>26</td>
+      <td>65</td>
+      <td>494.76</td>
+      <td>7.61</td>
+    </tr>
+    <tr>
+      <td>Manda</td>
+      <td>80</td>
+      <td>51</td>
+      <td>482.57</td>
+      <td>9.46</td>
+    </tr>
+    <tr>
+      <td>Pokeballer</td>
+      <td>30</td>
+      <td>54</td>
+      <td>474.91</td>
+      <td>8.79</td>
+    </tr>
+    <tr>
+      <td>Hotspoon</td>
+      <td>57</td>
+      <td>59</td>
+      <td>466.79</td>
+      <td>7.91</td>
+    </tr>
+    <tr>
+      <td>AnthonyLoretto</td>
+      <td>79</td>
+      <td>63</td>
+      <td>437.05</td>
+      <td>6.94</td>
+    </tr>
+    <tr>
+      <td>Ichaerus</td>
+      <td>20</td>
+      <td>53</td>
+      <td>410.97</td>
+      <td>7.75</td>
+    </tr>
+    <tr>
+      <td>ImSoFoolish</td>
+      <td>42</td>
+      <td>34</td>
+      <td>389.89</td>
+      <td>11.47</td>
+    </tr>
+    <tr>
+      <td>JudgeFudge</td>
+      <td>59</td>
+      <td>51</td>
+      <td>343.82</td>
+      <td>6.74</td>
+    </tr>
+    <tr>
+      <td>Williams</td>
+      <td>97</td>
+      <td>35</td>
+      <td>334.46</td>
+      <td>9.56</td>
+    </tr>
+    <tr>
+      <td>Ehrzvv</td>
+      <td>20</td>
+      <td>36</td>
+      <td>327.71</td>
+      <td>9.10</td>
+    </tr>
+    <tr>
+      <td>Xx_Eugene_xX</td>
+      <td>45</td>
+      <td>28</td>
+      <td>286.64</td>
+      <td>10.24</td>
+    </tr>
+    <tr>
+      <td>talies</td>
+      <td>85</td>
+      <td>24</td>
+      <td>284.40</td>
+      <td>11.85</td>
+    </tr>
+    <tr>
+      <td>Chang_E</td>
+      <td>25</td>
+      <td>26</td>
+      <td>260.88</td>
+      <td>10.03</td>
+    </tr>
+    <tr>
+      <td>TheCreature</td>
+      <td>40</td>
+      <td>19</td>
+      <td>259.41</td>
+      <td>13.65</td>
+    </tr>
+    <tr>
+      <td>Frank3nst3in</td>
+      <td>68</td>
+      <td>34</td>
+      <td>253.73</td>
+      <td>7.46</td>
+    </tr>
+    <tr>
+      <td>MorninGlory</td>
+      <td>38</td>
+      <td>23</td>
+      <td>232.64</td>
+      <td>10.11</td>
+    </tr>
+    <tr>
+      <td>BeerBandit40</td>
+      <td>25</td>
+      <td>36</td>
+      <td>232.53</td>
+      <td>6.46</td>
+    </tr>
+    <tr>
+      <td>PurpleCatnip</td>
+      <td>35</td>
+      <td>25</td>
+      <td>214.40</td>
+      <td>8.58</td>
+    </tr>
+    <tr>
+      <td>aarontrepus</td>
+      <td>39</td>
+      <td>40</td>
+      <td>186.59</td>
+      <td>4.66</td>
+    </tr>
+    <tr>
+      <td>Saltheart</td>
+      <td>94</td>
+      <td>20</td>
+      <td>181.86</td>
+      <td>9.09</td>
+    </tr>
+    <tr>
+      <td>RabbitBrain</td>
+      <td>53</td>
+      <td>21</td>
+      <td>170.22</td>
+      <td>8.11</td>
+    </tr>
+    <tr>
+      <td>Furnace_Funeral</td>
+      <td>35</td>
+      <td>24</td>
+      <td>167.51</td>
+      <td>6.98</td>
+    </tr>
+    <tr>
+      <td>ItBeLewis</td>
+      <td>80</td>
+      <td>21</td>
+      <td>166.90</td>
+      <td>7.95</td>
+    </tr>
+    <tr>
+      <td>Dopplis</td>
+      <td>32</td>
+      <td>15</td>
+      <td>155.96</td>
+      <td>10.40</td>
+    </tr>
+    <tr>
+      <td>sinb</td>
+      <td>68</td>
+      <td>18</td>
+      <td>144.92</td>
+      <td>8.05</td>
+    </tr>
+    <tr>
+      <td>GaloSengen</td>
+      <td>20</td>
+      <td>22</td>
+      <td>140.88</td>
+      <td>6.40</td>
+    </tr>
+    <tr>
+      <td>Lazy_seal</td>
+      <td>29</td>
+      <td>17</td>
+      <td>135.41</td>
+      <td>7.97</td>
+    </tr>
+    <tr>
+      <td>B3Dr1Ch</td>
+      <td>42</td>
+      <td>17</td>
+      <td>122.35</td>
+      <td>7.20</td>
+    </tr>
+    <tr>
+      <td>DocHammerMD</td>
+      <td>71</td>
+      <td>12</td>
+      <td>118.86</td>
+      <td>9.90</td>
+    </tr>
+    <tr>
+      <td>Skunkymonkey69</td>
+      <td>60</td>
+      <td>20</td>
+      <td>114.72</td>
+      <td>5.74</td>
+    </tr>
+    <tr>
+      <td>RinnX</td>
+      <td>75</td>
+      <td>21</td>
+      <td>101.81</td>
+      <td>4.85</td>
+    </tr>
+    <tr>
+      <td>KABOOSE96</td>
+      <td>69</td>
+      <td>19</td>
+      <td>98.96</td>
+      <td>5.21</td>
+    </tr>
+    <tr>
+      <td>-Poenie-</td>
+      <td>60</td>
+      <td>12</td>
+      <td>91.64</td>
+      <td>7.64</td>
+    </tr>
+    <tr>
+      <td>Bloodrose3</td>
+      <td>25</td>
+      <td>10</td>
+      <td>90.81</td>
+      <td>9.08</td>
+    </tr>
+    <tr>
+      <td>Blckmonarch</td>
+      <td>15</td>
+      <td>10</td>
+      <td>86.54</td>
+      <td>8.65</td>
+    </tr>
+    <tr>
+      <td>Bob937</td>
+      <td>55</td>
+      <td>14</td>
+      <td>81.85</td>
+      <td>5.85</td>
+    </tr>
+    <tr>
+      <td>DanniDraven</td>
+      <td>30</td>
+      <td>12</td>
+      <td>78.71</td>
+      <td>6.56</td>
+    </tr>
+    <tr>
+      <td>rocco_saint1</td>
+      <td>30</td>
+      <td>14</td>
+      <td>65.93</td>
+      <td>4.71</td>
+    </tr>
+    <tr>
+      <td>0Bane0</td>
+      <td>23</td>
+      <td>6</td>
+      <td>59.08</td>
+      <td>9.85</td>
+    </tr>
+    <tr>
+      <td>Teej136</td>
+      <td>40</td>
+      <td>6</td>
+      <td>55.26</td>
+      <td>9.21</td>
+    </tr>
+    <tr>
+      <td>bolthead0070</td>
+      <td>60</td>
+      <td>7</td>
+      <td>51.90</td>
+      <td>7.41</td>
+    </tr>
+    <tr>
+      <td>BETA-</td>
+      <td>51</td>
+      <td>6</td>
+      <td>43.78</td>
+      <td>7.30</td>
+    </tr>
+    <tr>
+      <td>The-Silence</td>
+      <td>88</td>
+      <td>6</td>
+      <td>42.10</td>
+      <td>7.02</td>
+    </tr>
+    <tr>
+      <td>PacificDragon</td>
+      <td>16</td>
+      <td>5</td>
+      <td>41.22</td>
+      <td>8.24</td>
+    </tr>
+    <tr>
+      <td>Mahibuki</td>
+      <td>80</td>
+      <td>7</td>
+      <td>39.43</td>
+      <td>5.63</td>
+    </tr>
+    <tr>
+      <td>JumanneStruggle</td>
+      <td>39</td>
+      <td>3</td>
+      <td>36.22</td>
+      <td>12.07</td>
+    </tr>
+    <tr>
+      <td>Farmst</td>
+      <td>40</td>
+      <td>7</td>
+      <td>33.28</td>
+      <td>4.75</td>
+    </tr>
+    <tr>
+      <td>IOIIIIIOI</td>
+      <td>60</td>
+      <td>4</td>
+      <td>27.92</td>
+      <td>6.98</td>
+    </tr>
+    <tr>
+      <td>crazypilot</td>
+      <td>20</td>
+      <td>2</td>
+      <td>25.14</td>
+      <td>12.57</td>
+    </tr>
+    <tr>
+      <td>AfterEight</td>
+      <td>15</td>
+      <td>2</td>
+      <td>20.44</td>
+      <td>10.22</td>
+    </tr>
+    <tr>
+      <td>Paddeyy</td>
+      <td>17</td>
+      <td>2</td>
+      <td>17.11</td>
+      <td>8.55</td>
+    </tr>
+    <tr>
+      <td>alirhl</td>
+      <td>45</td>
+      <td>2</td>
+      <td>16.74</td>
+      <td>8.37</td>
+    </tr>
+    <tr>
+      <td>sogunubica</td>
+      <td>66</td>
+      <td>4</td>
+      <td>16.63</td>
+      <td>4.16</td>
+    </tr>
+    <tr>
+      <td>Lykaios1</td>
+      <td>25</td>
+      <td>2</td>
+      <td>14.79</td>
+      <td>7.39</td>
+    </tr>
+    <tr>
+      <td>Doofenshmirtz</td>
+      <td>25</td>
+      <td>3</td>
+      <td>11.40</td>
+      <td>3.80</td>
+    </tr>
+    <tr>
+      <td>GrayFoxIRL</td>
+      <td>18</td>
+      <td>2</td>
+      <td>11.06</td>
+      <td>5.53</td>
+    </tr>
+    <tr>
+      <td>Maxey9320</td>
+      <td>15</td>
+      <td>1</td>
+      <td>9.64</td>
+      <td>9.64</td>
+    </tr>
+    <tr>
+      <td>Qlas</td>
+      <td>28</td>
+      <td>1</td>
+      <td>6.30</td>
+      <td>6.30</td>
+    </tr>
+    <tr>
+      <td>Ebenz33</td>
+      <td>27</td>
+      <td>1</td>
+      <td>6.23</td>
+      <td>6.23</td>
+    </tr>
+  </tbody>
+</table>
+        </div>
+        
+        <div class="faction-section">
+            <h3>⚔️ House of Dragonborn Members</h3>
+            <table class="dataframe war_report" id="enemy_faction_table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Members</th>
+      <th>Level</th>
+      <th>Attacks</th>
+      <th>Score</th>
+      <th>Avg score/hit</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Roberto</td>
+      <td>100</td>
+      <td>107</td>
+      <td>1,840.44</td>
+      <td>17.20</td>
+    </tr>
+    <tr>
+      <td>SekiroMain</td>
+      <td>64</td>
+      <td>73</td>
+      <td>1,034.51</td>
+      <td>14.17</td>
+    </tr>
+    <tr>
+      <td>Fairleemade</td>
+      <td>15</td>
+      <td>87</td>
+      <td>956.83</td>
+      <td>11.00</td>
+    </tr>
+    <tr>
+      <td>strange2</td>
+      <td>95</td>
+      <td>74</td>
+      <td>947.47</td>
+      <td>12.80</td>
+    </tr>
+    <tr>
+      <td>LuciusAgrippa</td>
+      <td>100</td>
+      <td>69</td>
+      <td>899.07</td>
+      <td>13.03</td>
+    </tr>
+    <tr>
+      <td>TheDon</td>
+      <td>80</td>
+      <td>50</td>
+      <td>681.89</td>
+      <td>13.64</td>
+    </tr>
+    <tr>
+      <td>jackofalltrades</td>
+      <td>82</td>
+      <td>56</td>
+      <td>669.73</td>
+      <td>11.96</td>
+    </tr>
+    <tr>
+      <td>Claw</td>
+      <td>21</td>
+      <td>71</td>
+      <td>664.60</td>
+      <td>9.36</td>
+    </tr>
+    <tr>
+      <td>Skylynninetails</td>
+      <td>48</td>
+      <td>7</td>
+      <td>658.29</td>
+      <td>94.04</td>
+    </tr>
+    <tr>
+      <td>fazza</td>
+      <td>79</td>
+      <td>52</td>
+      <td>618.29</td>
+      <td>11.89</td>
+    </tr>
+    <tr>
+      <td>Jacephantom</td>
+      <td>44</td>
+      <td>69</td>
+      <td>595.16</td>
+      <td>8.63</td>
+    </tr>
+    <tr>
+      <td>Goochflab</td>
+      <td>99</td>
+      <td>52</td>
+      <td>590.63</td>
+      <td>11.36</td>
+    </tr>
+    <tr>
+      <td>Maddog2</td>
+      <td>91</td>
+      <td>47</td>
+      <td>576.12</td>
+      <td>12.26</td>
+    </tr>
+    <tr>
+      <td>TheTwitch</td>
+      <td>90</td>
+      <td>59</td>
+      <td>537.79</td>
+      <td>9.12</td>
+    </tr>
+    <tr>
+      <td>Georgew</td>
+      <td>45</td>
+      <td>39</td>
+      <td>519.45</td>
+      <td>13.32</td>
+    </tr>
+    <tr>
+      <td>SirSriracha</td>
+      <td>48</td>
+      <td>110</td>
+      <td>504.68</td>
+      <td>4.59</td>
+    </tr>
+    <tr>
+      <td>Bealeb</td>
+      <td>61</td>
+      <td>41</td>
+      <td>470.82</td>
+      <td>11.48</td>
+    </tr>
+    <tr>
+      <td>Peuu</td>
+      <td>25</td>
+      <td>61</td>
+      <td>467.40</td>
+      <td>7.66</td>
+    </tr>
+    <tr>
+      <td>LeatherB</td>
+      <td>65</td>
+      <td>58</td>
+      <td>464.02</td>
+      <td>8.00</td>
+    </tr>
+    <tr>
+      <td>S_S</td>
+      <td>80</td>
+      <td>62</td>
+      <td>449.65</td>
+      <td>7.25</td>
+    </tr>
+    <tr>
+      <td>Dvalin</td>
+      <td>75</td>
+      <td>38</td>
+      <td>443.05</td>
+      <td>11.66</td>
+    </tr>
+    <tr>
+      <td>Archerrr</td>
+      <td>77</td>
+      <td>46</td>
+      <td>408.13</td>
+      <td>8.87</td>
+    </tr>
+    <tr>
+      <td>Darthylicious</td>
+      <td>50</td>
+      <td>70</td>
+      <td>392.52</td>
+      <td>5.61</td>
+    </tr>
+    <tr>
+      <td>Norseman1</td>
+      <td>64</td>
+      <td>51</td>
+      <td>372.15</td>
+      <td>7.30</td>
+    </tr>
+    <tr>
+      <td>Matty_Dean</td>
+      <td>74</td>
+      <td>54</td>
+      <td>333.32</td>
+      <td>6.17</td>
+    </tr>
+    <tr>
+      <td>TheCatsPyjamas</td>
+      <td>49</td>
+      <td>39</td>
+      <td>329.06</td>
+      <td>8.44</td>
+    </tr>
+    <tr>
+      <td>Krypteia</td>
+      <td>25</td>
+      <td>40</td>
+      <td>321.02</td>
+      <td>8.03</td>
+    </tr>
+    <tr>
+      <td>caioluis</td>
+      <td>79</td>
+      <td>24</td>
+      <td>306.24</td>
+      <td>12.76</td>
+    </tr>
+    <tr>
+      <td>Lesrata</td>
+      <td>60</td>
+      <td>36</td>
+      <td>280.11</td>
+      <td>7.78</td>
+    </tr>
+    <tr>
+      <td>redcars1</td>
+      <td>75</td>
+      <td>35</td>
+      <td>259.12</td>
+      <td>7.40</td>
+    </tr>
+    <tr>
+      <td>BabyNina</td>
+      <td>38</td>
+      <td>37</td>
+      <td>249.78</td>
+      <td>6.75</td>
+    </tr>
+    <tr>
+      <td>--Poison-Ivy-</td>
+      <td>50</td>
+      <td>38</td>
+      <td>243.29</td>
+      <td>6.40</td>
+    </tr>
+    <tr>
+      <td>Zombie125</td>
+      <td>20</td>
+      <td>46</td>
+      <td>231.99</td>
+      <td>5.04</td>
+    </tr>
+    <tr>
+      <td>YuumiHeart</td>
+      <td>8</td>
+      <td>42</td>
+      <td>227.40</td>
+      <td>5.41</td>
+    </tr>
+    <tr>
+      <td>Mentali</td>
+      <td>86</td>
+      <td>21</td>
+      <td>227.10</td>
+      <td>10.81</td>
+    </tr>
+    <tr>
+      <td>Vikingr</td>
+      <td>75</td>
+      <td>30</td>
+      <td>213.66</td>
+      <td>7.12</td>
+    </tr>
+    <tr>
+      <td>Haruka11</td>
+      <td>23</td>
+      <td>47</td>
+      <td>200.23</td>
+      <td>4.26</td>
+    </tr>
+    <tr>
+      <td>Guardian-Angel</td>
+      <td>15</td>
+      <td>33</td>
+      <td>190.80</td>
+      <td>5.78</td>
+    </tr>
+    <tr>
+      <td>HiUpDown</td>
+      <td>22</td>
+      <td>38</td>
+      <td>182.34</td>
+      <td>4.80</td>
+    </tr>
+    <tr>
+      <td>Old</td>
+      <td>63</td>
+      <td>29</td>
+      <td>172.51</td>
+      <td>5.95</td>
+    </tr>
+    <tr>
+      <td>SadgeJava</td>
+      <td>32</td>
+      <td>48</td>
+      <td>170.65</td>
+      <td>3.56</td>
+    </tr>
+    <tr>
+      <td>GruttePierFrl</td>
+      <td>82</td>
+      <td>24</td>
+      <td>169.37</td>
+      <td>7.06</td>
+    </tr>
+    <tr>
+      <td>jimmyrids</td>
+      <td>15</td>
+      <td>41</td>
+      <td>164.19</td>
+      <td>4.00</td>
+    </tr>
+    <tr>
+      <td>keyfoot</td>
+      <td>43</td>
+      <td>38</td>
+      <td>161.79</td>
+      <td>4.26</td>
+    </tr>
+    <tr>
+      <td>1SOLIDKEEPER</td>
+      <td>64</td>
+      <td>35</td>
+      <td>159.45</td>
+      <td>4.56</td>
+    </tr>
+    <tr>
+      <td>Mylad</td>
+      <td>35</td>
+      <td>28</td>
+      <td>155.32</td>
+      <td>5.55</td>
+    </tr>
+    <tr>
+      <td>lil_beezy</td>
+      <td>42</td>
+      <td>43</td>
+      <td>148.12</td>
+      <td>3.44</td>
+    </tr>
+    <tr>
+      <td>Serenitia</td>
+      <td>30</td>
+      <td>19</td>
+      <td>146.97</td>
+      <td>7.74</td>
+    </tr>
+    <tr>
+      <td>A1D</td>
+      <td>41</td>
+      <td>28</td>
+      <td>143.82</td>
+      <td>5.14</td>
+    </tr>
+    <tr>
+      <td>styrofoamgod</td>
+      <td>80</td>
+      <td>8</td>
+      <td>137.32</td>
+      <td>17.16</td>
+    </tr>
+    <tr>
+      <td>Jealousarow</td>
+      <td>15</td>
+      <td>30</td>
+      <td>134.63</td>
+      <td>4.49</td>
+    </tr>
+    <tr>
+      <td>tamago</td>
+      <td>69</td>
+      <td>14</td>
+      <td>133.98</td>
+      <td>9.57</td>
+    </tr>
+    <tr>
+      <td>RizzaParks</td>
+      <td>41</td>
+      <td>23</td>
+      <td>129.67</td>
+      <td>5.64</td>
+    </tr>
+    <tr>
+      <td>Dertrac</td>
+      <td>31</td>
+      <td>21</td>
+      <td>119.83</td>
+      <td>5.71</td>
+    </tr>
+    <tr>
+      <td>KiloBrown64K</td>
+      <td>47</td>
+      <td>15</td>
+      <td>116.15</td>
+      <td>7.74</td>
+    </tr>
+    <tr>
+      <td>SteveDodge</td>
+      <td>60</td>
+      <td>19</td>
+      <td>105.58</td>
+      <td>5.56</td>
+    </tr>
+    <tr>
+      <td>Xeromidas</td>
+      <td>70</td>
+      <td>23</td>
+      <td>103.98</td>
+      <td>4.52</td>
+    </tr>
+    <tr>
+      <td>DevilsLostAngel</td>
+      <td>20</td>
+      <td>32</td>
+      <td>103.58</td>
+      <td>3.24</td>
+    </tr>
+    <tr>
+      <td>Kenergy</td>
+      <td>33</td>
+      <td>13</td>
+      <td>92.63</td>
+      <td>7.13</td>
+    </tr>
+    <tr>
+      <td>Snake-Plissken</td>
+      <td>26</td>
+      <td>18</td>
+      <td>91.13</td>
+      <td>5.06</td>
+    </tr>
+    <tr>
+      <td>griffin47</td>
+      <td>50</td>
+      <td>10</td>
+      <td>88.53</td>
+      <td>8.85</td>
+    </tr>
+    <tr>
+      <td>Chug-Norris</td>
+      <td>20</td>
+      <td>19</td>
+      <td>88.48</td>
+      <td>4.66</td>
+    </tr>
+    <tr>
+      <td>z1m0x2n8c3b7</td>
+      <td>29</td>
+      <td>19</td>
+      <td>84.13</td>
+      <td>4.43</td>
+    </tr>
+    <tr>
+      <td>IrishNPC</td>
+      <td>20</td>
+      <td>17</td>
+      <td>82.90</td>
+      <td>4.88</td>
+    </tr>
+    <tr>
+      <td>Quim</td>
+      <td>96</td>
+      <td>9</td>
+      <td>82.16</td>
+      <td>9.13</td>
+    </tr>
+    <tr>
+      <td>IAmTheGrizz</td>
+      <td>25</td>
+      <td>14</td>
+      <td>80.30</td>
+      <td>5.74</td>
+    </tr>
+    <tr>
+      <td>WildFoxtrot</td>
+      <td>15</td>
+      <td>17</td>
+      <td>79.98</td>
+      <td>4.70</td>
+    </tr>
+    <tr>
+      <td>Dillono</td>
+      <td>60</td>
+      <td>21</td>
+      <td>77.59</td>
+      <td>3.69</td>
+    </tr>
+    <tr>
+      <td>DoofusJerry</td>
+      <td>53</td>
+      <td>16</td>
+      <td>72.15</td>
+      <td>4.51</td>
+    </tr>
+    <tr>
+      <td>Klem</td>
+      <td>77</td>
+      <td>5</td>
+      <td>63.95</td>
+      <td>12.79</td>
+    </tr>
+    <tr>
+      <td>Tanarra</td>
+      <td>73</td>
+      <td>9</td>
+      <td>53.15</td>
+      <td>5.91</td>
+    </tr>
+    <tr>
+      <td>Bombiii</td>
+      <td>40</td>
+      <td>6</td>
+      <td>44.75</td>
+      <td>7.46</td>
+    </tr>
+    <tr>
+      <td>Da_real_Toxic</td>
+      <td>50</td>
+      <td>5</td>
+      <td>39.70</td>
+      <td>7.94</td>
+    </tr>
+    <tr>
+      <td>L3onidas</td>
+      <td>57</td>
+      <td>6</td>
+      <td>31.24</td>
+      <td>5.21</td>
+    </tr>
+    <tr>
+      <td>Rebeca</td>
+      <td>60</td>
+      <td>5</td>
+      <td>30.87</td>
+      <td>6.17</td>
+    </tr>
+    <tr>
+      <td>AtaBerkC</td>
+      <td>23</td>
+      <td>4</td>
+      <td>30.34</td>
+      <td>7.58</td>
+    </tr>
+    <tr>
+      <td>Bluewolff</td>
+      <td>33</td>
+      <td>4</td>
+      <td>26.99</td>
+      <td>6.75</td>
+    </tr>
+    <tr>
+      <td>Austin</td>
+      <td>55</td>
+      <td>7</td>
+      <td>20.53</td>
+      <td>2.93</td>
+    </tr>
+    <tr>
+      <td>_AMIT_</td>
+      <td>60</td>
+      <td>3</td>
+      <td>17.49</td>
+      <td>5.83</td>
+    </tr>
+    <tr>
+      <td>kindman</td>
+      <td>55</td>
+      <td>3</td>
+      <td>16.96</td>
+      <td>5.65</td>
+    </tr>
+    <tr>
+      <td>Mineallmine</td>
+      <td>55</td>
+      <td>2</td>
+      <td>13.93</td>
+      <td>6.96</td>
+    </tr>
+    <tr>
+      <td>SepticSeption</td>
+      <td>75</td>
+      <td>3</td>
+      <td>11.50</td>
+      <td>3.83</td>
+    </tr>
+    <tr>
+      <td>fie313</td>
+      <td>28</td>
+      <td>1</td>
+      <td>10.00</td>
+      <td>10.00</td>
+    </tr>
+    <tr>
+      <td>FlameEmperor</td>
+      <td>62</td>
+      <td>1</td>
+      <td>8.62</td>
+      <td>8.62</td>
+    </tr>
+    <tr>
+      <td>Jayster_9000</td>
+      <td>68</td>
+      <td>2</td>
+      <td>7.45</td>
+      <td>3.73</td>
+    </tr>
+    <tr>
+      <td>SliverPython</td>
+      <td>75</td>
+      <td>1</td>
+      <td>3.66</td>
+      <td>3.66</td>
+    </tr>
+    <tr>
+      <td>MasterShoron</td>
+      <td>30</td>
+      <td>1</td>
+      <td>3.35</td>
+      <td>3.35</td>
+    </tr>
+    <tr>
+      <td>Nluecrue</td>
+      <td>24</td>
+      <td>1</td>
+      <td>3.05</td>
+      <td>3.05</td>
+    </tr>
+  </tbody>
+</table>
+        </div>
+        
+
+    <script>
+    function sortTable(columnIndex) {
+        const table = document.getElementById('war_report');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const header = table.querySelectorAll('th')[columnIndex];
+        
+        // Determine sort direction
+        let isAscending = !header.classList.contains('sort-asc');
+        
+        // Clear all sort indicators
+        table.querySelectorAll('th').forEach(th => {
+            th.classList.remove('sort-asc', 'sort-desc');
+        });
+        
+        // Add sort indicator to current header
+        header.classList.add(isAscending ? 'sort-asc' : 'sort-desc');
+        
+        // Sort rows
+        rows.sort((a, b) => {
+            let aValue = a.cells[columnIndex].textContent.trim();
+            let bValue = b.cells[columnIndex].textContent.trim();
+            
+            // Handle numeric values (remove commas and $ signs)
+            if (aValue.match(/^[\d,.$]+$/)) {
+                aValue = parseFloat(aValue.replace(/[,$]/g, '')) || 0;
+                bValue = parseFloat(bValue.replace(/[,$]/g, '')) || 0;
+                return isAscending ? aValue - bValue : bValue - aValue;
+            }
+            
+            // Handle text values
+            return isAscending ? 
+                aValue.localeCompare(bValue) : 
+                bValue.localeCompare(aValue);
+        });
+        
+        // Reinsert sorted rows
+        rows.forEach(row => tbody.appendChild(row));
+    }
+    
+    // Add click handlers to headers for both tables
+    document.addEventListener('DOMContentLoaded', function() {
+        const ourHeaders = document.querySelectorAll('#our_faction_table th');
+        const enemyHeaders = document.querySelectorAll('#enemy_faction_table th');
+        
+        ourHeaders.forEach((header, index) => {
+            header.addEventListener('click', () => sortTableById('our_faction_table', index));
+        });
+        
+        enemyHeaders.forEach((header, index) => {
+            header.addEventListener('click', () => sortTableById('enemy_faction_table', index));
+        });
+    });
+    
+    function sortTableById(tableId, columnIndex) {
+        const table = document.getElementById(tableId);
+        if (!table) return;
+        
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const header = table.querySelectorAll('th')[columnIndex];
+        
+        // Determine sort direction
+        let isAscending = !header.classList.contains('sort-asc');
+        
+        // Clear all sort indicators for this table
+        table.querySelectorAll('th').forEach(th => {
+            th.classList.remove('sort-asc', 'sort-desc');
+        });
+        
+        // Add sort indicator to current header
+        header.classList.add(isAscending ? 'sort-asc' : 'sort-desc');
+        
+        // Sort rows
+        rows.sort((a, b) => {
+            let aValue = a.cells[columnIndex].textContent.trim();
+            let bValue = b.cells[columnIndex].textContent.trim();
+            
+            // Handle numeric values (remove commas and $ signs)
+            if (aValue.match(/^[\d,.$]+$/)) {
+                aValue = parseFloat(aValue.replace(/[,$]/g, '')) || 0;
+                bValue = parseFloat(bValue.replace(/[,$]/g, '')) || 0;
+                return isAscending ? aValue - bValue : bValue - aValue;
+            }
+            
+            // Handle text values
+            return isAscending ? 
+                aValue.localeCompare(bValue) : 
+                bValue.localeCompare(aValue);
+        });
+        
+        // Reinsert sorted rows
+        rows.forEach(row => tbody.appendChild(row));
+    }
+    </script>
+</body>
+</html>
