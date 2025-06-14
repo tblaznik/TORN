@@ -1,13 +1,57 @@
 import requests
 import json
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 import pandas as pd
+import locale
 
 class TornWarReport:
     def __init__(self, api_key, faction_id=None, war_id=None):
         self.api_key = api_key
         self.faction_id = faction_id
         self.war_id = war_id
+        
+    def format_european_number(self, num):
+        """Format numbers with European standards: . as thousands separator, , as decimal"""
+        if isinstance(num, (int, float)):
+            # Convert to string with comma as decimal separator and dot as thousands separator
+            formatted = f"{num:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+            # Remove trailing zeros after decimal comma
+            if ',' in formatted:
+                formatted = formatted.rstrip('0').rstrip(',')
+            return formatted
+        return str(num)
+    
+    def convert_to_tct(self, timestamp):
+        """Take API timestamp and subtract 2 hours, then display"""
+        if timestamp:
+            dt = datetime.fromtimestamp(timestamp)
+            # Subtract 2 hours
+            tct_dt = dt - timedelta(hours=2)
+            return tct_dt.strftime('%Y-%m-%d %H:%M:%S TCT')
+        return "Unknown"
+    
+    def format_duration_hms(self, hours):
+        """Format duration as HH:MM:SS"""
+        if hours:
+            total_seconds = int(hours * 3600)
+            hours_part = total_seconds // 3600
+            minutes_part = (total_seconds % 3600) // 60
+            seconds_part = total_seconds % 60
+            return f"{hours_part:02d}:{minutes_part:02d}:{seconds_part:02d}"
+        return "00:00:00"
+    
+    def calculate_battle_stats(self, attacks, duration_hours):
+        """Calculate hits per minute"""
+        if attacks and duration_hours and duration_hours > 0:
+            hits_per_min = attacks / (duration_hours * 60)
+            return f"{hits_per_min:.5g}".replace('.', ',')  # Use European format
+        return 0.0
+    
+    def calculate_avg_hit_score(self, score, attacks):
+        """Calculate average score per hit"""
+        if score and attacks and attacks > 0:
+            return round(score / attacks, 2)
+        return 0.0
         
     def make_api_request(self, endpoint, api_version="v1"):
         if api_version == "v1":
@@ -106,7 +150,7 @@ class TornWarReport:
         if enemy_faction_data:
             print(f"Enemy faction: {enemy_faction_data.get('name', f'ID_{enemy_faction_id}')} (ID: {enemy_faction_id})")
         
-        print(f"War period: {datetime.fromtimestamp(war_start)} to {datetime.fromtimestamp(war_end)}")
+        print(f"War period: {self.convert_to_tct(war_start)} to {self.convert_to_tct(war_end)}")
         print(f"Our faction score: {our_faction_data.get('score', 0)}")
         if enemy_faction_data:
             print(f"Enemy faction score: {enemy_faction_data.get('score', 0)}")
@@ -146,7 +190,7 @@ class TornWarReport:
             total_attacks += member_attacks
             total_score += member_score
             
-            avg_score_hit = round(member_score / member_attacks, 2) if member_attacks > 0 else 0
+            avg_score_hit = member_score / member_attacks if member_attacks > 0 else 0
             
             member_stats[member_id] = {
                 'name': member_name,
@@ -168,7 +212,7 @@ class TornWarReport:
             enemy_total_attacks += member_attacks
             enemy_total_score += member_score
             
-            avg_score_hit = round(member_score / member_attacks, 2) if member_attacks > 0 else 0
+            avg_score_hit = member_score / member_attacks if member_attacks > 0 else 0
             
             member_stats[f"enemy_{member_id}"] = {
                 'name': member_name,
@@ -208,11 +252,11 @@ class TornWarReport:
         for member_id, stats in data['member_stats'].items():
             if stats['attacks'] > 0:  # Only show members who participated
                 row = {
-                    'Members': stats['name'],
+                    'Members': f'<a href="https://www.torn.com/profiles.php?XID={member_id.replace("enemy_", "")}" target="_blank" style="color: #ffffff; text-decoration: none;">{stats["name"]}</a>',
                     'Level': stats['level'],
                     'Attacks': stats['attacks'],
-                    'Score': f"{stats['score']:,.2f}",
-                    'Avg score/hit': f"{stats['avg_score_hit']:,.2f}"
+                    'Score': self.format_european_number(stats['score']),
+                    'Avg score/hit': self.format_european_number(stats['avg_score_hit'])
                 }
                 
                 if stats['faction'] == 'Our Faction':
@@ -227,21 +271,33 @@ class TornWarReport:
         our_df = pd.DataFrame(our_rows) if our_rows else pd.DataFrame()
         enemy_df = pd.DataFrame(enemy_rows) if enemy_rows else pd.DataFrame()
         
-        # Sort both by score descending
+        # Sort both by score descending (need to convert back to float for sorting)
         if not our_df.empty:
-            our_df = our_df.sort_values('Score', key=lambda x: x.str.replace(',', '').astype(float), ascending=False)
+            our_df['_sort_score'] = our_df['Score'].str.replace('.', '').str.replace(',', '.').astype(float)
+            our_df = our_df.sort_values('_sort_score', ascending=False)
+            our_df = our_df.drop('_sort_score', axis=1)
+            
         if not enemy_df.empty:
-            enemy_df = enemy_df.sort_values('Score', key=lambda x: x.str.replace(',', '').astype(float), ascending=False)
+            enemy_df['_sort_score'] = enemy_df['Score'].str.replace('.', '').str.replace(',', '.').astype(float)
+            enemy_df = enemy_df.sort_values('_sort_score', ascending=False)
+            enemy_df = enemy_df.drop('_sort_score', axis=1)
         
         return our_df, enemy_df, data
     
     def create_styled_html_report(self, our_df, enemy_df, war_data):
-        """Create a styled HTML table report using templates"""
+        """Create a styled HTML table report using templates with European formatting and TCT times"""
         
-        # War info
-        war_start = datetime.fromtimestamp(war_data['war_start']).strftime('%Y-%m-%d %H:%M:%S')
-        war_end = datetime.fromtimestamp(war_data['war_end']).strftime('%Y-%m-%d %H:%M:%S')
-        war_duration = (war_data['war_end'] - war_data['war_start']) / 3600
+        # War info with TCT times and duration formatting
+        war_start = self.convert_to_tct(war_data['war_start'])
+        war_end = self.convert_to_tct(war_data['war_end'])
+        war_duration_hours = (war_data['war_end'] - war_data['war_start']) / 3600
+        war_duration_formatted = self.format_duration_hms(war_duration_hours)
+        
+        # Calculate battle stats
+        our_hits_per_min = self.calculate_battle_stats(war_data['our_attacks'], war_duration_hours)
+        our_avg_hit_score = self.calculate_avg_hit_score(war_data['our_score'], war_data['our_attacks'])
+        enemy_hits_per_min = self.calculate_battle_stats(war_data['enemy_attacks'], war_duration_hours)
+        enemy_avg_hit_score = self.calculate_avg_hit_score(war_data['enemy_score'], war_data['enemy_attacks'])
         
         # Convert DataFrames to HTML tables
         our_table_html = ""
@@ -265,16 +321,52 @@ class TornWarReport:
                 border=0
             )
         
-        # Create combined table HTML with side-by-side layout
+        # Create combined table HTML with side-by-side layout and faction colors (EPIC Mafia = GREEN, Enemy = RED/ORANGE)
         tables_html = f"""
         <div class="tables-container">
             <div class="faction-section">
-                <h3>🏆 EPIC Mafia Members</h3>
+                <h3 style="background: linear-gradient(135deg, #2d5a2d, #4a8b4a); color: white; padding: 15px; border-radius: 8px;">EPIC Mafia</h3>
+                <div class="faction-stats our-stats" style="margin-bottom: 15px;">
+                    <div class="stat-box">
+                        <div class="stat-number">{self.format_european_number(war_data['our_attacks'])}</div>
+                        <div class="stat-label">Our Attacks</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">{self.format_european_number(war_data['our_score'])}</div>
+                        <div class="stat-label">Our Score</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">{self.format_european_number(our_hits_per_min)}</div>
+                        <div class="stat-label">Hits/Min</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">{self.format_european_number(our_avg_hit_score)}</div>
+                        <div class="stat-label">Avg Hit Score</div>
+                    </div>
+                </div>
                 {our_table_html}
             </div>
             
             <div class="faction-section">
-                <h3>⚔️ {war_data['enemy_faction_name']} Members</h3>
+                <h3 style="background: linear-gradient(135deg, #cc4d1f, #e55a2b); color: white; padding: 15px; border-radius: 8px;">{war_data['enemy_faction_name']}</h3>
+                <div class="faction-stats enemy-stats" style="margin-bottom: 15px;">
+                    <div class="stat-box">
+                        <div class="stat-number">{self.format_european_number(war_data['enemy_attacks'])}</div>
+                        <div class="stat-label">Enemy Attacks</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">{self.format_european_number(war_data['enemy_score'])}</div>
+                        <div class="stat-label">Enemy Score</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">{self.format_european_number(enemy_hits_per_min)}</div>
+                        <div class="stat-label">Hits/Min</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">{self.format_european_number(enemy_avg_hit_score)}</div>
+                        <div class="stat-label">Avg Hit Score</div>
+                    </div>
+                </div>
                 {enemy_table_html}
             </div>
         </div>
@@ -288,15 +380,19 @@ class TornWarReport:
             print("Template file not found, creating basic template...")
             template = self.get_default_template()
         
-        # Replace placeholders with actual data
+        # Replace placeholders with actual data (using European formatting)
         html = template.replace('{{WAR_ID}}', str(war_data['war_info']['war_id']))
         html = html.replace('{{WAR_START}}', war_start)
         html = html.replace('{{WAR_END}}', war_end)
-        html = html.replace('{{WAR_DURATION}}', f"{war_duration:.1f}")
-        html = html.replace('{{OUR_ATTACKS}}', str(war_data['our_attacks']))
-        html = html.replace('{{OUR_SCORE}}', f"{war_data['our_score']:,.0f}")
-        html = html.replace('{{ENEMY_ATTACKS}}', str(war_data['enemy_attacks']))
-        html = html.replace('{{ENEMY_SCORE}}', f"{war_data['enemy_score']:,.0f}")
+        html = html.replace('{{WAR_DURATION}}', war_duration_formatted)
+        html = html.replace('{{OUR_ATTACKS}}', self.format_european_number(war_data['our_attacks']))
+        html = html.replace('{{OUR_SCORE}}', self.format_european_number(war_data['our_score']))
+        html = html.replace('{{ENEMY_ATTACKS}}', self.format_european_number(war_data['enemy_attacks']))
+        html = html.replace('{{ENEMY_SCORE}}', self.format_european_number(war_data['enemy_score']))
+        html = html.replace('{{OUR_HITS_PER_MIN}}', self.format_european_number(our_hits_per_min))
+        html = html.replace('{{OUR_AVG_HIT_SCORE}}', self.format_european_number(our_avg_hit_score))
+        html = html.replace('{{ENEMY_HITS_PER_MIN}}', self.format_european_number(enemy_hits_per_min))
+        html = html.replace('{{ENEMY_AVG_HIT_SCORE}}', self.format_european_number(enemy_avg_hit_score))
         html = html.replace('{{ENEMY_FACTION_NAME}}', war_data['enemy_faction_name'])
         html = html.replace('{{TABLE_HTML}}', tables_html)
         
@@ -306,7 +402,10 @@ class TornWarReport:
         """Fallback template if file not found"""
         return """<!DOCTYPE html>
         <html>
-        <head><title>War Report</title></head>
+        <head>
+            <meta charset="UTF-8">
+            <title>War Report</title>
+        </head>
         <body>
         <h1>War Report {{WAR_ID}}</h1>
         <p>Period: {{WAR_START}} - {{WAR_END}}</p>
@@ -329,10 +428,10 @@ def main():
         if result and len(result) == 3 and (not result[0].empty or not result[1].empty):
             our_df, enemy_df, raw_data = result
             print("\nWAR EARNINGS REPORT GENERATED!")
-            print(f"Our Attacks: {raw_data['our_attacks']}")
-            print(f"Our Score: {raw_data['our_score']:,.2f}")
-            print(f"Enemy Attacks: {raw_data['enemy_attacks']}")
-            print(f"Enemy Score: {raw_data['enemy_score']:,.2f}")
+            print(f"Our Attacks: {reporter.format_european_number(raw_data['our_attacks'])}")
+            print(f"Our Score: {reporter.format_european_number(raw_data['our_score'])}")
+            print(f"Enemy Attacks: {reporter.format_european_number(raw_data['enemy_attacks'])}")
+            print(f"Enemy Score: {reporter.format_european_number(raw_data['enemy_score'])}")
             
             if not our_df.empty:
                 print("\nOur Top 10 Members:")
