@@ -36,10 +36,9 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.5);
     }
     table.war_report th {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       padding: 12px 8px;
-      text-align: left;
+      text-align: center;
       font-weight: bold;
       font-size: 14px;
       border-bottom: 2px solid #555;
@@ -47,6 +46,32 @@
       cursor: pointer;
       user-select: none;
       position: relative;
+    }
+    
+    /* Header section color coding */
+    table.war_report th:nth-child(1),  /* Member */
+    table.war_report th:nth-child(2),  /* Respect */
+    table.war_report th:nth-child(3),  /* Best */
+    table.war_report th:nth-child(4),  /* Avg */
+    table.war_report th:nth-child(5) { /* Attacks */
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    table.war_report th:nth-child(6),  /* War */
+    table.war_report th:nth-child(7) { /* Outside */
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    table.war_report th:nth-child(8),   /* Leave */
+    table.war_report th:nth-child(9),   /* Hosp */
+    table.war_report th:nth-child(10),  /* Mug */
+    table.war_report th:nth-child(11),  /* Retal */
+    table.war_report th:nth-child(12),  /* Overseas */
+    table.war_report th:nth-child(13),  /* Draw */
+    table.war_report th:nth-child(14),  /* Assist */
+    table.war_report th:nth-child(15),  /* Escape */
+    table.war_report th:nth-child(16) { /* Loss */
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
     }
     table.war_report th:last-child {
       border-right: none;
@@ -85,6 +110,26 @@
       background-color: #404040;
       transition: background-color 0.2s;
     }
+    /* Totals row styling - same as cells but bold */
+    table.war_report .totals-row {
+      background-color: #333333 !important;
+    }
+    table.war_report .totals-row:hover {
+      background-color: #333333 !important; /* Don't change on hover */
+    }
+    table.war_report .totals-cell {
+      background: #333333 !important;
+      color: #ffffff;
+      font-weight: bold;
+      border-bottom: 2px solid #555;
+      padding: 12px 8px;
+      text-align: center;
+      cursor: default !important; /* Remove pointer cursor */
+    }
+    /* Remove sorting arrows from totals row */
+    table.war_report .totals-cell::after {
+      content: '' !important;
+    }
   </style>
 </head>
 <body>
@@ -104,19 +149,25 @@
       const rows = Array.from(tbody.querySelectorAll('tr'));
       const header = table.querySelectorAll('th')[columnIndex];
       
+      // Skip the first header row when getting the column header for sorting
+      const actualHeaders = table.querySelectorAll('thead tr:first-child th');
+      const actualHeader = actualHeaders[columnIndex];
+      
       // Determine sort direction
-      let isAscending = !header.classList.contains('sort-asc');
+      let isAscending = !actualHeader.classList.contains('sort-asc');
       
       // Clear all sort indicators
-      table.querySelectorAll('th').forEach(th => {
+      actualHeaders.forEach(th => {
         th.classList.remove('sort-asc', 'sort-desc');
       });
       
       // Add sort indicator to current header
-      header.classList.add(isAscending ? 'sort-asc' : 'sort-desc');
+      actualHeader.classList.add(isAscending ? 'sort-asc' : 'sort-desc');
       
-      // Sort rows
-      rows.sort((a, b) => {
+      // Sort rows (excluding totals row by checking if it contains TOTALS)
+      const dataRows = rows.filter(row => !row.textContent.includes('TOTALS'));
+      
+      dataRows.sort((a, b) => {
         let aValue = a.cells[columnIndex].textContent.trim();
         let bValue = b.cells[columnIndex].textContent.trim();
         
@@ -129,17 +180,17 @@
           return isAscending ? aValue - bValue : bValue - aValue;
         }
         
-        // Handle European numeric values (remove dots and replace comma with dot)
-        if (aValue.match(/^[\d.,]+$/)) {
-          aValue = parseFloat(aValue.replace(/\./g, '').replace(/,/g, '.')) || 0;
-          bValue = parseFloat(bValue.replace(/\./g, '').replace(/,/g, '.')) || 0;
+        // Handle American numeric values (remove commas for thousands separator)
+        if (aValue.match(/^[\d,]+\.?\d*$/)) {
+          aValue = parseFloat(aValue.replace(/,/g, '')) || 0;
+          bValue = parseFloat(bValue.replace(/,/g, '')) || 0;
           return isAscending ? aValue - bValue : bValue - aValue;
         }
         
         // Handle percentage values
         if (aValue.includes('%')) {
-          aValue = parseFloat(aValue.replace('%', '').replace(',', '.')) || 0;
-          bValue = parseFloat(bValue.replace('%', '').replace(',', '.')) || 0;
+          aValue = parseFloat(aValue.replace('%', '')) || 0;
+          bValue = parseFloat(bValue.replace('%', '')) || 0;
           return isAscending ? aValue - bValue : bValue - aValue;
         }
         
@@ -149,14 +200,15 @@
           bValue.localeCompare(aValue);
       });
       
-      // Reinsert sorted rows
-      rows.forEach(row => tbody.appendChild(row));
+      // Clear tbody and reinsert sorted rows
+      tbody.innerHTML = '';
+      dataRows.forEach(row => tbody.appendChild(row));
     }
     
-    // Add click handlers to headers
+    // Add click handlers to headers (only the first header row, not totals row)
     document.addEventListener('DOMContentLoaded', function() {
       setTimeout(function() {
-        const headers = document.querySelectorAll('table.war_report th');
+        const headers = document.querySelectorAll('table.war_report thead tr:first-child th');
         headers.forEach((header, index) => {
           header.addEventListener('click', () => sortTable(index));
         });

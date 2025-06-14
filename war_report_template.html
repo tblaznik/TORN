@@ -302,17 +302,17 @@
             let aValue = a.cells[columnIndex].textContent.trim();
             let bValue = b.cells[columnIndex].textContent.trim();
             
-            // Handle European numeric values (remove dots and replace comma with dot)
-            if (aValue.match(/^[\d.,]+$/)) {
-                aValue = parseFloat(aValue.replace(/\./g, '').replace(/,/g, '.')) || 0;
-                bValue = parseFloat(bValue.replace(/\./g, '').replace(/,/g, '.')) || 0;
+            // Handle American numeric values (remove commas for thousands separator)
+            if (aValue.match(/^[\d,]+\.?\d*$/)) {
+                aValue = parseFloat(aValue.replace(/,/g, '')) || 0;
+                bValue = parseFloat(bValue.replace(/,/g, '')) || 0;
                 return isAscending ? aValue - bValue : bValue - aValue;
             }
             
             // Handle percentage values
             if (aValue.includes('%')) {
-                aValue = parseFloat(aValue.replace('%', '').replace(',', '.')) || 0;
-                bValue = parseFloat(bValue.replace('%', '').replace(',', '.')) || 0;
+                aValue = parseFloat(aValue.replace('%', '')) || 0;
+                bValue = parseFloat(bValue.replace('%', '')) || 0;
                 return isAscending ? aValue - bValue : bValue - aValue;
             }
             
@@ -365,17 +365,17 @@
             let aValue = a.cells[columnIndex].textContent.trim();
             let bValue = b.cells[columnIndex].textContent.trim();
             
-            // Handle European numeric values (remove dots and replace comma with dot)
-            if (aValue.match(/^[\d.,]+$/)) {
-                aValue = parseFloat(aValue.replace(/\./g, '').replace(/,/g, '.')) || 0;
-                bValue = parseFloat(bValue.replace(/\./g, '').replace(/,/g, '.')) || 0;
+            // Handle American numeric values (remove commas for thousands separator)
+            if (aValue.match(/^[\d,]+\.?\d*$/)) {
+                aValue = parseFloat(aValue.replace(/,/g, '')) || 0;
+                bValue = parseFloat(bValue.replace(/,/g, '')) || 0;
                 return isAscending ? aValue - bValue : bValue - aValue;
             }
             
             // Handle percentage values
             if (aValue.includes('%')) {
-                aValue = parseFloat(aValue.replace('%', '').replace(',', '.')) || 0;
-                bValue = parseFloat(bValue.replace('%', '').replace(',', '.')) || 0;
+                aValue = parseFloat(aValue.replace('%', '')) || 0;
+                bValue = parseFloat(bValue.replace('%', '')) || 0;
                 return isAscending ? aValue - bValue : bValue - aValue;
             }
             
