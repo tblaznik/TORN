@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>War Report</title>
-        <meta charset="UTF-8">
-        <style>
+<head>
+    <title>War Report</title>
+    <meta charset="UTF-8">
+    <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 20px;
@@ -110,6 +110,7 @@
             color: white;
             display: flex;
             justify-content: space-around;
+            flex-wrap: wrap;
         }
         .our-stats {
             background: linear-gradient(135deg, #2d5a2d, #4a8b4a);
@@ -119,15 +120,16 @@
         }
         .stat-box {
             text-align: center;
+            margin: 5px;
         }
         .stat-number {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             color: white;
         }
         .stat-label {
             color: rgba(255, 255, 255, 0.8);
-            font-size: 12px;
+            font-size: 11px;
             margin-top: 5px;
         }
         .tables-container {
@@ -147,6 +149,38 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             text-align: center;
         }
+        
+        /* Footer explanations */
+        .explanations {
+            background-color: #2a2a2a;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            border: 1px solid #444;
+        }
+        .explanations h3 {
+            margin-top: 0;
+            color: #ffffff;
+            border-bottom: 2px solid #444;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .explanation-item {
+            margin-bottom: 15px;
+        }
+        .explanation-term {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .explanation-desc {
+            color: #cccccc;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+
         @media (max-width: 1200px) {
             .tables-container {
                 flex-direction: column;
@@ -156,22 +190,96 @@
             }
         }
     </style>
-    </head>
-    <body>
-        <div class="header">
-            <h1>🎯 EPIC Mafia War Report</h1>
-            <p>War ID: {{WAR_ID}}</p>
+</head>
+<body>
+    <div class="header">
+        <h1>🎯 EPIC Mafia War Report</h1>
+        <p>War ID: {{WAR_ID}}</p>
+    </div>
+    
+    <div class="war-info">
+        <h3>War Information</h3>
+        <p><strong>Period:</strong> {{WAR_START}} to {{WAR_END}}</p>
+        <p><strong>Duration:</strong> {{WAR_DURATION}}</p>
+    </div>
+    
+    {{TABLE_HTML}}
+
+    <div class="explanations">
+        <h3>📊 Column Explanations</h3>
+        
+        <div class="explanation-item">
+            <div class="explanation-term">Members</div>
+            <div class="explanation-desc">Player names linked to their Torn profiles. Click to view their profile page.</div>
         </div>
-
-        <div class="war-info">
-            <h3>War Information</h3>
-            <p><strong>Period:</strong> {{WAR_START}} to {{WAR_END}}</p>
-            <p><strong>Duration:</strong> {{WAR_DURATION}}</p>
+        
+        <div class="explanation-item">
+            <div class="explanation-term">Level</div>
+            <div class="explanation-desc">Current player level in Torn. Higher levels generally indicate more experienced players.</div>
         </div>
+        
+        <div class="explanation-item">
+            <div class="explanation-term">Attacks</div>
+            <div class="explanation-desc">Total number of attacks made during this war. Higher numbers show more active participation.</div>
+        </div>
+        
+        <div class="explanation-item">
+            <div class="explanation-term">Hit %</div>
+            <div class="explanation-desc">Percentage of faction's total attacks made by this player. Shows relative activity level within the faction.</div>
+        </div>
+        
+        <div class="explanation-item">
+            <div class="explanation-term">Score</div>
+            <div class="explanation-desc">Total war points earned by this player. Points are awarded based on attack success and target difficulty.</div>
+        </div>
+        
+        <div class="explanation-item">
+            <div class="explanation-term">Score %</div>
+            <div class="explanation-desc">Percentage of faction's total score earned by this player. Shows relative contribution to faction's war effort.</div>
+        </div>
+        
+        <div class="explanation-item">
+            <div class="explanation-term">Avg score/hit</div>
+            <div class="explanation-desc">Average points earned per attack (Score ÷ Attacks). Higher values indicate better target selection or attack success.</div>
+        </div>
+        
+        <div class="explanation-item">
+            <div class="explanation-term">Efficiency</div>
+            <div class="explanation-desc">Score per minute during war (Score ÷ War Duration in minutes). Measures overall point generation rate.</div>
+        </div>
+        
+        <div class="explanation-item">
+            <div class="explanation-term">Att/Hr</div>
+            <div class="explanation-desc">Attack frequency (Attacks ÷ War Duration in hours). Shows how actively the player participated throughout the war.</div>
+        </div>
+        
+        <div class="explanation-item">
+            <div class="explanation-term">Score/Lvl</div>
+            <div class="explanation-desc">Performance vs level ratio (Score ÷ Level). Higher values indicate players punching above their weight class.</div>
+        </div>
+        
+        <div class="explanation-item">
+            <div class="explanation-term">vs Avg</div>
+            <div class="explanation-desc">Performance compared to faction average. Positive % = above average performance, Negative % = below average performance.</div>
+        </div>
+    </div>
 
-        {{TABLE_HTML}}
+    <script>
+    // Tooltip definitions
+    const tooltips = {
+        'Members': 'Player names linked to their Torn profiles. Click to view their profile page.',
+        'Level': 'Current player level in Torn. Higher levels generally indicate more experienced players.',
+        'Attacks': 'Total number of attacks made during this war. Higher numbers show more active participation.',
+        'Hit %': 'Percentage of faction\'s total attacks made by this player. Shows relative activity level within the faction.',
+        'Score': 'Total war points earned by this player. Points are awarded based on attack success and target difficulty.',
+        'Score %': 'Percentage of faction\'s total score earned by this player. Shows relative contribution to faction\'s war effort.',
+        'Avg score/hit': 'Average points earned per attack (Score ÷ Attacks). Higher values indicate better target selection or attack success.',
+        'Efficiency': 'Score per minute during war (Score ÷ War Duration in minutes). Measures overall point generation rate.',
+        'Att/Hr': 'Attack frequency (Attacks ÷ War Duration in hours). Shows how actively the player participated throughout the war.',
+        'Score/Lvl': 'Performance vs level ratio (Score ÷ Level). Higher values indicate players punching above their weight class.',
+        'vs Avg': 'Performance compared to faction average. Positive % = above average performance, Negative % = below average performance.'
+    };
 
-        <script>
     function sortTable(columnIndex) {
         const table = document.getElementById('war_report');
         const tbody = table.querySelector('tbody');
@@ -201,6 +309,13 @@
                 return isAscending ? aValue - bValue : bValue - aValue;
             }
             
+            // Handle percentage values
+            if (aValue.includes('%')) {
+                aValue = parseFloat(aValue.replace('%', '').replace(',', '.')) || 0;
+                bValue = parseFloat(bValue.replace('%', '').replace(',', '.')) || 0;
+                return isAscending ? aValue - bValue : bValue - aValue;
+            }
+            
             // Handle text values
             return isAscending ? 
                 aValue.localeCompare(bValue) : 
@@ -213,6 +328,7 @@
     
     // Add click handlers to headers for both tables
     document.addEventListener('DOMContentLoaded', function() {
+        // Add sorting functionality (tooltips are now added in Python)
         const ourHeaders = document.querySelectorAll('#our_faction_table th');
         const enemyHeaders = document.querySelectorAll('#enemy_faction_table th');
         
@@ -256,6 +372,13 @@
                 return isAscending ? aValue - bValue : bValue - aValue;
             }
             
+            // Handle percentage values
+            if (aValue.includes('%')) {
+                aValue = parseFloat(aValue.replace('%', '').replace(',', '.')) || 0;
+                bValue = parseFloat(bValue.replace('%', '').replace(',', '.')) || 0;
+                return isAscending ? aValue - bValue : bValue - aValue;
+            }
+            
             // Handle text values
             return isAscending ? 
                 aValue.localeCompare(bValue) : 
@@ -266,5 +389,5 @@
         rows.forEach(row => tbody.appendChild(row));
     }
     </script>
-    </body>
+</body>
 </html>

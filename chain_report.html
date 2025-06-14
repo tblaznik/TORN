@@ -1,0 +1,1988 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chain Report - EPIC Mafia</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+        .nav-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+        .nav-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #2a2a2a, #3a3a3a);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #444;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .stat-card h3 {
+            margin: 0 0 10px 0;
+            color: #ffffff;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .chain-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #2a2a2a;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #444;
+        }
+        .chain-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 12px;
+            border-right: 1px solid #555;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+        .chain-table th:last-child {
+            border-right: none;
+        }
+        .chain-table th:hover {
+            background: linear-gradient(135deg, #5a5a8a 0%, #6a5a82 100%);
+        }
+        .chain-table th::after {
+            content: ' ↕';
+            font-size: 10px;
+            opacity: 0.7;
+        }
+        .chain-table th.sort-asc::after {
+            content: ' ↑';
+            opacity: 1;
+        }
+        .chain-table th.sort-desc::after {
+            content: ' ↓';
+            opacity: 1;
+        }
+        .chain-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #444;
+            border-right: 1px solid #444;
+            font-size: 12px;
+            color: #ffffff;
+        }
+        .chain-table td:last-child {
+            border-right: none;
+        }
+        .chain-table tr:nth-child(even) {
+            background-color: #333333;
+        }
+        .chain-table tr:hover {
+            background-color: #404040;
+            transition: background-color 0.2s;
+        }
+        /* Right-align numeric columns */
+        .chain-table td:not(:first-child) {
+            text-align: right;
+        }
+        .member-name {
+            color: #87ceeb !important;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .member-name:hover {
+            color: #add8e6 !important;
+            text-decoration: underline;
+        }
+        .tooltip {
+            position: relative;
+        }
+        .tooltip:hover::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: #fff;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            line-height: 1.4;
+            white-space: nowrap;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            border: 1px solid #555;
+            max-width: 350px;
+            white-space: normal;
+            width: max-content;
+        }
+        .tooltip:hover::after {
+            content: "";
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: #333;
+            z-index: 1000;
+        }
+        @media (max-width: 768px) {
+            .nav-button {
+                position: static;
+                margin-bottom: 15px;
+                display: inline-block;
+            }
+            .summary-stats {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+            .chain-table {
+                font-size: 10px;
+            }
+            .chain-table th, .chain-table td {
+                padding: 6px 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="war_report.html" class="nav-button">📊 War Report</a>
+        <h1>🔗 Chain Report</h1>
+        <h2>EPIC Mafia</h2>
+        <p>Chain ID: 48885108</p>
+    </div>
+    
+    <div class="summary-stats">
+        <div class="stat-card">
+            <h3>Total Members</h3>
+            <div class="stat-number">{{98}}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Total Respect</h3>
+            <div class="stat-number">{{20.747}}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Total Attacks</h3>
+            <div class="stat-number">{{3.608}}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Average Respect</h3>
+            <div class="stat-number">{{211,71}}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Leave Rate</h3>
+            <div class="stat-number">{{74,4}}%</div>
+        </div>
+        <div class="stat-card">
+            <h3>Hosp Rate</h3>
+            <div class="stat-number">{{24,1}}%</div>
+        </div>
+    </div>
+
+    <table class="chain-table" id="chain_table">
+        <thead>
+            <tr>
+                <th class="tooltip" data-tooltip="Player names linked to their Torn profiles. Click to view their profile page.">Members</th>
+                <th class="tooltip" data-tooltip="Total respect earned by this player during the chain. Higher values indicate better performance.">Respect</th>
+                <th class="tooltip" data-tooltip="Best (highest) respect earned in a single attack. Shows the player's peak performance.">Best</th>
+                <th class="tooltip" data-tooltip="Average respect per attack. Higher values indicate more consistent good performance.">Avg</th>
+                <th class="tooltip" data-tooltip="Total number of attacks made during the chain. Shows activity level.">Attacks</th>
+                <th class="tooltip" data-tooltip="Number of attacks that resulted in the target leaving (being defeated). Higher is better.">Leave</th>
+                <th class="tooltip" data-tooltip="Number of mugging attacks (stealing money). Shows money-focused attacks.">Mug</th>
+                <th class="tooltip" data-tooltip="Number of attacks that resulted in hospitalization. Shows successful high-damage attacks.">Hosp</th>
+                <th class="tooltip" data-tooltip="Number of war attacks (if during faction war). Shows participation in faction warfare.">War</th>
+                <th class="tooltip" data-tooltip="Number of assists given to other faction members. Shows teamwork and support.">Assist</th>
+                <th class="tooltip" data-tooltip="Number of retaliation attacks. Shows defensive activity against attackers.">Retal</th>
+                <th class="tooltip" data-tooltip="Number of overseas attacks (against players in different countries). May have travel costs.">Overseas</th>
+                <th class="tooltip" data-tooltip="Number of drawn attacks (no clear winner). Usually indicates evenly matched opponents.">Draw</th>
+                <th class="tooltip" data-tooltip="Number of escape attempts during attacks. Shows defensive actions when being attacked.">Escape</th>
+                <th class="tooltip" data-tooltip="Number of lost attacks (defeats). Lower numbers indicate better performance.">Loss</th>
+            </tr>
+        </thead>
+        <tbody>
+                        <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3212903" target="_blank" class="member-name">JlambJLAMB [3212903]</a></td>
+                <td>2,368</td>
+                <td>26.17</td>
+                <td>12.14</td>
+                <td>195</td>
+                <td>131</td>
+                <td>0</td>
+                <td>64</td>
+                <td>195</td>
+                <td>8</td>
+                <td>49</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>20</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=1953965" target="_blank" class="member-name">RipTheJackerRIPTHEJACKER [1953965]</a></td>
+                <td>1,917</td>
+                <td>28.30</td>
+                <td>9.88</td>
+                <td>194</td>
+                <td>86</td>
+                <td>8</td>
+                <td>100</td>
+                <td>185</td>
+                <td>11</td>
+                <td>73</td>
+                <td>17</td>
+                <td>0</td>
+                <td>0</td>
+                <td>5</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2125322" target="_blank" class="member-name">daprinceomarDAPRINCEOMAR [2125322]</a></td>
+                <td>2,287</td>
+                <td>29.93</td>
+                <td>9.98</td>
+                <td>151</td>
+                <td>78</td>
+                <td>0</td>
+                <td>73</td>
+                <td>150</td>
+                <td>9</td>
+                <td>41</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2228876" target="_blank" class="member-name">FuzzyRight1FUZZYRIGHT1 [2228876]</a></td>
+                <td>1,757</td>
+                <td>30.07</td>
+                <td>11.81</td>
+                <td>143</td>
+                <td>83</td>
+                <td>1</td>
+                <td>59</td>
+                <td>142</td>
+                <td>1</td>
+                <td>40</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>8</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2189677" target="_blank" class="member-name">Monst3rousMONST3ROUS [2189677]</a></td>
+                <td>2,742</td>
+                <td>27.63</td>
+                <td>10.52</td>
+                <td>140</td>
+                <td>46</td>
+                <td>0</td>
+                <td>94</td>
+                <td>140</td>
+                <td>10</td>
+                <td>37</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td>9</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3155566" target="_blank" class="member-name">Shindig7SHINDIG7 [3155566]</a></td>
+                <td>1,41</td>
+                <td>23.07</td>
+                <td>12.26</td>
+                <td>115</td>
+                <td>94</td>
+                <td>0</td>
+                <td>21</td>
+                <td>115</td>
+                <td>5</td>
+                <td>16</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>8</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3521451" target="_blank" class="member-name">Caz27CAZ27 [3521451]</a></td>
+                <td>1,086</td>
+                <td>18.24</td>
+                <td>10.45</td>
+                <td>104</td>
+                <td>78</td>
+                <td>2</td>
+                <td>24</td>
+                <td>97</td>
+                <td>10</td>
+                <td>8</td>
+                <td>1</td>
+                <td>1</td>
+                <td>0</td>
+                <td>10</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2752336" target="_blank" class="member-name">CheJCHEJ [2752336]</a></td>
+                <td>1,212</td>
+                <td>19.48</td>
+                <td>11.77</td>
+                <td>103</td>
+                <td>89</td>
+                <td>0</td>
+                <td>14</td>
+                <td>103</td>
+                <td>4</td>
+                <td>13</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>6</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3143592" target="_blank" class="member-name">sloojSLOOJ [3143592]</a></td>
+                <td>994</td>
+                <td>23.92</td>
+                <td>10.25</td>
+                <td>97</td>
+                <td>68</td>
+                <td>1</td>
+                <td>28</td>
+                <td>93</td>
+                <td>4</td>
+                <td>18</td>
+                <td>17</td>
+                <td>0</td>
+                <td>0</td>
+                <td>6</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2325363" target="_blank" class="member-name">JetBeanJETBEAN [2325363]</a></td>
+                <td>1,45</td>
+                <td>24.92</td>
+                <td>12.02</td>
+                <td>95</td>
+                <td>59</td>
+                <td>0</td>
+                <td>36</td>
+                <td>95</td>
+                <td>6</td>
+                <td>9</td>
+                <td>17</td>
+                <td>0</td>
+                <td>0</td>
+                <td>3</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2176411" target="_blank" class="member-name">kirbKIRB [2176411]</a></td>
+                <td>950</td>
+                <td>27.17</td>
+                <td>10.92</td>
+                <td>87</td>
+                <td>15</td>
+                <td>0</td>
+                <td>72</td>
+                <td>87</td>
+                <td>9</td>
+                <td>34</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2646329" target="_blank" class="member-name">Cyb3rpunkxCYB3RPUNKX [2646329]</a></td>
+                <td>759</td>
+                <td>24.89</td>
+                <td>8.82</td>
+                <td>86</td>
+                <td>56</td>
+                <td>0</td>
+                <td>30</td>
+                <td>86</td>
+                <td>3</td>
+                <td>25</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>3</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3399414" target="_blank" class="member-name">RenderhpRENDERHP [3399414]</a></td>
+                <td>977</td>
+                <td>25.72</td>
+                <td>11.37</td>
+                <td>86</td>
+                <td>50</td>
+                <td>0</td>
+                <td>36</td>
+                <td>86</td>
+                <td>7</td>
+                <td>27</td>
+                <td>16</td>
+                <td>0</td>
+                <td>0</td>
+                <td>4</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3709844" target="_blank" class="member-name">SlayersApexSLAYERSAPEX [3709844]</a></td>
+                <td>741</td>
+                <td>17.31</td>
+                <td>9.04</td>
+                <td>82</td>
+                <td>79</td>
+                <td>0</td>
+                <td>3</td>
+                <td>82</td>
+                <td>3</td>
+                <td>3</td>
+                <td>7</td>
+                <td>0</td>
+                <td>0</td>
+                <td>14</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2599153" target="_blank" class="member-name">SouthieSOUTHIE [2599153]</a></td>
+                <td>945</td>
+                <td>21.19</td>
+                <td>12.30</td>
+                <td>77</td>
+                <td>52</td>
+                <td>0</td>
+                <td>25</td>
+                <td>77</td>
+                <td>4</td>
+                <td>10</td>
+                <td>10</td>
+                <td>0</td>
+                <td>0</td>
+                <td>3</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2015888" target="_blank" class="member-name">DarthBelloqDARTHBELLOQ [2015888]</a></td>
+                <td>671</td>
+                <td>20.79</td>
+                <td>9.07</td>
+                <td>74</td>
+                <td>37</td>
+                <td>0</td>
+                <td>37</td>
+                <td>74</td>
+                <td>11</td>
+                <td>17</td>
+                <td>0</td>
+                <td>2</td>
+                <td>0</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2608152" target="_blank" class="member-name">neonredNEONRED [2608152]</a></td>
+                <td>869</td>
+                <td>17.95</td>
+                <td>12.24</td>
+                <td>71</td>
+                <td>66</td>
+                <td>0</td>
+                <td>5</td>
+                <td>70</td>
+                <td>0</td>
+                <td>1</td>
+                <td>70</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3654507" target="_blank" class="member-name">BlnkoBLNKO [3654507]</a></td>
+                <td>513</td>
+                <td>13.95</td>
+                <td>7.22</td>
+                <td>71</td>
+                <td>66</td>
+                <td>4</td>
+                <td>1</td>
+                <td>65</td>
+                <td>10</td>
+                <td>0</td>
+                <td>12</td>
+                <td>0</td>
+                <td>0</td>
+                <td>9</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3537137" target="_blank" class="member-name">LeadeatinmaniacLEADEATINMANIAC [3537137]</a></td>
+                <td>550</td>
+                <td>13.34</td>
+                <td>8.60</td>
+                <td>64</td>
+                <td>60</td>
+                <td>1</td>
+                <td>3</td>
+                <td>61</td>
+                <td>7</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>7</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=1858055" target="_blank" class="member-name">AnthonyLorettoANTHONYLORETTO [1858055]</a></td>
+                <td>437</td>
+                <td>13.86</td>
+                <td>6.94</td>
+                <td>63</td>
+                <td>62</td>
+                <td>0</td>
+                <td>1</td>
+                <td>63</td>
+                <td>1</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3158789" target="_blank" class="member-name">HotspoonHOTSPOON [3158789]</a></td>
+                <td>480</td>
+                <td>15.18</td>
+                <td>6.89</td>
+                <td>63</td>
+                <td>59</td>
+                <td>4</td>
+                <td>0</td>
+                <td>59</td>
+                <td>3</td>
+                <td>0</td>
+                <td>4</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3637762" target="_blank" class="member-name">AktashAKTASH [3637762]</a></td>
+                <td>508</td>
+                <td>12.16</td>
+                <td>8.06</td>
+                <td>63</td>
+                <td>61</td>
+                <td>0</td>
+                <td>2</td>
+                <td>62</td>
+                <td>9</td>
+                <td>1</td>
+                <td>9</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3027058" target="_blank" class="member-name">ElswickaELSWICKA [3027058]</a></td>
+                <td>626</td>
+                <td>16.11</td>
+                <td>10.44</td>
+                <td>60</td>
+                <td>58</td>
+                <td>0</td>
+                <td>2</td>
+                <td>59</td>
+                <td>1</td>
+                <td>0</td>
+                <td>2</td>
+                <td>1</td>
+                <td>0</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3269984" target="_blank" class="member-name">PokeballerPOKEBALLER [3269984]</a></td>
+                <td>475</td>
+                <td>14.82</td>
+                <td>8.79</td>
+                <td>54</td>
+                <td>50</td>
+                <td>1</td>
+                <td>3</td>
+                <td>54</td>
+                <td>4</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>10</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2882495" target="_blank" class="member-name">IchaerusICHAERUS [2882495]</a></td>
+                <td>411</td>
+                <td>18.94</td>
+                <td>7.75</td>
+                <td>53</td>
+                <td>37</td>
+                <td>0</td>
+                <td>16</td>
+                <td>53</td>
+                <td>4</td>
+                <td>12</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=1719132" target="_blank" class="member-name">HeartsPrincessHEARTSPRINCESS [1719132]</a></td>
+                <td>507</td>
+                <td>17.45</td>
+                <td>9.75</td>
+                <td>52</td>
+                <td>27</td>
+                <td>0</td>
+                <td>25</td>
+                <td>51</td>
+                <td>5</td>
+                <td>17</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2080360" target="_blank" class="member-name">hells_nellsHELLS_NELLS [2080360]</a></td>
+                <td>659</td>
+                <td>28.61</td>
+                <td>12.68</td>
+                <td>52</td>
+                <td>28</td>
+                <td>0</td>
+                <td>24</td>
+                <td>52</td>
+                <td>5</td>
+                <td>14</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2806010" target="_blank" class="member-name">MandaMANDA [2806010]</a></td>
+                <td>483</td>
+                <td>19.57</td>
+                <td>9.46</td>
+                <td>51</td>
+                <td>40</td>
+                <td>0</td>
+                <td>11</td>
+                <td>51</td>
+                <td>9</td>
+                <td>8</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>5</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2880827" target="_blank" class="member-name">JudgeFudgeJUDGEFUDGE [2880827]</a></td>
+                <td>344</td>
+                <td>13.23</td>
+                <td>6.74</td>
+                <td>51</td>
+                <td>49</td>
+                <td>0</td>
+                <td>2</td>
+                <td>51</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>3</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2955185" target="_blank" class="member-name">SoulHunter8SOULHUNTER8 [2955185]</a></td>
+                <td>513</td>
+                <td>17.53</td>
+                <td>10.26</td>
+                <td>50</td>
+                <td>47</td>
+                <td>0</td>
+                <td>3</td>
+                <td>50</td>
+                <td>3</td>
+                <td>3</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>15</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3746198" target="_blank" class="member-name">EhrzvvEHRZVV [3746198]</a></td>
+                <td>366</td>
+                <td>16.51</td>
+                <td>7.95</td>
+                <td>46</td>
+                <td>43</td>
+                <td>0</td>
+                <td>3</td>
+                <td>36</td>
+                <td>9</td>
+                <td>0</td>
+                <td>10</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3535815" target="_blank" class="member-name">_Moridin__MORIDIN_ [3535815]</a></td>
+                <td>499</td>
+                <td>16.85</td>
+                <td>11.33</td>
+                <td>44</td>
+                <td>44</td>
+                <td>0</td>
+                <td>0</td>
+                <td>44</td>
+                <td>10</td>
+                <td>0</td>
+                <td>0</td>
+                <td>2</td>
+                <td>0</td>
+                <td>3</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2899384" target="_blank" class="member-name">aarontrepusAARONTREPUS [2899384]</a></td>
+                <td>187</td>
+                <td>9.21</td>
+                <td>4.66</td>
+                <td>40</td>
+                <td>40</td>
+                <td>0</td>
+                <td>0</td>
+                <td>40</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3317890" target="_blank" class="member-name">Xx_Eugene_xXXX_EUGENE_XX [3317890]</a></td>
+                <td>337</td>
+                <td>13.57</td>
+                <td>9.11</td>
+                <td>37</td>
+                <td>37</td>
+                <td>0</td>
+                <td>0</td>
+                <td>28</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>12</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2973461" target="_blank" class="member-name">Frank3nst3inFRANK3NST3IN [2973461]</a></td>
+                <td>264</td>
+                <td>13.31</td>
+                <td>7.33</td>
+                <td>36</td>
+                <td>27</td>
+                <td>1</td>
+                <td>8</td>
+                <td>34</td>
+                <td>1</td>
+                <td>2</td>
+                <td>13</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3654210" target="_blank" class="member-name">BeerBandit40BEERBANDIT40 [3654210]</a></td>
+                <td>233</td>
+                <td>11.92</td>
+                <td>6.46</td>
+                <td>36</td>
+                <td>36</td>
+                <td>0</td>
+                <td>0</td>
+                <td>36</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>3</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=140444" target="_blank" class="member-name">WilliamsWILLIAMS [140444]</a></td>
+                <td>334</td>
+                <td>17.79</td>
+                <td>9.56</td>
+                <td>35</td>
+                <td>35</td>
+                <td>0</td>
+                <td>0</td>
+                <td>35</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td>2</td>
+                <td>0</td>
+                <td>4</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3251350" target="_blank" class="member-name">ImSoFoolishIMSOFOOLISH [3251350]</a></td>
+                <td>390</td>
+                <td>13.87</td>
+                <td>11.47</td>
+                <td>34</td>
+                <td>34</td>
+                <td>0</td>
+                <td>0</td>
+                <td>34</td>
+                <td>2</td>
+                <td>0</td>
+                <td>5</td>
+                <td>0</td>
+                <td>0</td>
+                <td>3</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3715900" target="_blank" class="member-name">GaloSengenGALOSENGEN [3715900]</a></td>
+                <td>173</td>
+                <td>10.07</td>
+                <td>5.75</td>
+                <td>30</td>
+                <td>25</td>
+                <td>5</td>
+                <td>0</td>
+                <td>22</td>
+                <td>4</td>
+                <td>0</td>
+                <td>7</td>
+                <td>1</td>
+                <td>0</td>
+                <td>3</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3694822" target="_blank" class="member-name">crazypilotCRAZYPILOT [3694822]</a></td>
+                <td>129</td>
+                <td>12.57</td>
+                <td>4.44</td>
+                <td>29</td>
+                <td>16</td>
+                <td>12</td>
+                <td>1</td>
+                <td>2</td>
+                <td>1</td>
+                <td>0</td>
+                <td>27</td>
+                <td>0</td>
+                <td>0</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2790420" target="_blank" class="member-name">Chang_ECHANG_E [2790420]</a></td>
+                <td>261</td>
+                <td>17.83</td>
+                <td>10.03</td>
+                <td>26</td>
+                <td>22</td>
+                <td>1</td>
+                <td>3</td>
+                <td>26</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>8</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3786518" target="_blank" class="member-name">DaimiyoDeathDAIMIYODEATH [3786518]</a></td>
+                <td>114</td>
+                <td>5.34</td>
+                <td>4.38</td>
+                <td>26</td>
+                <td>25</td>
+                <td>0</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2899757" target="_blank" class="member-name">PurpleCatnipPURPLECATNIP [2899757]</a></td>
+                <td>214</td>
+                <td>14.12</td>
+                <td>8.58</td>
+                <td>25</td>
+                <td>25</td>
+                <td>0</td>
+                <td>0</td>
+                <td>25</td>
+                <td>0</td>
+                <td>0</td>
+                <td>9</td>
+                <td>0</td>
+                <td>0</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3021017" target="_blank" class="member-name">KABOOSE96KABOOSE96 [3021017]</a></td>
+                <td>116</td>
+                <td>7.14</td>
+                <td>4.63</td>
+                <td>25</td>
+                <td>19</td>
+                <td>6</td>
+                <td>0</td>
+                <td>19</td>
+                <td>0</td>
+                <td>0</td>
+                <td>23</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2272830" target="_blank" class="member-name">taliesTALIES [2272830]</a></td>
+                <td>284</td>
+                <td>17.55</td>
+                <td>11.85</td>
+                <td>24</td>
+                <td>20</td>
+                <td>0</td>
+                <td>4</td>
+                <td>24</td>
+                <td>4</td>
+                <td>3</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3076983" target="_blank" class="member-name">Furnace_FuneralFURNACE_FUNERAL [3076983]</a></td>
+                <td>168</td>
+                <td>13.07</td>
+                <td>6.98</td>
+                <td>24</td>
+                <td>20</td>
+                <td>0</td>
+                <td>4</td>
+                <td>24</td>
+                <td>3</td>
+                <td>3</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3263240" target="_blank" class="member-name">MorninGloryMORNINGLORY [3263240]</a></td>
+                <td>233</td>
+                <td>14.91</td>
+                <td>10.11</td>
+                <td>23</td>
+                <td>23</td>
+                <td>0</td>
+                <td>0</td>
+                <td>23</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3650111" target="_blank" class="member-name">Lazy_sealLAZY_SEAL [3650111]</a></td>
+                <td>168</td>
+                <td>13.61</td>
+                <td>7.31</td>
+                <td>23</td>
+                <td>22</td>
+                <td>0</td>
+                <td>1</td>
+                <td>17</td>
+                <td>3</td>
+                <td>0</td>
+                <td>5</td>
+                <td>0</td>
+                <td>0</td>
+                <td>4</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=1775453" target="_blank" class="member-name">ItBeLewisITBELEWIS [1775453]</a></td>
+                <td>167</td>
+                <td>15.34</td>
+                <td>7.95</td>
+                <td>21</td>
+                <td>21</td>
+                <td>0</td>
+                <td>0</td>
+                <td>21</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2752990" target="_blank" class="member-name">RinnXRINNX [2752990]</a></td>
+                <td>102</td>
+                <td>7.00</td>
+                <td>4.85</td>
+                <td>21</td>
+                <td>21</td>
+                <td>0</td>
+                <td>0</td>
+                <td>21</td>
+                <td>1</td>
+                <td>0</td>
+                <td>1</td>
+                <td>1</td>
+                <td>0</td>
+                <td>8</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2765265" target="_blank" class="member-name">RabbitBrainRABBITBRAIN [2765265]</a></td>
+                <td>170</td>
+                <td>11.79</td>
+                <td>8.11</td>
+                <td>21</td>
+                <td>21</td>
+                <td>0</td>
+                <td>0</td>
+                <td>21</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3177305" target="_blank" class="member-name">Skunkymonkey69SKUNKYMONKEY69 [3177305]</a></td>
+                <td>118</td>
+                <td>18.17</td>
+                <td>5.62</td>
+                <td>21</td>
+                <td>17</td>
+                <td>1</td>
+                <td>3</td>
+                <td>20</td>
+                <td>1</td>
+                <td>1</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2196526" target="_blank" class="member-name">SaltheartSALTHEART [2196526]</a></td>
+                <td>182</td>
+                <td>15.91</td>
+                <td>9.09</td>
+                <td>20</td>
+                <td>10</td>
+                <td>0</td>
+                <td>10</td>
+                <td>20</td>
+                <td>0</td>
+                <td>3</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>6</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3251071" target="_blank" class="member-name">TheCreatureTHECREATURE [3251071]</a></td>
+                <td>259</td>
+                <td>15.04</td>
+                <td>13.65</td>
+                <td>19</td>
+                <td>19</td>
+                <td>0</td>
+                <td>0</td>
+                <td>19</td>
+                <td>0</td>
+                <td>0</td>
+                <td>13</td>
+                <td>0</td>
+                <td>0</td>
+                <td>8</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2338906" target="_blank" class="member-name">sinbSINB [2338906]</a></td>
+                <td>145</td>
+                <td>13.11</td>
+                <td>8.05</td>
+                <td>18</td>
+                <td>17</td>
+                <td>0</td>
+                <td>1</td>
+                <td>18</td>
+                <td>2</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>2</td>
+                <td>5</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3517148" target="_blank" class="member-name">DopplisDOPPLIS [3517148]</a></td>
+                <td>166</td>
+                <td>17.10</td>
+                <td>9.22</td>
+                <td>18</td>
+                <td>15</td>
+                <td>3</td>
+                <td>0</td>
+                <td>15</td>
+                <td>2</td>
+                <td>0</td>
+                <td>12</td>
+                <td>0</td>
+                <td>0</td>
+                <td>3</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2418310" target="_blank" class="member-name">B3Dr1ChB3DR1CH [2418310]</a></td>
+                <td>122</td>
+                <td>15.68</td>
+                <td>7.20</td>
+                <td>17</td>
+                <td>14</td>
+                <td>0</td>
+                <td>3</td>
+                <td>17</td>
+                <td>0</td>
+                <td>3</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3786193" target="_blank" class="member-name">BlckmonarchBLCKMONARCH [3786193]</a></td>
+                <td>106</td>
+                <td>9.58</td>
+                <td>7.06</td>
+                <td>15</td>
+                <td>12</td>
+                <td>0</td>
+                <td>3</td>
+                <td>10</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2369794" target="_blank" class="member-name">rocco_saint1ROCCO_SAINT1 [2369794]</a></td>
+                <td>66</td>
+                <td>8.67</td>
+                <td>4.71</td>
+                <td>14</td>
+                <td>14</td>
+                <td>0</td>
+                <td>0</td>
+                <td>14</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3000530" target="_blank" class="member-name">Bob937BOB937 [3000530]</a></td>
+                <td>82</td>
+                <td>9.26</td>
+                <td>5.85</td>
+                <td>14</td>
+                <td>14</td>
+                <td>0</td>
+                <td>0</td>
+                <td>14</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3675061" target="_blank" class="member-name">Lykaios1LYKAIOS1 [3675061]</a></td>
+                <td>75</td>
+                <td>10.02</td>
+                <td>5.37</td>
+                <td>14</td>
+                <td>14</td>
+                <td>0</td>
+                <td>0</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2660709" target="_blank" class="member-name">-Poenie--POENIE- [2660709]</a></td>
+                <td>94</td>
+                <td>12.32</td>
+                <td>7.23</td>
+                <td>13</td>
+                <td>12</td>
+                <td>0</td>
+                <td>1</td>
+                <td>12</td>
+                <td>0</td>
+                <td>0</td>
+                <td>9</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2326128" target="_blank" class="member-name">DanniDravenDANNIDRAVEN [2326128]</a></td>
+                <td>79</td>
+                <td>12.67</td>
+                <td>6.56</td>
+                <td>12</td>
+                <td>12</td>
+                <td>0</td>
+                <td>0</td>
+                <td>12</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2671955" target="_blank" class="member-name">DocHammerMDDOCHAMMERMD [2671955]</a></td>
+                <td>119</td>
+                <td>16.04</td>
+                <td>9.91</td>
+                <td>12</td>
+                <td>8</td>
+                <td>0</td>
+                <td>4</td>
+                <td>12</td>
+                <td>0</td>
+                <td>4</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3672395" target="_blank" class="member-name">Bloodrose3BLOODROSE3 [3672395]</a></td>
+                <td>96</td>
+                <td>12.84</td>
+                <td>8.73</td>
+                <td>11</td>
+                <td>11</td>
+                <td>0</td>
+                <td>0</td>
+                <td>10</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>4</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3803892" target="_blank" class="member-name">JoePalettaJOEPALETTA [3803892]</a></td>
+                <td>33</td>
+                <td>4.25</td>
+                <td>2.99</td>
+                <td>11</td>
+                <td>11</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3785490" target="_blank" class="member-name">Maxey9320MAXEY9320 [3785490]</a></td>
+                <td>44</td>
+                <td>9.64</td>
+                <td>4.45</td>
+                <td>10</td>
+                <td>7</td>
+                <td>2</td>
+                <td>1</td>
+                <td>1</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>9</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2161745" target="_blank" class="member-name">bolthead0070BOLTHEAD0070 [2161745]</a></td>
+                <td>57</td>
+                <td>12.85</td>
+                <td>7.18</td>
+                <td>8</td>
+                <td>8</td>
+                <td>0</td>
+                <td>0</td>
+                <td>7</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=1923612" target="_blank" class="member-name">MahibukiMAHIBUKI [1923612]</a></td>
+                <td>39</td>
+                <td>9.23</td>
+                <td>5.63</td>
+                <td>7</td>
+                <td>7</td>
+                <td>0</td>
+                <td>0</td>
+                <td>7</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3182308" target="_blank" class="member-name">FarmstFARMST [3182308]</a></td>
+                <td>33</td>
+                <td>5.93</td>
+                <td>4.75</td>
+                <td>7</td>
+                <td>7</td>
+                <td>0</td>
+                <td>0</td>
+                <td>7</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3811041" target="_blank" class="member-name">BIspBISP [3811041]</a></td>
+                <td>33</td>
+                <td>5.25</td>
+                <td>4.77</td>
+                <td>7</td>
+                <td>7</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2407136" target="_blank" class="member-name">The-SilenceTHE-SILENCE [2407136]</a></td>
+                <td>42</td>
+                <td>10.35</td>
+                <td>7.02</td>
+                <td>6</td>
+                <td>6</td>
+                <td>0</td>
+                <td>0</td>
+                <td>6</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2866126" target="_blank" class="member-name">BETA-BETA- [2866126]</a></td>
+                <td>44</td>
+                <td>12.08</td>
+                <td>7.30</td>
+                <td>6</td>
+                <td>6</td>
+                <td>0</td>
+                <td>0</td>
+                <td>6</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3301709" target="_blank" class="member-name">Teej136TEEJ136 [3301709]</a></td>
+                <td>55</td>
+                <td>10.94</td>
+                <td>9.21</td>
+                <td>6</td>
+                <td>6</td>
+                <td>0</td>
+                <td>0</td>
+                <td>6</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>5</td>
+                <td>3</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3700645" target="_blank" class="member-name">0Bane00BANE0 [3700645]</a></td>
+                <td>59</td>
+                <td>10.76</td>
+                <td>9.85</td>
+                <td>6</td>
+                <td>5</td>
+                <td>0</td>
+                <td>1</td>
+                <td>6</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3612329" target="_blank" class="member-name">QlasQLAS [3612329]</a></td>
+                <td>19</td>
+                <td>6.30</td>
+                <td>3.74</td>
+                <td>5</td>
+                <td>5</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3744400" target="_blank" class="member-name">PacificDragonPACIFICDRAGON [3744400]</a></td>
+                <td>41</td>
+                <td>12.44</td>
+                <td>8.24</td>
+                <td>5</td>
+                <td>5</td>
+                <td>0</td>
+                <td>0</td>
+                <td>5</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2522325" target="_blank" class="member-name">IOIIIIIOIIOIIIIIOI [2522325]</a></td>
+                <td>28</td>
+                <td>11.88</td>
+                <td>6.98</td>
+                <td>4</td>
+                <td>4</td>
+                <td>0</td>
+                <td>0</td>
+                <td>4</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2799812" target="_blank" class="member-name">sogunubicaSOGUNUBICA [2799812]</a></td>
+                <td>17</td>
+                <td>4.53</td>
+                <td>4.16</td>
+                <td>4</td>
+                <td>4</td>
+                <td>0</td>
+                <td>0</td>
+                <td>4</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3705449" target="_blank" class="member-name">GrayFoxIRLGRAYFOXIRL [3705449]</a></td>
+                <td>17</td>
+                <td>6.05</td>
+                <td>4.27</td>
+                <td>4</td>
+                <td>4</td>
+                <td>0</td>
+                <td>0</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2105039" target="_blank" class="member-name">DoofenshmirtzDOOFENSHMIRTZ [2105039]</a></td>
+                <td>11</td>
+                <td>4.08</td>
+                <td>3.80</td>
+                <td>3</td>
+                <td>3</td>
+                <td>0</td>
+                <td>0</td>
+                <td>3</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3316436" target="_blank" class="member-name">JumanneStruggleJUMANNESTRUGGLE [3316436]</a></td>
+                <td>36</td>
+                <td>13.80</td>
+                <td>12.07</td>
+                <td>3</td>
+                <td>3</td>
+                <td>0</td>
+                <td>0</td>
+                <td>3</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3803354" target="_blank" class="member-name">IjatSD1IJATSD1 [3803354]</a></td>
+                <td>13</td>
+                <td>4.99</td>
+                <td>4.36</td>
+                <td>3</td>
+                <td>3</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2728756" target="_blank" class="member-name">alirhlALIRHL [2728756]</a></td>
+                <td>17</td>
+                <td>10.10</td>
+                <td>8.37</td>
+                <td>2</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td>2</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=2864324" target="_blank" class="member-name">Ebenz33EBENZ33 [2864324]</a></td>
+                <td>10</td>
+                <td>6.23</td>
+                <td>4.78</td>
+                <td>2</td>
+                <td>1</td>
+                <td>1</td>
+                <td>0</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3751400" target="_blank" class="member-name">PaddeyyPADDEYY [3751400]</a></td>
+                <td>17</td>
+                <td>9.27</td>
+                <td>8.56</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td>2</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3776266" target="_blank" class="member-name">AfterEightAFTEREIGHT [3776266]</a></td>
+                <td>20</td>
+                <td>10.27</td>
+                <td>10.22</td>
+                <td>2</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td>2</td>
+                <td>18</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>13</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3781782" target="_blank" class="member-name">21Bam21BAM [3781782]</a></td>
+                <td>9</td>
+                <td>4.99</td>
+                <td>4.74</td>
+                <td>2</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3798738" target="_blank" class="member-name">Dummy999DUMMY999 [3798738]</a></td>
+                <td>7</td>
+                <td>4.08</td>
+                <td>3.41</td>
+                <td>2</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3795407" target="_blank" class="member-name">AI-AI- [3795407]</a></td>
+                <td>0</td>
+                <td>0.00</td>
+                <td>0.00</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>7</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=1995664" target="_blank" class="member-name">JNIXIEJNIXIE [1995664]</a></td>
+                <td>0</td>
+                <td>0.00</td>
+                <td>0.00</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3002536" target="_blank" class="member-name">SherezadaSHEREZADA [3002536]</a></td>
+                <td>0</td>
+                <td>0.00</td>
+                <td>0.00</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3689656" target="_blank" class="member-name">ColeX6COLEX6 [3689656]</a></td>
+                <td>0</td>
+                <td>0.00</td>
+                <td>0.00</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3710950" target="_blank" class="member-name">JarredGOONSJARREDGOONS [3710950]</a></td>
+                <td>0</td>
+                <td>0.00</td>
+                <td>0.00</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3743832" target="_blank" class="member-name">DeezPandaDEEZPANDA [3743832]</a></td>
+                <td>0</td>
+                <td>0.00</td>
+                <td>0.00</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3766372" target="_blank" class="member-name">ArlechinulARLECHINUL [3766372]</a></td>
+                <td>0</td>
+                <td>0.00</td>
+                <td>0.00</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3800713" target="_blank" class="member-name">BraydenOswellBRAYDENOSWELL [3800713]</a></td>
+                <td>0</td>
+                <td>0.00</td>
+                <td>0.00</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.torn.com/profiles.php?XID=3810545" target="_blank" class="member-name">AreywingsAREYWINGS [3810545]</a></td>
+                <td>0</td>
+                <td>0.00</td>
+                <td>0.00</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        function sortTable(columnIndex) {
+            const table = document.getElementById('chain_table');
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const header = table.querySelectorAll('th')[columnIndex];
+            
+            // Determine sort direction
+            let isAscending = !header.classList.contains('sort-asc');
+            
+            // Clear all sort indicators
+            table.querySelectorAll('th').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+            });
+            
+            // Add sort indicator to current header
+            header.classList.add(isAscending ? 'sort-asc' : 'sort-desc');
+            
+            // Sort rows
+            rows.sort((a, b) => {
+                let aValue = a.cells[columnIndex].textContent.trim();
+                let bValue = b.cells[columnIndex].textContent.trim();
+                
+                // Handle European numeric values (dots as thousands separator, comma as decimal)
+                if (aValue.match(/^[\d.,]+$/)) {
+                    // Remove thousands separators (dots) and convert decimal separator (comma to dot)
+                    aValue = parseFloat(aValue.replace(/\./g, '').replace(/,/g, '.')) || 0;
+                    bValue = parseFloat(bValue.replace(/\./g, '').replace(/,/g, '.')) || 0;
+                    return isAscending ? aValue - bValue : bValue - aValue;
+                }
+                
+                // Handle percentage values
+                if (aValue.includes('%')) {
+                    aValue = parseFloat(aValue.replace('%', '').replace(',', '.')) || 0;
+                    bValue = parseFloat(bValue.replace('%', '').replace(',', '.')) || 0;
+                    return isAscending ? aValue - bValue : bValue - aValue;
+                }
+                
+                // Handle text values (member names)
+                return isAscending ? 
+                    aValue.localeCompare(bValue) : 
+                    bValue.localeCompare(aValue);
+            });
+            
+            // Reinsert sorted rows
+            rows.forEach(row => tbody.appendChild(row));
+        }
+        
+        // Add click handlers to headers
+        document.addEventListener('DOMContentLoaded', function() {
+            const headers = document.querySelectorAll('#chain_table th');
+            headers.forEach((header, index) => {
+                header.addEventListener('click', () => sortTable(index));
+            });
+        });
+
+        // Function to extract user ID from member name
+        function extractUserId(memberText) {
+            const match = memberText.match(/\[(\d+)\]/);
+            return match ? match[1] : null;
+        }
+
+        // Add click handlers to member names for profile links
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const memberCells = document.querySelectorAll('#chain_table tbody tr td:first-child');
+                memberCells.forEach(cell => {
+                    const userId = extractUserId(cell.textContent);
+                    if (userId) {
+                        cell.innerHTML = `<a href="https://www.torn.com/profiles.php?XID=${userId}" target="_blank" class="member-name">${cell.textContent}</a>`;
+                    }
+                });
+            }, 100);
+        });
+    </script>
+</body>
+</html>

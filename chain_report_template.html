@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chain Report - {{FACTION_NAME}}</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+        .nav-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+        .nav-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #2a2a2a, #3a3a3a);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #444;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .stat-card h3 {
+            margin: 0 0 10px 0;
+            color: #ffffff;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .chain-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #2a2a2a;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #444;
+        }
+        .chain-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 12px;
+            border-right: 1px solid #555;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+        .chain-table th:last-child {
+            border-right: none;
+        }
+        .chain-table th:hover {
+            background: linear-gradient(135deg, #5a5a8a 0%, #6a5a82 100%);
+        }
+        .chain-table th::after {
+            content: ' ↕';
+            font-size: 10px;
+            opacity: 0.7;
+        }
+        .chain-table th.sort-asc::after {
+            content: ' ↑';
+            opacity: 1;
+        }
+        .chain-table th.sort-desc::after {
+            content: ' ↓';
+            opacity: 1;
+        }
+        .chain-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #444;
+            border-right: 1px solid #444;
+            font-size: 12px;
+            color: #ffffff;
+        }
+        .chain-table td:last-child {
+            border-right: none;
+        }
+        .chain-table tr:nth-child(even) {
+            background-color: #333333;
+        }
+        .chain-table tr:hover {
+            background-color: #404040;
+            transition: background-color 0.2s;
+        }
+        /* Right-align numeric columns */
+        .chain-table td:not(:first-child) {
+            text-align: right;
+        }
+        .member-name {
+            color: #87ceeb !important;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .member-name:hover {
+            color: #add8e6 !important;
+            text-decoration: underline;
+        }
+        .tooltip {
+            position: relative;
+        }
+        .tooltip:hover::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: #fff;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            line-height: 1.4;
+            white-space: nowrap;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            border: 1px solid #555;
+            max-width: 350px;
+            white-space: normal;
+            width: max-content;
+        }
+        .tooltip:hover::after {
+            content: "";
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: #333;
+            z-index: 1000;
+        }
+        @media (max-width: 768px) {
+            .nav-button {
+                position: static;
+                margin-bottom: 15px;
+                display: inline-block;
+            }
+            .summary-stats {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+            .chain-table {
+                font-size: 10px;
+            }
+            .chain-table th, .chain-table td {
+                padding: 6px 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="war_report.html" class="nav-button">📊 War Report</a>
+        <h1>🔗 Chain Report</h1>
+        <h2>{{FACTION_NAME}}</h2>
+        <p>Chain ID: {{CHAIN_ID}}</p>
+    </div>
+    
+    <div class="summary-stats">
+        <div class="stat-card">
+            <h3>Total Members</h3>
+            <div class="stat-number">{{TOTAL_MEMBERS}}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Total Respect</h3>
+            <div class="stat-number">{{TOTAL_RESPECT}}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Total Attacks</h3>
+            <div class="stat-number">{{TOTAL_ATTACKS}}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Average Respect</h3>
+            <div class="stat-number">{{AVG_RESPECT}}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Leave Rate</h3>
+            <div class="stat-number">{{LEAVE_RATE}}%</div>
+        </div>
+        <div class="stat-card">
+            <h3>Hosp Rate</h3>
+            <div class="stat-number">{{HOSP_RATE}}%</div>
+        </div>
+    </div>
+
+    <table class="chain-table" id="chain_table">
+        <thead>
+            <tr>
+                <th class="tooltip" data-tooltip="Player names linked to their Torn profiles. Click to view their profile page.">Members</th>
+                <th class="tooltip" data-tooltip="Total respect earned by this player during the chain. Higher values indicate better performance.">Respect</th>
+                <th class="tooltip" data-tooltip="Best (highest) respect earned in a single attack. Shows the player's peak performance.">Best</th>
+                <th class="tooltip" data-tooltip="Average respect per attack. Higher values indicate more consistent good performance.">Avg</th>
+                <th class="tooltip" data-tooltip="Total number of attacks made during the chain. Shows activity level.">Attacks</th>
+                <th class="tooltip" data-tooltip="Number of attacks that resulted in the target leaving (being defeated). Higher is better.">Leave</th>
+                <th class="tooltip" data-tooltip="Number of mugging attacks (stealing money). Shows money-focused attacks.">Mug</th>
+                <th class="tooltip" data-tooltip="Number of attacks that resulted in hospitalization. Shows successful high-damage attacks.">Hosp</th>
+                <th class="tooltip" data-tooltip="Number of war attacks (if during faction war). Shows participation in faction warfare.">War</th>
+                <th class="tooltip" data-tooltip="Number of assists given to other faction members. Shows teamwork and support.">Assist</th>
+                <th class="tooltip" data-tooltip="Number of retaliation attacks. Shows defensive activity against attackers.">Retal</th>
+                <th class="tooltip" data-tooltip="Number of overseas attacks (against players in different countries). May have travel costs.">Overseas</th>
+                <th class="tooltip" data-tooltip="Number of drawn attacks (no clear winner). Usually indicates evenly matched opponents.">Draw</th>
+                <th class="tooltip" data-tooltip="Number of escape attempts during attacks. Shows defensive actions when being attacked.">Escape</th>
+                <th class="tooltip" data-tooltip="Number of lost attacks (defeats). Lower numbers indicate better performance.">Loss</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{TABLE_ROWS}}
+        </tbody>
+    </table>
+
+    <script>
+        function sortTable(columnIndex) {
+            const table = document.getElementById('chain_table');
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const header = table.querySelectorAll('th')[columnIndex];
+            
+            // Determine sort direction
+            let isAscending = !header.classList.contains('sort-asc');
+            
+            // Clear all sort indicators
+            table.querySelectorAll('th').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+            });
+            
+            // Add sort indicator to current header
+            header.classList.add(isAscending ? 'sort-asc' : 'sort-desc');
+            
+            // Sort rows
+            rows.sort((a, b) => {
+                let aValue = a.cells[columnIndex].textContent.trim();
+                let bValue = b.cells[columnIndex].textContent.trim();
+                
+                // Handle European numeric values (dots as thousands separator, comma as decimal)
+                if (aValue.match(/^[\d.,]+$/)) {
+                    // Remove thousands separators (dots) and convert decimal separator (comma to dot)
+                    aValue = parseFloat(aValue.replace(/\./g, '').replace(/,/g, '.')) || 0;
+                    bValue = parseFloat(bValue.replace(/\./g, '').replace(/,/g, '.')) || 0;
+                    return isAscending ? aValue - bValue : bValue - aValue;
+                }
+                
+                // Handle percentage values
+                if (aValue.includes('%')) {
+                    aValue = parseFloat(aValue.replace('%', '').replace(',', '.')) || 0;
+                    bValue = parseFloat(bValue.replace('%', '').replace(',', '.')) || 0;
+                    return isAscending ? aValue - bValue : bValue - aValue;
+                }
+                
+                // Handle text values (member names)
+                return isAscending ? 
+                    aValue.localeCompare(bValue) : 
+                    bValue.localeCompare(aValue);
+            });
+            
+            // Reinsert sorted rows
+            rows.forEach(row => tbody.appendChild(row));
+        }
+        
+        // Add click handlers to headers
+        document.addEventListener('DOMContentLoaded', function() {
+            const headers = document.querySelectorAll('#chain_table th');
+            headers.forEach((header, index) => {
+                header.addEventListener('click', () => sortTable(index));
+            });
+        });
+
+        // Function to extract user ID from member name
+        function extractUserId(memberText) {
+            const match = memberText.match(/\[(\d+)\]/);
+            return match ? match[1] : null;
+        }
+
+        // Add click handlers to member names for profile links
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const memberCells = document.querySelectorAll('#chain_table tbody tr td:first-child');
+                memberCells.forEach(cell => {
+                    const userId = extractUserId(cell.textContent);
+                    if (userId) {
+                        cell.innerHTML = `<a href="https://www.torn.com/profiles.php?XID=${userId}" target="_blank" class="member-name">${cell.textContent}</a>`;
+                    }
+                });
+            }, 100);
+        });
+    </script>
+</body>
+</html>

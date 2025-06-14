@@ -2,7 +2,8 @@ import requests
 import json
 from datetime import datetime, timezone, timedelta
 import pandas as pd
-import locale
+import numpy as np
+import statistics
 
 class TornWarReport:
     def __init__(self, api_key, faction_id=None, war_id=None):
@@ -44,14 +45,67 @@ class TornWarReport:
         """Calculate hits per minute"""
         if attacks and duration_hours and duration_hours > 0:
             hits_per_min = attacks / (duration_hours * 60)
-            return f"{hits_per_min:.5g}".replace('.', ',')  # Use European format
-        return 0.0
+            return f"{hits_per_min:.4g}".replace('.', ',')  # Use European format
+        return "0,0000"
     
     def calculate_avg_hit_score(self, score, attacks):
         """Calculate average score per hit"""
         if score and attacks and attacks > 0:
             return round(score / attacks, 2)
         return 0.0
+    
+    # Advanced Metrics Functions
+    def calculate_efficiency_score(self, score, duration_hours):
+        """Score per minute (combines attack frequency + effectiveness)"""
+        if duration_hours and duration_hours > 0:
+            return score / (duration_hours * 60)
+        return 0.0
+    
+    def calculate_attack_frequency(self, attacks, duration_hours):
+        """Attacks per hour"""
+        if duration_hours and duration_hours > 0:
+            return attacks / duration_hours
+        return 0.0
+    
+    def calculate_performance_vs_level(self, score, level):
+        """Score per level - shows who's punching above their weight"""
+        if level and level > 0:
+            return score / level
+        return 0.0
+    
+    def calculate_faction_stats(self, member_stats, faction_name):
+        """Calculate advanced faction-wide statistics"""
+        faction_members = [stats for stats in member_stats.values() if stats['faction'] == faction_name]
+        if not faction_members:
+            return {}
+        
+        # Get all scores for statistical analysis
+        scores = [member['score'] for member in faction_members if member['attacks'] > 0]
+        attacks = [member['attacks'] for member in faction_members if member['attacks'] > 0]
+        
+        if not scores:
+            return {}
+        
+        # Calculate statistics
+        avg_score = statistics.mean(scores)
+        score_std_dev = statistics.stdev(scores) if len(scores) > 1 else 0
+        
+        # Participation rate (members who attacked vs total members)
+        total_members = len([m for m in member_stats.values() if m['faction'] == faction_name])
+        participating_members = len(scores)
+        participation_rate = (participating_members / total_members) * 100 if total_members > 0 else 0
+        
+        # Consistency rating (lower std dev relative to mean = more consistent)
+        consistency_rating = (score_std_dev / avg_score) * 100 if avg_score > 0 else 0
+        
+        return {
+            'avg_score': avg_score,
+            'score_std_dev': score_std_dev,
+            'participation_rate': participation_rate,
+            'consistency_rating': consistency_rating,
+            'total_members': total_members,
+            'participating_members': participating_members
+        }
         
     def make_api_request(self, endpoint, api_version="v1"):
         if api_version == "v1":
@@ -132,6 +186,7 @@ class TornWarReport:
         
         war_start = war_data.get('start', 0)
         war_end = war_data.get('end', 0)
+        war_duration_hours = (war_end - war_start) / 3600
         our_faction_data = war_data.get('our_faction', {})
         
         # Get all factions in the war
@@ -159,21 +214,6 @@ class TornWarReport:
         enemy_members = enemy_faction_data.get('members', {}) if enemy_faction_data else {}
         print(f"Found {len(war_members)} our members, {len(enemy_members)} enemy members")
         
-        # Debug: Print the structure of the first member to see what data is available
-        if war_members:
-            first_member_id = next(iter(war_members))
-            first_member_data = war_members[first_member_id]
-            print(f"\nDEBUG - First member data structure:")
-            print(f"Member ID: {first_member_id}")
-            print(f"Member data keys: {list(first_member_data.keys())}")
-            print(f"Full member data: {first_member_data}")
-            print()
-        
-        # Debug: Print our faction data structure
-        print(f"\nDEBUG - Our faction data keys: {list(our_faction_data.keys())}")
-        print(f"Our faction data: {our_faction_data}")
-        print()
-        
         member_stats = {}
         total_attacks = 0
         total_score = 0
@@ -192,6 +232,11 @@ class TornWarReport:
             
             avg_score_hit = round(member_score / member_attacks, 2) if member_attacks > 0 else 0
             
+            # Calculate advanced metrics
+            efficiency_score = self.calculate_efficiency_score(member_score, war_duration_hours)
+            attack_frequency = self.calculate_attack_frequency(member_attacks, war_duration_hours)
+            performance_vs_level = self.calculate_performance_vs_level(member_score, member_level)
+            
             member_stats[member_id] = {
                 'name': member_name,
                 'level': member_level,
@@ -199,7 +244,10 @@ class TornWarReport:
                 'score': member_score,
                 'avg_score_hit': avg_score_hit,
                 'faction': 'Our Faction',
-                'faction_id': self.faction_id
+                'faction_id': self.faction_id,
+                'efficiency_score': efficiency_score,
+                'attack_frequency': attack_frequency,
+                'performance_vs_level': performance_vs_level
             }
         
         # Process enemy faction members
@@ -212,7 +260,12 @@ class TornWarReport:
             enemy_total_attacks += member_attacks
             enemy_total_score += member_score
             
-            avg_score_hit = member_score / member_attacks if member_attacks > 0 else 0
+            avg_score_hit = round(member_score / member_attacks, 2) if member_attacks > 0 else 0
+            
+            # Calculate advanced metrics
+            efficiency_score = self.calculate_efficiency_score(member_score, war_duration_hours)
+            attack_frequency = self.calculate_attack_frequency(member_attacks, war_duration_hours)
+            performance_vs_level = self.calculate_performance_vs_level(member_score, member_level)
             
             member_stats[f"enemy_{member_id}"] = {
                 'name': member_name,
@@ -221,11 +274,18 @@ class TornWarReport:
                 'score': member_score,
                 'avg_score_hit': avg_score_hit,
                 'faction': enemy_faction_data.get('name', 'Enemy Faction') if enemy_faction_data else 'Enemy Faction',
-                'faction_id': enemy_faction_id
+                'faction_id': enemy_faction_id,
+                'efficiency_score': efficiency_score,
+                'attack_frequency': attack_frequency,
+                'performance_vs_level': performance_vs_level
             }
         
         print(f"Processed {total_attacks} our attacks with {total_score} our score")
         print(f"Processed {enemy_total_attacks} enemy attacks with {enemy_total_score} enemy score")
+        
+        # Calculate faction-wide statistics
+        our_faction_stats = self.calculate_faction_stats(member_stats, 'Our Faction')
+        enemy_faction_stats = self.calculate_faction_stats(member_stats, enemy_faction_data.get('name', 'Enemy Faction') if enemy_faction_data else 'Enemy Faction')
         
         return {
             'war_info': war_data,
@@ -238,17 +298,27 @@ class TornWarReport:
             'enemy_score': enemy_total_score,
             'enemy_faction_name': enemy_faction_data.get('name', 'Enemy Faction') if enemy_faction_data else 'Enemy Faction',
             'war_start': war_start,
-            'war_end': war_end
+            'war_end': war_end,
+            'war_duration_hours': war_duration_hours,
+            'our_faction_stats': our_faction_stats,
+            'enemy_faction_stats': enemy_faction_stats
         }
     
     def create_report_dataframe(self):
         data = self.generate_war_earnings_data()
         if not data:
-            return None, None
+            return None, None, None
         
-        # Calculate totals first
+        # Calculate totals and averages for comparison
         our_total_attacks = sum(stats['attacks'] for stats in data['member_stats'].values() if stats['faction'] == 'Our Faction')
         enemy_total_attacks = sum(stats['attacks'] for stats in data['member_stats'].values() if stats['faction'] != 'Our Faction')
+        
+        # Calculate faction averages for comparison
+        our_members = [stats for stats in data['member_stats'].values() if stats['faction'] == 'Our Faction' and stats['attacks'] > 0]
+        enemy_members = [stats for stats in data['member_stats'].values() if stats['faction'] != 'Our Faction' and stats['attacks'] > 0]
+        
+        our_avg_score = statistics.mean([m['score'] for m in our_members]) if our_members else 0
+        enemy_avg_score = statistics.mean([m['score'] for m in enemy_members]) if enemy_members else 0
         
         our_rows = []
         enemy_rows = []
@@ -259,9 +329,13 @@ class TornWarReport:
                 if stats['faction'] == 'Our Faction':
                     hit_percentage = (stats['attacks'] / our_total_attacks) * 100 if our_total_attacks > 0 else 0
                     score_percentage = (stats['score'] / data['our_score']) * 100 if data['our_score'] > 0 else 0
+                    # Performance comparison (above/below faction average)
+                    performance_vs_avg = ((stats['score'] - our_avg_score) / our_avg_score) * 100 if our_avg_score > 0 else 0
                 else:
                     hit_percentage = (stats['attacks'] / enemy_total_attacks) * 100 if enemy_total_attacks > 0 else 0
                     score_percentage = (stats['score'] / data['enemy_score']) * 100 if data['enemy_score'] > 0 else 0
+                    # Performance comparison (above/below faction average)
+                    performance_vs_avg = ((stats['score'] - enemy_avg_score) / enemy_avg_score) * 100 if enemy_avg_score > 0 else 0
                 
                 row = {
                     'Members': f'<a href="https://www.torn.com/profiles.php?XID={member_id.replace("enemy_", "")}" target="_blank" style="color: #ffffff; text-decoration: none;">{stats["name"]}</a>',
@@ -270,7 +344,11 @@ class TornWarReport:
                     'Hit %': f"{hit_percentage:.2f}%",
                     'Score': self.format_european_number(stats['score']),
                     'Score %': f"{score_percentage:.2f}%",
-                    'Avg score/hit': self.format_european_number(stats['avg_score_hit'])
+                    'Avg score/hit': self.format_european_number(stats['avg_score_hit']),
+                    'Efficiency': self.format_european_number(stats['efficiency_score']),
+                    'Att/Hr': self.format_european_number(stats['attack_frequency']),
+                    'Score/Lvl': self.format_european_number(stats['performance_vs_level']),
+                    'vs Avg': f"{performance_vs_avg:+.1f}%"
                 }
                 
                 if stats['faction'] == 'Our Faction':
@@ -279,7 +357,7 @@ class TornWarReport:
                     enemy_rows.append(row)
         
         if not our_rows and not enemy_rows:
-            return None, None, data
+            return None, None, None, data
         
         # Create separate DataFrames
         our_df = pd.DataFrame(our_rows) if our_rows else pd.DataFrame()
@@ -298,21 +376,18 @@ class TornWarReport:
         
         return our_df, enemy_df, data
     
-    
-    
     def create_styled_html_report(self, our_df, enemy_df, war_data):
         """Create a styled HTML table report using templates with European formatting and TCT times"""
         
         # War info with TCT times and duration formatting
         war_start = self.convert_to_tct(war_data['war_start'])
         war_end = self.convert_to_tct(war_data['war_end'])
-        war_duration_hours = (war_data['war_end'] - war_data['war_start']) / 3600
-        war_duration_formatted = self.format_duration_hms(war_duration_hours)
+        war_duration_formatted = self.format_duration_hms(war_data['war_duration_hours'])
         
         # Calculate battle stats
-        our_hits_per_min = self.calculate_battle_stats(war_data['our_attacks'], war_duration_hours)
+        our_hits_per_min = self.calculate_battle_stats(war_data['our_attacks'], war_data['war_duration_hours'])
         our_avg_hit_score = self.calculate_avg_hit_score(war_data['our_score'], war_data['our_attacks'])
-        enemy_hits_per_min = self.calculate_battle_stats(war_data['enemy_attacks'], war_duration_hours)
+        enemy_hits_per_min = self.calculate_battle_stats(war_data['enemy_attacks'], war_data['war_duration_hours'])
         enemy_avg_hit_score = self.calculate_avg_hit_score(war_data['enemy_score'], war_data['enemy_attacks'])
         
         # Convert DataFrames to HTML tables
@@ -337,6 +412,10 @@ class TornWarReport:
                 border=0
             )
         
+        # Add faction statistics to the stats boxes
+        our_stats = war_data.get('our_faction_stats', {})
+        enemy_stats = war_data.get('enemy_faction_stats', {})
+        
         # Create combined table HTML with side-by-side layout and faction colors (EPIC Mafia = GREEN, Enemy = RED/ORANGE)
         tables_html = f"""
         <div class="tables-container">
@@ -352,12 +431,20 @@ class TornWarReport:
                         <div class="stat-label">Our Score</div>
                     </div>
                     <div class="stat-box">
-                        <div class="stat-number">{self.format_european_number(our_hits_per_min)}</div>
+                        <div class="stat-number">{our_hits_per_min}</div>
                         <div class="stat-label">Hits/Min</div>
                     </div>
                     <div class="stat-box">
                         <div class="stat-number">{self.format_european_number(our_avg_hit_score)}</div>
                         <div class="stat-label">Avg Hit Score</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">{our_stats.get('participation_rate', 0):.1f}%</div>
+                        <div class="stat-label">Participation</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">{our_stats.get('consistency_rating', 0):.1f}%</div>
+                        <div class="stat-label">Consistency</div>
                     </div>
                 </div>
                 {our_table_html}
@@ -375,12 +462,20 @@ class TornWarReport:
                         <div class="stat-label">Enemy Score</div>
                     </div>
                     <div class="stat-box">
-                        <div class="stat-number">{self.format_european_number(enemy_hits_per_min)}</div>
+                        <div class="stat-number">{enemy_hits_per_min}</div>
                         <div class="stat-label">Hits/Min</div>
                     </div>
                     <div class="stat-box">
                         <div class="stat-number">{self.format_european_number(enemy_avg_hit_score)}</div>
                         <div class="stat-label">Avg Hit Score</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">{enemy_stats.get('participation_rate', 0):.1f}%</div>
+                        <div class="stat-label">Participation</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">{enemy_stats.get('consistency_rating', 0):.1f}%</div>
+                        <div class="stat-label">Consistency</div>
                     </div>
                 </div>
                 {enemy_table_html}
@@ -401,15 +496,6 @@ class TornWarReport:
         html = html.replace('{{WAR_START}}', war_start)
         html = html.replace('{{WAR_END}}', war_end)
         html = html.replace('{{WAR_DURATION}}', war_duration_formatted)
-        html = html.replace('{{OUR_ATTACKS}}', self.format_european_number(war_data['our_attacks']))
-        html = html.replace('{{OUR_SCORE}}', self.format_european_number(war_data['our_score']))
-        html = html.replace('{{ENEMY_ATTACKS}}', self.format_european_number(war_data['enemy_attacks']))
-        html = html.replace('{{ENEMY_SCORE}}', self.format_european_number(war_data['enemy_score']))
-        html = html.replace('{{OUR_HITS_PER_MIN}}', self.format_european_number(our_hits_per_min))
-        html = html.replace('{{OUR_AVG_HIT_SCORE}}', self.format_european_number(our_avg_hit_score))
-        html = html.replace('{{ENEMY_HITS_PER_MIN}}', self.format_european_number(enemy_hits_per_min))
-        html = html.replace('{{ENEMY_AVG_HIT_SCORE}}', self.format_european_number(enemy_avg_hit_score))
-        html = html.replace('{{ENEMY_FACTION_NAME}}', war_data['enemy_faction_name'])
         html = html.replace('{{TABLE_HTML}}', tables_html)
         
         return html
@@ -425,7 +511,7 @@ class TornWarReport:
         <body>
         <h1>War Report {{WAR_ID}}</h1>
         <p>Period: {{WAR_START}} - {{WAR_END}}</p>
-        <p>Our Score: {{OUR_SCORE}} vs Enemy: {{ENEMY_SCORE}}</p>
+        <p>Duration: {{WAR_DURATION}}</p>
         {{TABLE_HTML}}
         </body>
         </html>"""
@@ -448,6 +534,16 @@ def main():
             print(f"Our Score: {reporter.format_european_number(raw_data['our_score'])}")
             print(f"Enemy Attacks: {reporter.format_european_number(raw_data['enemy_attacks'])}")
             print(f"Enemy Score: {reporter.format_european_number(raw_data['enemy_score'])}")
+            
+            # Print advanced statistics
+            our_stats = raw_data.get('our_faction_stats', {})
+            enemy_stats = raw_data.get('enemy_faction_stats', {})
+            
+            print(f"\n📊 ADVANCED STATISTICS:")
+            print(f"Our Participation Rate: {our_stats.get('participation_rate', 0):.1f}%")
+            print(f"Our Consistency Rating: {our_stats.get('consistency_rating', 0):.1f}%")
+            print(f"Enemy Participation Rate: {enemy_stats.get('participation_rate', 0):.1f}%")
+            print(f"Enemy Consistency Rating: {enemy_stats.get('consistency_rating', 0):.1f}%")
             
             if not our_df.empty:
                 print("\nOur Top 10 Members:")
