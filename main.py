@@ -246,15 +246,26 @@ class TornWarReport:
         if not data:
             return None, None
         
+        # Calculate hit percentages first
+        our_total_attacks = sum(stats['attacks'] for stats in data['member_stats'].values() if stats['faction'] == 'Our Faction')
+        enemy_total_attacks = sum(stats['attacks'] for stats in data['member_stats'].values() if stats['faction'] != 'Our Faction')
+        
         our_rows = []
         enemy_rows = []
         
         for member_id, stats in data['member_stats'].items():
             if stats['attacks'] > 0:  # Only show members who participated
+                # Calculate hit percentage
+                if stats['faction'] == 'Our Faction':
+                    hit_percentage = (stats['attacks'] / our_total_attacks) * 100 if our_total_attacks > 0 else 0
+                else:
+                    hit_percentage = (stats['attacks'] / enemy_total_attacks) * 100 if enemy_total_attacks > 0 else 0
+                
                 row = {
                     'Members': f'<a href="https://www.torn.com/profiles.php?XID={member_id.replace("enemy_", "")}" target="_blank" style="color: #ffffff; text-decoration: none;">{stats["name"]}</a>',
                     'Level': stats['level'],
                     'Attacks': stats['attacks'],
+                    'Hit %': f"{hit_percentage:.1f}%",
                     'Score': self.format_european_number(stats['score']),
                     'Avg score/hit': self.format_european_number(stats['avg_score_hit'])
                 }
@@ -283,7 +294,6 @@ class TornWarReport:
             enemy_df = enemy_df.drop('_sort_score', axis=1)
         
         return our_df, enemy_df, data
-    
     def create_styled_html_report(self, our_df, enemy_df, war_data):
         """Create a styled HTML table report using templates with European formatting and TCT times"""
         
