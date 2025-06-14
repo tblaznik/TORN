@@ -13,8 +13,11 @@ class TornWarReport:
     def format_european_number(self, num):
         """Format numbers with European standards: . as thousands separator, , as decimal"""
         if isinstance(num, (int, float)):
-            # Force 2 decimal places, then convert to European format
-            formatted = f"{num:.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+            # Format with 2 decimal places and proper thousands separators
+            # First format with standard separators, then swap them
+            formatted = f"{num:,.2f}"
+            # Swap: comma becomes temp, period becomes comma, temp becomes period
+            formatted = formatted.replace(',', 'TEMP').replace('.', ',').replace('TEMP', '.')
             return formatted
         return str(num)
     
