@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>War Report</title>
+    <title>War Earnings Report</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -111,7 +111,13 @@
             color: #7f8c8d;
             font-size: 12px;
         }
+        .tables-container {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
         .faction-section {
+            flex: 1;
             margin-bottom: 30px;
         }
         .faction-section h3 {
@@ -121,12 +127,18 @@
             background-color: white;
             border-radius: 5px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        @media (max-width: 1200px) {
+            .tables-container {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>🎯 EPIC Mafia War Report</h1>
+        <h1>🎯 EPIC Mafia War Earnings Report</h1>
         <p>War ID: 26833</p>
     </div>
     
@@ -162,9 +174,10 @@
     </div>
 
     
-        <div class="faction-section">
-            <h3>🏆 EPIC Mafia Members</h3>
-            <table class="dataframe war_report" id="our_faction_table">
+        <div class="tables-container">
+            <div class="faction-section">
+                <h3>🏆 EPIC Mafia Members</h3>
+                <table class="dataframe war_report" id="our_faction_table">
   <thead>
     <tr style="text-align: right;">
       <th>Members</th>
@@ -758,11 +771,11 @@
     </tr>
   </tbody>
 </table>
-        </div>
-        
-        <div class="faction-section">
-            <h3>⚔️ House of Dragonborn Members</h3>
-            <table class="dataframe war_report" id="enemy_faction_table">
+            </div>
+            
+            <div class="faction-section">
+                <h3>⚔️ House of Dragonborn Members</h3>
+                <table class="dataframe war_report" id="enemy_faction_table">
   <thead>
     <tr style="text-align: right;">
       <th>Members</th>
@@ -1391,6 +1404,7 @@
     </tr>
   </tbody>
 </table>
+            </div>
         </div>
         
 

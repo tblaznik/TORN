@@ -265,16 +265,18 @@ class TornWarReport:
                 border=0
             )
         
-        # Create combined table HTML with headers
+        # Create combined table HTML with side-by-side layout
         tables_html = f"""
-        <div class="faction-section">
-            <h3>🏆 EPIC Mafia Members</h3>
-            {our_table_html}
-        </div>
-        
-        <div class="faction-section">
-            <h3>⚔️ {war_data['enemy_faction_name']} Members</h3>
-            {enemy_table_html}
+        <div class="tables-container">
+            <div class="faction-section">
+                <h3>🏆 EPIC Mafia Members</h3>
+                {our_table_html}
+            </div>
+            
+            <div class="faction-section">
+                <h3>⚔️ {war_data['enemy_faction_name']} Members</h3>
+                {enemy_table_html}
+            </div>
         </div>
         """
         
