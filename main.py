@@ -13,11 +13,8 @@ class TornWarReport:
     def format_european_number(self, num):
         """Format numbers with European standards: . as thousands separator, , as decimal"""
         if isinstance(num, (int, float)):
-            # Convert to string with comma as decimal separator and dot as thousands separator
-            formatted = f"{num:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
-            # Remove trailing zeros after decimal comma
-            if ',' in formatted:
-                formatted = formatted.rstrip('0').rstrip(',')
+            # Force 2 decimal places, then convert to European format
+            formatted = f"{num:.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
             return formatted
         return str(num)
     
@@ -190,7 +187,7 @@ class TornWarReport:
             total_attacks += member_attacks
             total_score += member_score
             
-            avg_score_hit = member_score / member_attacks if member_attacks > 0 else 0
+            avg_score_hit = round(member_score / member_attacks, 2) if member_attacks > 0 else 0
             
             member_stats[member_id] = {
                 'name': member_name,
