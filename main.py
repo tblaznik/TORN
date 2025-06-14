@@ -4,6 +4,8 @@ from datetime import datetime, timezone, timedelta
 import pandas as pd
 import numpy as np
 import statistics
+from chain_report_module import generate_chain_report
+
 
 class TornWarReport:
     def __init__(self, api_key, faction_id=None, war_id=None):
@@ -520,52 +522,42 @@ def main():
     API_KEY = "XrSNtZr7UKlaOXFT"
     FACTION_ID = 40959
     WAR_ID = 26833
-    
+
     print("Starting Torn War Report Generator...")
-    
+
     try:
-        reporter = TornWarReport(API_KEY, FACTION_ID, WAR_ID)
+        reporter = TornWarReport(api_key=API_KEY, faction_id=FACTION_ID, war_id=WAR_ID)
         result = reporter.create_report_dataframe()
-        
+
         if result and len(result) == 3 and (not result[0].empty or not result[1].empty):
             our_df, enemy_df, raw_data = result
-            print("\nWAR EARNINGS REPORT GENERATED!")
-            print(f"Our Attacks: {reporter.format_european_number(raw_data['our_attacks'])}")
-            print(f"Our Score: {reporter.format_european_number(raw_data['our_score'])}")
-            print(f"Enemy Attacks: {reporter.format_european_number(raw_data['enemy_attacks'])}")
-            print(f"Enemy Score: {reporter.format_european_number(raw_data['enemy_score'])}")
-            
-            # Print advanced statistics
-            our_stats = raw_data.get('our_faction_stats', {})
-            enemy_stats = raw_data.get('enemy_faction_stats', {})
-            
-            print(f"\n📊 ADVANCED STATISTICS:")
-            print(f"Our Participation Rate: {our_stats.get('participation_rate', 0):.1f}%")
-            print(f"Our Consistency Rating: {our_stats.get('consistency_rating', 0):.1f}%")
-            print(f"Enemy Participation Rate: {enemy_stats.get('participation_rate', 0):.1f}%")
-            print(f"Enemy Consistency Rating: {enemy_stats.get('consistency_rating', 0):.1f}%")
-            
-            if not our_df.empty:
-                print("\nOur Top 10 Members:")
-                print(our_df.head(10).to_string(index=False))
-            
-            if not enemy_df.empty:
-                print("\nEnemy Top 10 Members:")
-                print(enemy_df.head(10).to_string(index=False))
-            
-            # Create styled HTML report
+
             html_report = reporter.create_styled_html_report(our_df, enemy_df, raw_data)
-            with open('war_report.html', 'w', encoding='utf-8') as f:
+            html_report = html_report.replace(
+                "<div class=\"header\">",
+                "<div class=\"header\">\n  <div style='text-align:right'><a href='https://epic-mafia.netlify.app/chain_report.html' style='color:#67e8f9;text-decoration:none;font-size:13px;'>→ Go to Chain Report</a></div>"
+            )
+
+            with open("war_report.html", "w", encoding="utf-8") as f:
                 f.write(html_report)
-            print("\n✅ Styled HTML report saved to 'war_report.html'")
-            
+
+            print("\n✅ Styled HTML war report saved to 'war_report.html'")
         else:
-            print("Failed to generate report")
-            
+            print("Failed to generate war report")
+
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error generating war report: {e}")
+        import traceback
+        traceback.print_exc()
+
+    print("\nStarting Chain Report Generator...")
+    try:
+        generate_chain_report()
+    except Exception as e:
+        print(f"Error generating chain report: {e}")
         import traceback
         traceback.print_exc()
 
 if __name__ == "__main__":
     main()
+
