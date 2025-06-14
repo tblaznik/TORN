@@ -128,6 +128,22 @@ class TornWarReport:
         except Exception as e:
             print(f"API request failed: {e}")
             return None
+        
+    def get_market_price(self, item_id):
+        print(f"Getting market price for item ID: {item_id}")
+        url = f"https://api.torn.com/v2/market/{item_id}?key={self.api_key}&selections=itemmarket"
+        try:
+            response = requests.get(url)
+            print(f"Response status code: {response.status_code}")
+            response.raise_for_status()
+            data = response.json()
+            if 'error' in data:
+                print(f"API Error: {data['error']}")
+                return None
+            return data['itemmarket']['item'].get('average_price', 0)
+        except Exception as e:
+            print(f"Failed to get market price: {e}")
+            return None
     
     def get_faction_info(self):
         print("Getting faction info...")
@@ -183,6 +199,7 @@ class TornWarReport:
             return None
         
         war_data = self.get_specific_war_data()
+        
         if not war_data:
             return None
         
@@ -190,6 +207,17 @@ class TornWarReport:
         war_end = war_data.get('end', 0)
         war_duration_hours = (war_end - war_start) / 3600
         our_faction_data = war_data.get('our_faction', {})
+
+        war_respect = war_data['war_info']['factions']['40959']['rewards']['respect']
+        war_items = war_data['war_info']['factions']['40959']['rewards'].get('items', [])
+        print(war_items)
+        for id,items in war_items.items():
+            print(f"Item ID: {id}, Items: {items}")
+            avg_price = self.get_market_price(id)
+            print(f"Average market price for item ID {id}: {avg_price}")
+        item_df = pd.DataFrame.from_dict(war_items, orient='index').reset_index()
+        
+        print(item_df)
         
         # Get all factions in the war
         all_factions = war_data['war_info'].get('factions', {})
