@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>War Report</title>
-    <meta charset="UTF-8">
-    <style>
+    <head>
+        <title>War Report</title>
+        <meta charset="UTF-8">
+        <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 20px;
@@ -43,7 +43,7 @@
             color: #ffffff;
         }
         table.war_report th {
-            background: linear-gradient(135deg, #3a3a3a 0%, #4a4a4a 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 12px 8px;
             text-align: left;
@@ -156,22 +156,22 @@
             }
         }
     </style>
-</head>
-<body>
-    <div class="header">
-        <h1>🎯 EPIC Mafia War Report</h1>
-        <p>War ID: {{WAR_ID}}</p>
-    </div>
-    
-    <div class="war-info">
-        <h3>War Information</h3>
-        <p><strong>Period:</strong> {{WAR_START}} to {{WAR_END}}</p>
-        <p><strong>Duration:</strong> {{WAR_DURATION}}</p>
-    </div>
-    
-    {{TABLE_HTML}}
+    </head>
+    <body>
+        <div class="header">
+            <h1>🎯 EPIC Mafia War Report</h1>
+            <p>War ID: {{WAR_ID}}</p>
+        </div>
 
-    <script>
+        <div class="war-info">
+            <h3>War Information</h3>
+            <p><strong>Period:</strong> {{WAR_START}} to {{WAR_END}}</p>
+            <p><strong>Duration:</strong> {{WAR_DURATION}}</p>
+        </div>
+
+        {{TABLE_HTML}}
+
+        <script>
     function sortTable(columnIndex) {
         const table = document.getElementById('war_report');
         const tbody = table.querySelector('tbody');
@@ -266,5 +266,5 @@
         rows.forEach(row => tbody.appendChild(row));
     }
     </script>
-</body>
+    </body>
 </html>
