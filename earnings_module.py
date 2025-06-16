@@ -152,14 +152,10 @@ class ChainEarningsCalculator:
         # Try to read saves from Excel file first, then CSV
         saves_df = None
         if os.path.exists('saves.xlsx'):
-            print("\n📊 Reading saves from XLSX file...")
+            print("\nReading saves from XLSX file...")
             saves_df = pd.read_excel('saves.xlsx')
-            print(f"✅ Saves XLSX loaded: {len(saves_df)} rows")
-        elif os.path.exists('saves.csv'):
-            print("\n📊 Reading saves from CSV file...")
-            saves_df = pd.read_csv('saves.csv', sep=';', encoding='utf-8')
-            print(f"✅ Saves CSV loaded: {len(saves_df)} rows")
-        
+            print(f"Saves XLSX loaded: {len(saves_df)} rows")
+
         if saves_df is not None:
             print(f"   Saves columns: {saves_df.columns.tolist()}")
             
@@ -186,11 +182,11 @@ class ChainEarningsCalculator:
             merged_df['Saves'] = merged_df['Saves'].fillna(0)
             merged_df['Save_Score'] = merged_df['Save_Score'].fillna(0)
             
-            print(f"✅ Merged saves data: {len(merged_df)} rows")
+            print(f"Merged saves data: {len(merged_df)} rows")
             
             chain_df = merged_df.drop('Clean_Member', axis=1)  # Remove temporary column
         else:
-            print("❌ No saves file found. Adding empty save columns.")
+            print("No saves file found. Adding empty save columns.")
             chain_df['Saves'] = 0
             chain_df['Save_Score'] = 0
         
@@ -199,50 +195,50 @@ class ChainEarningsCalculator:
         total_war_hits = chain_df['War'].sum()
         
         print(f"\n" + "="*60)
-        print("📊 RAW TOTALS CALCULATION")
+        print("RAW TOTALS CALCULATION")
         print("="*60)
-        print(f"🎯 War Respect Total: {total_respect:,.2f}")
-        print(f"👊 War Hits Total: {total_war_hits:,}")
+        print(f"War Respect Total: {total_respect:,.2f}")
+        print(f"War Hits Total: {total_war_hits:,}")
         
         # Calculate save statistics from merged data
         total_saves = chain_df['Saves'].sum()
         total_save_score = chain_df['Save_Score'].sum()
         save_pay = 0  # Set to 0 for now
         
-        print(f"\n💾 Save Statistics:")
+        print(f"\nSave Statistics:")
         print(f"   Total Saves: {total_saves}")
         print(f"   Total Save Score: {total_save_score:.2f}")
         print(f"   Save Pay: ${save_pay:,.2f}")
         
         # Calculate mod values using WAR RESPECT
-        mod_score = total_respect + total_save_score  # Use war respect + save score
-        mod_hit = total_war_hits + total_saves  # Use actual saves count
+        mod_score = total_respect + total_save_score 
+        mod_hit = total_war_hits + total_saves 
         avg_score_hit = mod_score / mod_hit if mod_hit > 0 else 0
         save_resp = avg_score_hit * 1.2
         
         print(f"\n" + "="*60)
         print("🔧 MOD VALUES CALCULATION")
         print("="*60)
-        print(f"📈 Mod Score Calculation:")
+        print(f"Mod Score Calculation:")
         print(f"   {total_respect:,.2f} (war respect) + {total_save_score:.2f} (save score) = {mod_score:,.2f}")
-        print(f"📈 Mod Hit Calculation:")
+        print(f"Mod Hit Calculation:")
         print(f"   {total_war_hits:,} (war hits) + {total_saves} (saves) = {mod_hit:,}")
-        print(f"📊 Average Score/Hit: {avg_score_hit:.2f} ({mod_score:,.2f} ÷ {mod_hit:,})")
-        print(f"🆘 Save Resp (120% avg): {save_resp:.2f} ({avg_score_hit:.2f} × 1.2)")
+        print(f"Average Score/Hit: {avg_score_hit:.2f} ({mod_score:,.2f} ÷ {mod_hit:,})")
+        print(f"Save Resp (120% avg): {save_resp:.2f} ({avg_score_hit:.2f} × 1.2)")
         
         remaining_payout = self.total_payout - save_pay  # Subtract save pay first
 
         print(f"\n" + "="*60)
-        print("💰 POOL CALCULATIONS")
+        print("POOL CALCULATIONS")
         print("="*60)
-        print(f"💵 Remaining Payout Calculation:")
+        print(f"Remaining Payout Calculation:")
         print(f"   ${self.total_payout:,.2f} (total payout) - ${save_pay:,.2f} (save pay) = ${remaining_payout:,.2f}")
         
         # Calculate pools from remaining payout using correct 60/90 and 30/90 ratios
         hit_pool = remaining_payout * (self.hit_weight / self.total_weight)
         score_pool = remaining_payout * (self.respect_weight / self.total_weight)
         
-        print(f"\n🎯 Pool Distribution:")
+        print(f"\nPool Distribution:")
         print(f"   Hit Pool: ${remaining_payout:,.2f} × ({self.hit_weight}/{self.total_weight}) = ${hit_pool:,.2f}")
         print(f"   Score Pool: ${remaining_payout:,.2f} × ({self.respect_weight}/{self.total_weight}) = ${score_pool:,.2f}")
         print(f"   Hit %: {(self.hit_weight/self.total_weight)*100:.2f}%")
@@ -253,11 +249,11 @@ class ChainEarningsCalculator:
         pay_score = score_pool / mod_score if mod_score > 0 else 0
         
         print(f"\n" + "="*60)
-        print("💎 PAY RATE CALCULATIONS")
+        print("PAY RATE CALCULATIONS")
         print("="*60)
-        print(f"💰 Pay per Hit:")
+        print(f"Pay per Hit:")
         print(f"   ${hit_pool:,.2f} (hit pool) ÷ {mod_hit:,} (mod hits) = ${pay_hit:,.2f}")
-        print(f"💰 Pay per Score:")
+        print(f"Pay per Score:")
         print(f"   ${score_pool:,.2f} (score pool) ÷ {mod_score:,.2f} (mod score) = ${pay_score:,.2f}")
         
         print(f"\n📋 Final Values Summary:")
@@ -302,8 +298,9 @@ class ChainEarningsCalculator:
                 'Member': row['Member'],
                 'Respect': member_respect,
                 'War_Hits': member_war_hits,
-                'Save_Score': member_save_score,
                 'Total_Score': member_total_score,
+                'Saves': row['Saves'],
+                'Save_Score': member_save_score,
                 'Respect_Share': score_share * 100,
                 'Hit_Share': hit_share * 100,
                 'Respect_Earnings': score_earnings,
@@ -383,6 +380,8 @@ class ChainEarningsCalculator:
         display_df['Member'] = display_df['Member'].apply(format_member)
         
         # Format for display
+        display_df['War_Hits'] = display_df['War_Hits'].astype(int)
+        display_df['Saves'] = display_df['Saves'].astype(int)
         display_df['Respect %'] = display_df['Respect_Share'].apply(lambda x: f"{x:.2f}%")
         display_df['Hit %'] = display_df['Hit_Share'].apply(lambda x: f"{x:.2f}%")
         display_df['Total %'] = display_df['Total_Share'].apply(lambda x: f"{x:.2f}%")
@@ -391,11 +390,11 @@ class ChainEarningsCalculator:
         display_df['Total Earnings'] = display_df['Total_Earnings'].apply(self.format_us_currency)
         
         # Select columns for display
-        display_cols = ['Member', 'Respect', 'War_Hits', 'Save_Score', 'Total_Score', 'Respect %', 'Hit %', 
+        display_cols = ['Member', 'Respect', 'War_Hits',  'Total_Score', 'Saves', 'Save_Score', 'Respect %', 'Hit %', 
                        'Respect Earnings', 'Hit Earnings', 'Total Earnings', 'Total %']
         display_df = display_df[display_cols]
-        display_df.columns = ['Member', 'War Respect', 'Hits', 'Save Score', 'Total Score', 'Respect %', 'Hit %', 
-                             'Respect Earnings', 'Hit Earnings', 'Total Earnings', 'Total %']
+        display_df.columns = ['Member', 'Respect', 'War Hits',  'Total Score', 'Saves', 'Save Score', 'Respect %', 'Hit %', 
+                       'Respect Earnings', 'Hit Earnings', 'Total Earnings', 'Total %']
         
         # Sort by total earnings (descending)
         # Create a temporary numeric column for sorting
