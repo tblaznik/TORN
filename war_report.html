@@ -43,10 +43,9 @@
             color: #ffffff;
         }
         table.war_report th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 12px 8px;
-            text-align: left;
+            text-align: center;
             font-weight: bold;
             font-size: 14px;
             border-bottom: 2px solid #555;
@@ -54,6 +53,16 @@
             cursor: pointer;
             user-select: none;
             position: relative;
+        }
+        
+        /* Green headers for our faction table */
+        #our_faction_table th {
+            background: linear-gradient(135deg, #2d5a2d, #4a8b4a);
+        }
+        
+        /* Orange headers for enemy faction table */
+        #enemy_faction_table th {
+            background: linear-gradient(135deg, #cc4d1f, #e55a2b);
         }
         table.war_report th:last-child {
             border-right: none;
@@ -80,6 +89,7 @@
             border-right: 1px solid #444;
             font-size: 13px;
             color: #ffffff;
+            text-align: center;
         }
         table.war_report td:last-child {
             border-right: none;
@@ -91,11 +101,20 @@
             background-color: #404040;
             transition: background-color 0.2s;
         }
+        /* Make member name links blue and visible */
+        table.war_report td a {
+            color: #67e8f9 !important;
+            text-decoration: none;
+        }
+        table.war_report td a:hover {
+            color: #8ecef7 !important;
+            text-decoration: underline;
+        }
         table.war_report td:nth-child(3), 
         table.war_report td:nth-child(4),
         table.war_report td:nth-child(5),
         table.war_report td:nth-child(6) {
-            text-align: right;
+            text-align: center;
         }
         .stats-summary {
             display: flex;
@@ -210,7 +229,7 @@
                 <h3 style="background: linear-gradient(135deg, #2d5a2d, #4a8b4a); color: white; padding: 15px; border-radius: 8px;">EPIC Mafia</h3>
                 <div class="faction-stats our-stats" style="margin-bottom: 15px;">
                     <div class="stat-box">
-                        <div class="stat-number">3,410.00</div>
+                        <div class="stat-number">3,410</div>
                         <div class="stat-label">Our Attacks</div>
                     </div>
                     <div class="stat-box">
@@ -773,7 +792,7 @@
     </tr>
     <tr>
       <td><a href="https://www.torn.com/profiles.php?XID=3654210" target="_blank" style="color: #ffffff; text-decoration: none;">BeerBandit40</a></td>
-      <td>25</td>
+      <td>26</td>
       <td>36</td>
       <td>1.06%</td>
       <td>232.53</td>
@@ -781,7 +800,7 @@
       <td>6.46</td>
       <td>0.10</td>
       <td>0.93</td>
-      <td>9.30</td>
+      <td>8.94</td>
       <td>-46.7%</td>
     </tr>
     <tr>
@@ -890,7 +909,7 @@
     </tr>
     <tr>
       <td><a href="https://www.torn.com/profiles.php?XID=3715900" target="_blank" style="color: #ffffff; text-decoration: none;">GaloSengen</a></td>
-      <td>20</td>
+      <td>21</td>
       <td>22</td>
       <td>0.65%</td>
       <td>140.88</td>
@@ -898,7 +917,7 @@
       <td>6.40</td>
       <td>0.06</td>
       <td>0.57</td>
-      <td>7.04</td>
+      <td>6.71</td>
       <td>-67.7%</td>
     </tr>
     <tr>
@@ -1007,7 +1026,7 @@
     </tr>
     <tr>
       <td><a href="https://www.torn.com/profiles.php?XID=3786193" target="_blank" style="color: #ffffff; text-decoration: none;">Blckmonarch</a></td>
-      <td>15</td>
+      <td>16</td>
       <td>10</td>
       <td>0.29%</td>
       <td>86.54</td>
@@ -1015,7 +1034,7 @@
       <td>8.65</td>
       <td>0.04</td>
       <td>0.26</td>
-      <td>5.77</td>
+      <td>5.41</td>
       <td>-80.1%</td>
     </tr>
     <tr>
@@ -1215,7 +1234,7 @@
     </tr>
     <tr>
       <td><a href="https://www.torn.com/profiles.php?XID=3751400" target="_blank" style="color: #ffffff; text-decoration: none;">Paddeyy</a></td>
-      <td>17</td>
+      <td>18</td>
       <td>2</td>
       <td>0.06%</td>
       <td>17.11</td>
@@ -1223,7 +1242,7 @@
       <td>8.55</td>
       <td>0.01</td>
       <td>0.05</td>
-      <td>1.01</td>
+      <td>0.95</td>
       <td>-96.1%</td>
     </tr>
     <tr>
@@ -1293,7 +1312,7 @@
     </tr>
     <tr>
       <td><a href="https://www.torn.com/profiles.php?XID=3785490" target="_blank" style="color: #ffffff; text-decoration: none;">Maxey9320</a></td>
-      <td>15</td>
+      <td>16</td>
       <td>1</td>
       <td>0.03%</td>
       <td>9.64</td>
@@ -1301,7 +1320,7 @@
       <td>9.64</td>
       <td>0.00</td>
       <td>0.03</td>
-      <td>0.64</td>
+      <td>0.60</td>
       <td>-97.8%</td>
     </tr>
     <tr>
@@ -1338,7 +1357,7 @@
                 <h3 style="background: linear-gradient(135deg, #cc4d1f, #e55a2b); color: white; padding: 15px; border-radius: 8px;">House of Dragonborn</h3>
                 <div class="faction-stats enemy-stats" style="margin-bottom: 15px;">
                     <div class="stat-box">
-                        <div class="stat-number">2,769.00</div>
+                        <div class="stat-number">2,769</div>
                         <div class="stat-label">Enemy Attacks</div>
                     </div>
                     <div class="stat-box">
@@ -1680,7 +1699,7 @@
     </tr>
     <tr>
       <td><a href="https://www.torn.com/profiles.php?XID=2885904" target="_blank" style="color: #ffffff; text-decoration: none;">Norseman1</a></td>
-      <td>64</td>
+      <td>65</td>
       <td>51</td>
       <td>1.84%</td>
       <td>372.15</td>
@@ -1688,7 +1707,7 @@
       <td>7.30</td>
       <td>0.16</td>
       <td>1.32</td>
-      <td>5.81</td>
+      <td>5.73</td>
       <td>+38.8%</td>
     </tr>
     <tr>
@@ -1771,7 +1790,7 @@
     </tr>
     <tr>
       <td><a href="https://www.torn.com/profiles.php?XID=3391903" target="_blank" style="color: #ffffff; text-decoration: none;">BabyNina</a></td>
-      <td>38</td>
+      <td>39</td>
       <td>37</td>
       <td>1.34%</td>
       <td>249.78</td>
@@ -1779,7 +1798,7 @@
       <td>6.75</td>
       <td>0.11</td>
       <td>0.96</td>
-      <td>6.57</td>
+      <td>6.40</td>
       <td>-6.8%</td>
     </tr>
     <tr>
@@ -1810,7 +1829,7 @@
     </tr>
     <tr>
       <td><a href="https://www.torn.com/profiles.php?XID=3812555" target="_blank" style="color: #ffffff; text-decoration: none;">YuumiHeart</a></td>
-      <td>8</td>
+      <td>9</td>
       <td>42</td>
       <td>1.52%</td>
       <td>227.40</td>
@@ -1818,7 +1837,7 @@
       <td>5.41</td>
       <td>0.10</td>
       <td>1.09</td>
-      <td>28.43</td>
+      <td>25.27</td>
       <td>-15.2%</td>
     </tr>
     <tr>
@@ -1888,7 +1907,7 @@
     </tr>
     <tr>
       <td><a href="https://www.torn.com/profiles.php?XID=2668259" target="_blank" style="color: #ffffff; text-decoration: none;">Old</a></td>
-      <td>63</td>
+      <td>64</td>
       <td>29</td>
       <td>1.05%</td>
       <td>172.51</td>
@@ -1896,7 +1915,7 @@
       <td>5.95</td>
       <td>0.07</td>
       <td>0.75</td>
-      <td>2.74</td>
+      <td>2.70</td>
       <td>-35.7%</td>
     </tr>
     <tr>
@@ -2252,7 +2271,7 @@
     </tr>
     <tr>
       <td><a href="https://www.torn.com/profiles.php?XID=2681024" target="_blank" style="color: #ffffff; text-decoration: none;">Dillono</a></td>
-      <td>60</td>
+      <td>74</td>
       <td>21</td>
       <td>0.76%</td>
       <td>77.59</td>
@@ -2260,7 +2279,7 @@
       <td>3.69</td>
       <td>0.03</td>
       <td>0.54</td>
-      <td>1.29</td>
+      <td>1.05</td>
       <td>-71.1%</td>
     </tr>
     <tr>
@@ -2382,7 +2401,7 @@
     </tr>
     <tr>
       <td><a href="https://www.torn.com/profiles.php?XID=1213813" target="_blank" style="color: #ffffff; text-decoration: none;">Austin</a></td>
-      <td>55</td>
+      <td>64</td>
       <td>7</td>
       <td>0.25%</td>
       <td>20.53</td>
@@ -2390,7 +2409,7 @@
       <td>2.93</td>
       <td>0.01</td>
       <td>0.18</td>
-      <td>0.37</td>
+      <td>0.32</td>
       <td>-92.3%</td>
     </tr>
     <tr>

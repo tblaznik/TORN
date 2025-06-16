@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import statistics
 from chain_report_module import generate_chain_report
+from earnings_module import generate_earnings_report
 
 
 class TornWarReport:
@@ -13,8 +14,8 @@ class TornWarReport:
         self.faction_id = faction_id
         self.war_id = war_id
         
-    def format_number(self, num):
-        """Format numbers with American standards: comma as thousands separator, period as decimal"""
+    def format_number_american(self, num):
+        """Format numbers with AMERICAN standards: comma as thousands separator, period as decimal"""
         if isinstance(num, (int, float)):
             return f"{num:,.2f}"
         return str(num)
@@ -42,14 +43,15 @@ class TornWarReport:
         """Calculate hits per minute"""
         if attacks and duration_hours and duration_hours > 0:
             hits_per_min = attacks / (duration_hours * 60)
-            return f"{hits_per_min:.4f}"
+            return f"{hits_per_min:.4f}"  # American decimal format
         return "0.0000"
     
     def calculate_avg_hit_score(self, score, attacks):
         """Calculate average score per hit"""
         if score and attacks and attacks > 0:
-            return round(score / attacks, 2)
-        return 0.0
+            avg = round(score / attacks, 2)
+            return self.format_number_american(avg)
+        return "0.00"
     
     # Advanced Metrics Functions
     def calculate_efficiency_score(self, score, duration_hours):
@@ -186,6 +188,34 @@ class TornWarReport:
         print(f"Failed to get war data")
         return None
 
+    def get_war_respect_data(self):
+        """Get war respect data for merging with chain report"""
+        print("Getting war respect data for earnings calculations...")
+        
+        war_data = self.get_specific_war_data()
+        if not war_data:
+            return None
+        
+        our_faction_data = war_data.get('our_faction', {})
+        war_members = our_faction_data.get('members', {})
+        
+        war_respect_data = {}
+        
+        for member_id, member_data in war_members.items():
+            member_name = member_data.get('name', f'ID_{member_id}')
+            war_respect = member_data.get('score', 0)  # This is the WAR-only respect
+            war_attacks = member_data.get('attacks', 0)
+            
+            # Store with member name as key for merging
+            war_respect_data[member_name] = {
+                'war_respect': war_respect,
+                'war_attacks': war_attacks,
+                'member_id': member_id
+            }
+        
+        print(f"Got war respect data for {len(war_respect_data)} members")
+        return war_respect_data
+
     def generate_war_earnings_data(self):
         print("STARTING WAR EARNINGS REPORT GENERATION")
         
@@ -209,7 +239,7 @@ class TornWarReport:
         for id,items in war_items.items():
             print(f"Item ID: {id}, Items: {items}")
             avg_price = self.get_market_price(id)
-            print(f"Average market price for item ID {id}: {avg_price}")
+            print(f"Average market price for item ID {id}: {self.format_number_american(avg_price) if avg_price else 'N/A'}")
         item_df = pd.DataFrame.from_dict(war_items, orient='index').reset_index()
         
         print(item_df)
@@ -231,9 +261,9 @@ class TornWarReport:
             print(f"Enemy faction: {enemy_faction_data.get('name', f'ID_{enemy_faction_id}')} (ID: {enemy_faction_id})")
         
         print(f"War period: {self.convert_to_tct(war_start)} to {self.convert_to_tct(war_end)}")
-        print(f"Our faction score: {our_faction_data.get('score', 0)}")
+        print(f"Our faction score: {self.format_number_american(our_faction_data.get('score', 0))}")
         if enemy_faction_data:
-            print(f"Enemy faction score: {enemy_faction_data.get('score', 0)}")
+            print(f"Enemy faction score: {self.format_number_american(enemy_faction_data.get('score', 0))}")
         
         war_members = our_faction_data.get('members', {})
         enemy_members = enemy_faction_data.get('members', {}) if enemy_faction_data else {}
@@ -305,8 +335,8 @@ class TornWarReport:
                 'performance_vs_level': performance_vs_level
             }
         
-        print(f"Processed {total_attacks} our attacks with {total_score} our score")
-        print(f"Processed {enemy_total_attacks} enemy attacks with {enemy_total_score} enemy score")
+        print(f"Processed {total_attacks} our attacks with {self.format_number_american(total_score)} our score")
+        print(f"Processed {enemy_total_attacks} enemy attacks with {self.format_number_american(enemy_total_score)} enemy score")
         
         # Calculate faction-wide statistics
         our_faction_stats = self.calculate_faction_stats(member_stats, 'Our Faction')
@@ -366,14 +396,14 @@ class TornWarReport:
                     'Members': f'<a href="https://www.torn.com/profiles.php?XID={member_id.replace("enemy_", "")}" target="_blank" style="color: #ffffff; text-decoration: none;">{stats["name"]}</a>',
                     'Level': stats['level'],
                     'Attacks': stats['attacks'],
-                    'Hit %': f"{hit_percentage:.2f}%",
-                    'Score': self.format_number(stats['score']),
-                    'Score %': f"{score_percentage:.2f}%",
-                    'Avg score/hit': self.format_number(stats['avg_score_hit']),
-                    'Efficiency': self.format_number(stats['efficiency_score']),
-                    'Att/Hr': self.format_number(stats['attack_frequency']),
-                    'Score/Lvl': self.format_number(stats['performance_vs_level']),
-                    'vs Avg': f"{performance_vs_avg:+.1f}%"
+                    'Hit %': f"{hit_percentage:.2f}%",  # American format
+                    'Score': self.format_number_american(stats['score']),
+                    'Score %': f"{score_percentage:.2f}%",  # American format
+                    'Avg score/hit': self.format_number_american(stats['avg_score_hit']),
+                    'Efficiency': self.format_number_american(stats['efficiency_score']),
+                    'Att/Hr': self.format_number_american(stats['attack_frequency']),
+                    'Score/Lvl': self.format_number_american(stats['performance_vs_level']),
+                    'vs Avg': f"{performance_vs_avg:+.1f}%"  # American format
                 }
                 
                 if stats['faction'] == 'Our Faction':
@@ -388,7 +418,7 @@ class TornWarReport:
         our_df = pd.DataFrame(our_rows) if our_rows else pd.DataFrame()
         enemy_df = pd.DataFrame(enemy_rows) if enemy_rows else pd.DataFrame()
         
-        # Sort both by score descending (need to convert back to float for sorting)
+        # Sort both by score descending (need to parse American format for sorting)
         if not our_df.empty:
             our_df['_sort_score'] = our_df['Score'].str.replace(',', '').astype(float)
             our_df = our_df.sort_values('_sort_score', ascending=False)
@@ -409,7 +439,7 @@ class TornWarReport:
         war_end = self.convert_to_tct(war_data['war_end'])
         war_duration_formatted = self.format_duration_hms(war_data['war_duration_hours'])
         
-        # Calculate battle stats
+        # Calculate battle stats with American formatting
         our_hits_per_min = self.calculate_battle_stats(war_data['our_attacks'], war_data['war_duration_hours'])
         our_avg_hit_score = self.calculate_avg_hit_score(war_data['our_score'], war_data['our_attacks'])
         enemy_hits_per_min = self.calculate_battle_stats(war_data['enemy_attacks'], war_data['war_duration_hours'])
@@ -448,11 +478,11 @@ class TornWarReport:
                 <h3 style="background: linear-gradient(135deg, #2d5a2d, #4a8b4a); color: white; padding: 15px; border-radius: 8px;">EPIC Mafia</h3>
                 <div class="faction-stats our-stats" style="margin-bottom: 15px;">
                     <div class="stat-box">
-                        <div class="stat-number">{self.format_number(war_data['our_attacks'])}</div>
+                        <div class="stat-number">{war_data['our_attacks']:,}</div>
                         <div class="stat-label">Our Attacks</div>
                     </div>
                     <div class="stat-box">
-                        <div class="stat-number">{self.format_number(war_data['our_score'])}</div>
+                        <div class="stat-number">{self.format_number_american(war_data['our_score'])}</div>
                         <div class="stat-label">Our Score</div>
                     </div>
                     <div class="stat-box">
@@ -460,7 +490,7 @@ class TornWarReport:
                         <div class="stat-label">Hits/Min</div>
                     </div>
                     <div class="stat-box">
-                        <div class="stat-number">{self.format_number(our_avg_hit_score)}</div>
+                        <div class="stat-number">{our_avg_hit_score}</div>
                         <div class="stat-label">Avg Hit Score</div>
                     </div>
                     <div class="stat-box">
@@ -479,11 +509,11 @@ class TornWarReport:
                 <h3 style="background: linear-gradient(135deg, #cc4d1f, #e55a2b); color: white; padding: 15px; border-radius: 8px;">{war_data['enemy_faction_name']}</h3>
                 <div class="faction-stats enemy-stats" style="margin-bottom: 15px;">
                     <div class="stat-box">
-                        <div class="stat-number">{self.format_number(war_data['enemy_attacks'])}</div>
+                        <div class="stat-number">{war_data['enemy_attacks']:,}</div>
                         <div class="stat-label">Enemy Attacks</div>
                     </div>
                     <div class="stat-box">
-                        <div class="stat-number">{self.format_number(war_data['enemy_score'])}</div>
+                        <div class="stat-number">{self.format_number_american(war_data['enemy_score'])}</div>
                         <div class="stat-label">Enemy Score</div>
                     </div>
                     <div class="stat-box">
@@ -491,7 +521,7 @@ class TornWarReport:
                         <div class="stat-label">Hits/Min</div>
                     </div>
                     <div class="stat-box">
-                        <div class="stat-number">{self.format_number(enemy_avg_hit_score)}</div>
+                        <div class="stat-number">{enemy_avg_hit_score}</div>
                         <div class="stat-label">Avg Hit Score</div>
                     </div>
                     <div class="stat-box">
@@ -516,7 +546,7 @@ class TornWarReport:
             print("Template file not found, creating basic template...")
             template = self.get_default_template()
         
-        # Replace placeholders with actual data (using American formatting)
+        # Replace placeholders with actual data
         html = template.replace('{{WAR_ID}}', str(war_data['war_info']['war_id']))
         html = html.replace('{{WAR_START}}', war_start)
         html = html.replace('{{WAR_END}}', war_end)
@@ -550,6 +580,19 @@ def main():
 
     try:
         reporter = TornWarReport(api_key=API_KEY, faction_id=FACTION_ID, war_id=WAR_ID)
+        
+        # First, get war respect data for the earnings module
+        print("\n=== GETTING WAR RESPECT DATA FOR EARNINGS ===")
+        war_respect_data = reporter.get_war_respect_data()
+        if war_respect_data:
+            # Save war respect data to CSV for the earnings module to use
+            war_df = pd.DataFrame.from_dict(war_respect_data, orient='index')
+            war_df.reset_index(inplace=True)
+            war_df.rename(columns={'index': 'Member'}, inplace=True)
+            war_df.to_csv('war_respect_data.csv', sep=';', index=False, encoding='utf-8')
+            print(f"✅ War respect data saved for {len(war_df)} members")
+        
+        # Generate war report
         result = reporter.create_report_dataframe()
 
         if result and len(result) == 3 and (not result[0].empty or not result[1].empty):
@@ -578,6 +621,14 @@ def main():
         generate_chain_report()
     except Exception as e:
         print(f"Error generating chain report: {e}")
+        import traceback
+        traceback.print_exc()
+    
+    print("\nStarting Earnings Report Generator...")
+    try:
+        generate_earnings_report()
+    except Exception as e:
+        print(f"Error generating earnings report: {e}")
         import traceback
         traceback.print_exc()
 

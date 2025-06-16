@@ -43,10 +43,9 @@
             color: #ffffff;
         }
         table.war_report th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 12px 8px;
-            text-align: left;
+            text-align: center;
             font-weight: bold;
             font-size: 14px;
             border-bottom: 2px solid #555;
@@ -54,6 +53,16 @@
             cursor: pointer;
             user-select: none;
             position: relative;
+        }
+        
+        /* Green headers for our faction table */
+        #our_faction_table th {
+            background: linear-gradient(135deg, #2d5a2d, #4a8b4a);
+        }
+        
+        /* Orange headers for enemy faction table */
+        #enemy_faction_table th {
+            background: linear-gradient(135deg, #cc4d1f, #e55a2b);
         }
         table.war_report th:last-child {
             border-right: none;
@@ -80,6 +89,7 @@
             border-right: 1px solid #444;
             font-size: 13px;
             color: #ffffff;
+            text-align: center;
         }
         table.war_report td:last-child {
             border-right: none;
@@ -91,11 +101,20 @@
             background-color: #404040;
             transition: background-color 0.2s;
         }
+        /* Make member name links blue and visible */
+        table.war_report td a {
+            color: #67e8f9 !important;
+            text-decoration: none;
+        }
+        table.war_report td a:hover {
+            color: #8ecef7 !important;
+            text-decoration: underline;
+        }
         table.war_report td:nth-child(3), 
         table.war_report td:nth-child(4),
         table.war_report td:nth-child(5),
         table.war_report td:nth-child(6) {
-            text-align: right;
+            text-align: center;
         }
         .stats-summary {
             display: flex;
