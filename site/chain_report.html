@@ -1,0 +1,2326 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='UTF-8'>
+  <title>Chain Report</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;600;700&family=Crimson+Text:wght@400;600&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Oswald', sans-serif;
+      background: 
+        radial-gradient(ellipse at top, rgba(20, 20, 20, 0.9) 0%, rgba(0, 0, 0, 0.95) 100%),
+        linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+      color: #d4c5a0;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 15% 25%, rgba(85, 107, 47, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 85% 75%, rgba(107, 142, 35, 0.06) 0%, transparent 40%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1600px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(45, 45, 45, 0.7) 100%);
+      border: 2px solid #556B2F;
+      border-radius: 15px;
+      backdrop-filter: blur(15px);
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #556B2F, #6B8E23, #556B2F);
+    }
+    
+    .header h1 {
+      font-size: clamp(2.5em, 6vw, 4em);
+      font-weight: 700;
+      color: #d4c5a0;
+      text-shadow: 3px 3px 0px #556B2F, 6px 6px 10px rgba(0, 0, 0, 0.8);
+      margin-bottom: 15px;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+    }
+    
+    /* Back Button */
+    .back-button {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(45, 45, 45, 0.7) 100%);
+      border: 2px solid #FF8C00;
+      border-radius: 25px;
+      padding: 12px 20px;
+      color: #FF8C00;
+      text-decoration: none;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+    
+    .back-button:hover {
+      background: linear-gradient(135deg, rgba(255, 140, 0, 0.1) 0%, rgba(255, 140, 0, 0.05) 100%);
+      box-shadow: 0 0 20px rgba(255, 140, 0, 0.3);
+      transform: scale(1.05);
+    }
+    
+    /* Chain Table */
+    table.war_report {
+      width: 100%;
+      border-collapse: collapse;
+      background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(45, 45, 45, 0.7) 100%);
+      color: #d4c5a0;
+      border-radius: 15px;
+      overflow: hidden;
+      backdrop-filter: blur(15px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      margin-bottom: 40px;
+    }
+    
+    table.war_report th {
+      padding: 15px 8px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.9em;
+      border-bottom: 2px solid rgba(85, 107, 47, 0.4);
+      border-right: 1px solid rgba(68, 68, 68, 0.5);
+      cursor: pointer;
+      user-select: none;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    /* Header section color coding */
+    table.war_report th:nth-child(1),  /* Member */
+    table.war_report th:nth-child(2),  /* Respect */
+    table.war_report th:nth-child(3),  /* Best */
+    table.war_report th:nth-child(4),  /* Avg */
+    table.war_report th:nth-child(5) { /* Attacks */
+      background: linear-gradient(135deg, rgba(103, 126, 234, 0.4) 0%, rgba(118, 75, 162, 0.3) 100%);
+    }
+    
+    table.war_report th:nth-child(6),  /* War */
+    table.war_report th:nth-child(7) { /* Outside */
+      background: linear-gradient(135deg, rgba(240, 147, 251, 0.4) 0%, rgba(245, 87, 108, 0.3) 100%);
+    }
+    
+    table.war_report th:nth-child(8),  /* Saves */
+    table.war_report th:nth-child(9) { /* Save Score */
+      background: linear-gradient(135deg, rgba(255, 140, 0, 0.4) 0%, rgba(218, 165, 32, 0.3) 100%);
+    }
+    
+    table.war_report th:nth-child(10),  /* Leave */
+    table.war_report th:nth-child(11),  /* Hosp */
+    table.war_report th:nth-child(12),  /* Mug */
+    table.war_report th:nth-child(13),  /* Retal */
+    table.war_report th:nth-child(14),  /* Overseas */
+    table.war_report th:nth-child(15),  /* Draw */
+    table.war_report th:nth-child(16),  /* Assist */
+    table.war_report th:nth-child(17),  /* Escape */
+    table.war_report th:nth-child(18) { /* Loss */
+      background: linear-gradient(135deg, rgba(79, 172, 254, 0.4) 0%, rgba(0, 242, 254, 0.3) 100%);
+    }
+    
+    table.war_report th:last-child {
+      border-right: none;
+    }
+    
+    table.war_report th:hover {
+      background: linear-gradient(135deg, rgba(218, 165, 32, 0.2) 0%, rgba(255, 215, 0, 0.1) 100%);
+    }
+    
+    table.war_report th::after {
+      content: ' ↕';
+      font-size: 0.8em;
+      opacity: 0.6;
+    }
+    
+    table.war_report th.sort-asc::after {
+      content: ' ↑';
+      opacity: 1;
+    }
+    
+    table.war_report th.sort-desc::after {
+      content: ' ↓';
+      opacity: 1;
+    }
+    
+    table.war_report td {
+      padding: 10px 8px;
+      border-bottom: 1px solid rgba(68, 68, 68, 0.3);
+      border-right: 1px solid rgba(68, 68, 68, 0.3);
+      font-size: 0.9em;
+      text-align: center;
+      transition: background-color 0.2s ease;
+    }
+    
+    table.war_report td:last-child {
+      border-right: none;
+    }
+    
+    table.war_report tr:nth-child(even) {
+      background-color: rgba(51, 51, 51, 0.3);
+    }
+    
+    table.war_report tr:hover {
+      background-color: rgba(107, 142, 35, 0.1);
+    }
+    
+    table.war_report td a {
+      color: #FFD700;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    table.war_report td a:hover {
+      color: #FFF;
+      text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+    }
+    
+    /* Totals row styling */
+    table.war_report .totals-row {
+      background-color: rgba(85, 107, 47, 0.2) !important;
+    }
+    
+    table.war_report .totals-row:hover {
+      background-color: rgba(85, 107, 47, 0.2) !important;
+    }
+    
+    table.war_report .totals-cell {
+      background: rgba(85, 107, 47, 0.2) !important;
+      color: #d4c5a0;
+      font-weight: 700;
+      border-bottom: 2px solid rgba(85, 107, 47, 0.5);
+      padding: 15px 8px;
+      text-align: center;
+      cursor: default !important;
+    }
+    
+    table.war_report .totals-cell::after {
+      content: '' !important;
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .header h1 {
+        letter-spacing: 3px;
+      }
+      
+      table.war_report th,
+      table.war_report td {
+        padding: 8px 4px;
+        font-size: 0.8em;
+      }
+      
+      .back-button {
+        position: relative;
+        top: 0;
+        right: 0;
+        margin-bottom: 20px;
+        display: inline-block;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back-button">← Back</a>
+  
+  <div class="container">
+    <div class="header">
+      <h1>⛓️ Chain Report</h1>
+    </div>
+    <table class="dataframe war_report">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Member</th>
+      <th>Respect</th>
+      <th>Best</th>
+      <th>Avg</th>
+      <th>Attacks</th>
+      <th>War</th>
+      <th>Outside</th>
+      <th>Saves</th>
+      <th>Save_Score</th>
+      <th>Leave</th>
+      <th>Hosp</th>
+      <th>Mug</th>
+      <th>Retal</th>
+      <th>Overseas</th>
+      <th>Draw</th>
+      <th>Assist</th>
+      <th>Escape</th>
+      <th>Loss</th>
+    </tr>
+  <tr class="totals-row"><th class="totals-cell"><strong>TOTALS</strong></th><th class="totals-cell"><strong>36,185</strong></th><th class="totals-cell"><strong>30.07</strong></th><th class="totals-cell"><strong>369.23</strong></th><th class="totals-cell"><strong>3,608</strong></th><th class="totals-cell"><div data-sort="3410"><strong>3,410</strong><div style="font-size: 10px; color: #aaa"><strong>94.51%</strong></div></div></th><th class="totals-cell"><div data-sort="198"><strong>198</strong><div style="font-size: 10px; color: #aaa"><strong>5.49%</strong></div></div></th><th class="totals-cell"><strong>19</strong></th><th class="totals-cell"><strong>225.34</strong></th><th class="totals-cell"><div data-sort="2686"><strong>2,686</strong><div style="font-size: 10px; color: #aaa"><strong>78.77%</strong></div></div></th><th class="totals-cell"><div data-sort="868"><strong>868</strong><div style="font-size: 10px; color: #aaa"><strong>25.45%</strong></div></div></th><th class="totals-cell"><div data-sort="54"><strong>54</strong><div style="font-size: 10px; color: #aaa"><strong>1.58%</strong></div></div></th><th class="totals-cell"><div data-sort="497"><strong>497</strong><div style="font-size: 10px; color: #aaa"><strong>14.57%</strong></div></div></th><th class="totals-cell"><div data-sort="325"><strong>325</strong><div style="font-size: 10px; color: #aaa"><strong>9.53%</strong></div></div></th><th class="totals-cell"><div data-sort="10"><strong>10</strong><div style="font-size: 10px; color: #aaa"><strong>0.29%</strong></div></div></th><th class="totals-cell"><div data-sort="252"><strong>252</strong><div style="font-size: 10px; color: #aaa"><strong>7.39%</strong></div></div></th><th class="totals-cell"><div data-sort="9"><strong>9</strong><div style="font-size: 10px; color: #aaa"><strong>0.26%</strong></div></div></th><th class="totals-cell"><div data-sort="300"><strong>300</strong><div style="font-size: 10px; color: #aaa"><strong>8.80%</strong></div></div></th></tr></thead>
+  <tbody>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2189677" target="_blank" style="color:#67e8f9;text-decoration:none">Monst3rous</a></td>
+      <td>2,742</td>
+      <td>27.63</td>
+      <td>10.52</td>
+      <td>140</td>
+      <td><div data-sort="140">140<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="46">46<div style="font-size: 10px; color: #aaa">32.86%</div></div></td>
+      <td><div data-sort="94">94<div style="font-size: 10px; color: #aaa">67.14%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="37">37<div style="font-size: 10px; color: #aaa">26.43%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">1.43%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="10">10<div style="font-size: 10px; color: #aaa">7.14%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="9">9<div style="font-size: 10px; color: #aaa">6.43%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3212903" target="_blank" style="color:#67e8f9;text-decoration:none">JlambJLAMB</a></td>
+      <td>2,368</td>
+      <td>26.17</td>
+      <td>12.14</td>
+      <td>195</td>
+      <td><div data-sort="195">195<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="131">131<div style="font-size: 10px; color: #aaa">67.18%</div></div></td>
+      <td><div data-sort="64">64<div style="font-size: 10px; color: #aaa">32.82%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="49">49<div style="font-size: 10px; color: #aaa">25.13%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="8">8<div style="font-size: 10px; color: #aaa">4.10%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="20">20<div style="font-size: 10px; color: #aaa">10.26%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2125322" target="_blank" style="color:#67e8f9;text-decoration:none">daprinceomar</a></td>
+      <td>2,281</td>
+      <td>29.93</td>
+      <td>9.98</td>
+      <td>151</td>
+      <td><div data-sort="150">150<div style="font-size: 10px; color: #aaa">99.34%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">0.66%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="78">78<div style="font-size: 10px; color: #aaa">52.00%</div></div></td>
+      <td><div data-sort="73">73<div style="font-size: 10px; color: #aaa">48.67%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="41">41<div style="font-size: 10px; color: #aaa">27.33%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="9">9<div style="font-size: 10px; color: #aaa">6.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">0.67%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=1953965" target="_blank" style="color:#67e8f9;text-decoration:none">RipTheJacker</a></td>
+      <td>1,901</td>
+      <td>28.30</td>
+      <td>9.88</td>
+      <td>194</td>
+      <td><div data-sort="185">185<div style="font-size: 10px; color: #aaa">95.36%</div></div></td>
+      <td><div data-sort="9">9<div style="font-size: 10px; color: #aaa">4.64%</div></div></td>
+      <td>6</td>
+      <td>71.16</td>
+      <td><div data-sort="86">86<div style="font-size: 10px; color: #aaa">46.49%</div></div></td>
+      <td><div data-sort="100">100<div style="font-size: 10px; color: #aaa">54.05%</div></div></td>
+      <td><div data-sort="8">8<div style="font-size: 10px; color: #aaa">4.32%</div></div></td>
+      <td><div data-sort="73">73<div style="font-size: 10px; color: #aaa">39.46%</div></div></td>
+      <td><div data-sort="17">17<div style="font-size: 10px; color: #aaa">9.19%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="11">11<div style="font-size: 10px; color: #aaa">5.95%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="5">5<div style="font-size: 10px; color: #aaa">2.70%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2228876" target="_blank" style="color:#67e8f9;text-decoration:none">FuzzyRight1</a></td>
+      <td>1,752</td>
+      <td>30.07</td>
+      <td>11.81</td>
+      <td>143</td>
+      <td><div data-sort="142">142<div style="font-size: 10px; color: #aaa">99.30%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">0.70%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="83">83<div style="font-size: 10px; color: #aaa">58.45%</div></div></td>
+      <td><div data-sort="59">59<div style="font-size: 10px; color: #aaa">41.55%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">0.70%</div></div></td>
+      <td><div data-sort="40">40<div style="font-size: 10px; color: #aaa">28.17%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">0.70%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="8">8<div style="font-size: 10px; color: #aaa">5.63%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2325363" target="_blank" style="color:#67e8f9;text-decoration:none">JetBeanJETBEAN</a></td>
+      <td>1,450</td>
+      <td>24.92</td>
+      <td>12.02</td>
+      <td>95</td>
+      <td><div data-sort="95">95<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="59">59<div style="font-size: 10px; color: #aaa">62.11%</div></div></td>
+      <td><div data-sort="36">36<div style="font-size: 10px; color: #aaa">37.89%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="9">9<div style="font-size: 10px; color: #aaa">9.47%</div></div></td>
+      <td><div data-sort="17">17<div style="font-size: 10px; color: #aaa">17.89%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="6">6<div style="font-size: 10px; color: #aaa">6.32%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">3.16%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3155566" target="_blank" style="color:#67e8f9;text-decoration:none">Shindig7</a></td>
+      <td>1,410</td>
+      <td>23.07</td>
+      <td>12.26</td>
+      <td>115</td>
+      <td><div data-sort="115">115<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="94">94<div style="font-size: 10px; color: #aaa">81.74%</div></div></td>
+      <td><div data-sort="21">21<div style="font-size: 10px; color: #aaa">18.26%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="16">16<div style="font-size: 10px; color: #aaa">13.91%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="5">5<div style="font-size: 10px; color: #aaa">4.35%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="8">8<div style="font-size: 10px; color: #aaa">6.96%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2752336" target="_blank" style="color:#67e8f9;text-decoration:none">CheJCHEJ</a></td>
+      <td>1,212</td>
+      <td>19.48</td>
+      <td>11.77</td>
+      <td>103</td>
+      <td><div data-sort="103">103<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="89">89<div style="font-size: 10px; color: #aaa">86.41%</div></div></td>
+      <td><div data-sort="14">14<div style="font-size: 10px; color: #aaa">13.59%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="13">13<div style="font-size: 10px; color: #aaa">12.62%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">0.97%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="4">4<div style="font-size: 10px; color: #aaa">3.88%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="6">6<div style="font-size: 10px; color: #aaa">5.83%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3521451" target="_blank" style="color:#67e8f9;text-decoration:none">Caz27CAZ27</a></td>
+      <td>1,056</td>
+      <td>18.24</td>
+      <td>10.45</td>
+      <td>104</td>
+      <td><div data-sort="97">97<div style="font-size: 10px; color: #aaa">93.27%</div></div></td>
+      <td><div data-sort="7">7<div style="font-size: 10px; color: #aaa">6.73%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="78">78<div style="font-size: 10px; color: #aaa">80.41%</div></div></td>
+      <td><div data-sort="24">24<div style="font-size: 10px; color: #aaa">24.74%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">2.06%</div></div></td>
+      <td><div data-sort="8">8<div style="font-size: 10px; color: #aaa">8.25%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">1.03%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">1.03%</div></div></td>
+      <td><div data-sort="10">10<div style="font-size: 10px; color: #aaa">10.31%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="10">10<div style="font-size: 10px; color: #aaa">10.31%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3143592" target="_blank" style="color:#67e8f9;text-decoration:none">sloojSLOOJ</a></td>
+      <td>985</td>
+      <td>23.92</td>
+      <td>10.25</td>
+      <td>97</td>
+      <td><div data-sort="93">93<div style="font-size: 10px; color: #aaa">95.88%</div></div></td>
+      <td><div data-sort="4">4<div style="font-size: 10px; color: #aaa">4.12%</div></div></td>
+      <td>3</td>
+      <td>35.58</td>
+      <td><div data-sort="68">68<div style="font-size: 10px; color: #aaa">73.12%</div></div></td>
+      <td><div data-sort="28">28<div style="font-size: 10px; color: #aaa">30.11%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">1.08%</div></div></td>
+      <td><div data-sort="18">18<div style="font-size: 10px; color: #aaa">19.35%</div></div></td>
+      <td><div data-sort="17">17<div style="font-size: 10px; color: #aaa">18.28%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="4">4<div style="font-size: 10px; color: #aaa">4.30%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="6">6<div style="font-size: 10px; color: #aaa">6.45%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3399414" target="_blank" style="color:#67e8f9;text-decoration:none">Renderhp</a></td>
+      <td>977</td>
+      <td>25.72</td>
+      <td>11.37</td>
+      <td>86</td>
+      <td><div data-sort="86">86<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="50">50<div style="font-size: 10px; color: #aaa">58.14%</div></div></td>
+      <td><div data-sort="36">36<div style="font-size: 10px; color: #aaa">41.86%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="27">27<div style="font-size: 10px; color: #aaa">31.40%</div></div></td>
+      <td><div data-sort="16">16<div style="font-size: 10px; color: #aaa">18.60%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="7">7<div style="font-size: 10px; color: #aaa">8.14%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="4">4<div style="font-size: 10px; color: #aaa">4.65%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2176411" target="_blank" style="color:#67e8f9;text-decoration:none">kirbKIRB</a></td>
+      <td>950</td>
+      <td>27.17</td>
+      <td>10.92</td>
+      <td>87</td>
+      <td><div data-sort="87">87<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="15">15<div style="font-size: 10px; color: #aaa">17.24%</div></div></td>
+      <td><div data-sort="72">72<div style="font-size: 10px; color: #aaa">82.76%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="34">34<div style="font-size: 10px; color: #aaa">39.08%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="9">9<div style="font-size: 10px; color: #aaa">10.34%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">2.30%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2599153" target="_blank" style="color:#67e8f9;text-decoration:none">SouthieSOUTHIE</a></td>
+      <td>945</td>
+      <td>21.19</td>
+      <td>12.30</td>
+      <td>77</td>
+      <td><div data-sort="77">77<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="52">52<div style="font-size: 10px; color: #aaa">67.53%</div></div></td>
+      <td><div data-sort="25">25<div style="font-size: 10px; color: #aaa">32.47%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="10">10<div style="font-size: 10px; color: #aaa">12.99%</div></div></td>
+      <td><div data-sort="10">10<div style="font-size: 10px; color: #aaa">12.99%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="4">4<div style="font-size: 10px; color: #aaa">5.19%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">3.90%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2608152" target="_blank" style="color:#67e8f9;text-decoration:none">neonredNEONRED</a></td>
+      <td>861</td>
+      <td>17.95</td>
+      <td>12.24</td>
+      <td>71</td>
+      <td><div data-sort="70">70<div style="font-size: 10px; color: #aaa">98.59%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">1.41%</div></div></td>
+      <td>1</td>
+      <td>11.86</td>
+      <td><div data-sort="66">66<div style="font-size: 10px; color: #aaa">94.29%</div></div></td>
+      <td><div data-sort="5">5<div style="font-size: 10px; color: #aaa">7.14%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">1.43%</div></div></td>
+      <td><div data-sort="70">70<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2646329" target="_blank" style="color:#67e8f9;text-decoration:none">Cyb3rpunkx</a></td>
+      <td>759</td>
+      <td>24.89</td>
+      <td>8.82</td>
+      <td>86</td>
+      <td><div data-sort="86">86<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="56">56<div style="font-size: 10px; color: #aaa">65.12%</div></div></td>
+      <td><div data-sort="30">30<div style="font-size: 10px; color: #aaa">34.88%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="25">25<div style="font-size: 10px; color: #aaa">29.07%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">3.49%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">3.49%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3709844" target="_blank" style="color:#67e8f9;text-decoration:none">SlayersApex</a></td>
+      <td>741</td>
+      <td>17.31</td>
+      <td>9.04</td>
+      <td>82</td>
+      <td><div data-sort="82">82<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>2</td>
+      <td>23.72</td>
+      <td><div data-sort="79">79<div style="font-size: 10px; color: #aaa">96.34%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">3.66%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">3.66%</div></div></td>
+      <td><div data-sort="7">7<div style="font-size: 10px; color: #aaa">8.54%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">3.66%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="14">14<div style="font-size: 10px; color: #aaa">17.07%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2015888" target="_blank" style="color:#67e8f9;text-decoration:none">DarthBelloq</a></td>
+      <td>671</td>
+      <td>20.79</td>
+      <td>9.07</td>
+      <td>74</td>
+      <td><div data-sort="74">74<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="37">37<div style="font-size: 10px; color: #aaa">50.00%</div></div></td>
+      <td><div data-sort="37">37<div style="font-size: 10px; color: #aaa">50.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="17">17<div style="font-size: 10px; color: #aaa">22.97%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">2.70%</div></div></td>
+      <td><div data-sort="11">11<div style="font-size: 10px; color: #aaa">14.86%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">2.70%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2080360" target="_blank" style="color:#67e8f9;text-decoration:none">hells_nells</a></td>
+      <td>659</td>
+      <td>28.61</td>
+      <td>12.68</td>
+      <td>52</td>
+      <td><div data-sort="52">52<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="28">28<div style="font-size: 10px; color: #aaa">53.85%</div></div></td>
+      <td><div data-sort="24">24<div style="font-size: 10px; color: #aaa">46.15%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="14">14<div style="font-size: 10px; color: #aaa">26.92%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="5">5<div style="font-size: 10px; color: #aaa">9.62%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">3.85%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3027058" target="_blank" style="color:#67e8f9;text-decoration:none">Elswicka</a></td>
+      <td>624</td>
+      <td>16.11</td>
+      <td>10.44</td>
+      <td>60</td>
+      <td><div data-sort="59">59<div style="font-size: 10px; color: #aaa">98.33%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">1.67%</div></div></td>
+      <td>1</td>
+      <td>11.86</td>
+      <td><div data-sort="58">58<div style="font-size: 10px; color: #aaa">98.31%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">3.39%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">3.39%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">1.69%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">1.69%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">3.39%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3537137" target="_blank" style="color:#67e8f9;text-decoration:none">Leadeatinmaniac</a></td>
+      <td>544</td>
+      <td>13.34</td>
+      <td>8.60</td>
+      <td>64</td>
+      <td><div data-sort="61">61<div style="font-size: 10px; color: #aaa">95.31%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">4.69%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="60">60<div style="font-size: 10px; color: #aaa">98.36%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">4.92%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">1.64%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="7">7<div style="font-size: 10px; color: #aaa">11.48%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="7">7<div style="font-size: 10px; color: #aaa">11.48%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2955185" target="_blank" style="color:#67e8f9;text-decoration:none">SoulHunter8</a></td>
+      <td>513</td>
+      <td>17.53</td>
+      <td>10.26</td>
+      <td>50</td>
+      <td><div data-sort="50">50<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="47">47<div style="font-size: 10px; color: #aaa">94.00%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">6.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">6.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">2.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">6.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="15">15<div style="font-size: 10px; color: #aaa">30.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=1719132" target="_blank" style="color:#67e8f9;text-decoration:none">HeartsPrincess</a></td>
+      <td>505</td>
+      <td>17.45</td>
+      <td>9.75</td>
+      <td>52</td>
+      <td><div data-sort="51">51<div style="font-size: 10px; color: #aaa">98.08%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">1.92%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="27">27<div style="font-size: 10px; color: #aaa">52.94%</div></div></td>
+      <td><div data-sort="25">25<div style="font-size: 10px; color: #aaa">49.02%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="17">17<div style="font-size: 10px; color: #aaa">33.33%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="5">5<div style="font-size: 10px; color: #aaa">9.80%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">1.96%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3637762" target="_blank" style="color:#67e8f9;text-decoration:none">AktashAKTASH</a></td>
+      <td>503</td>
+      <td>12.16</td>
+      <td>8.06</td>
+      <td>63</td>
+      <td><div data-sort="62">62<div style="font-size: 10px; color: #aaa">98.41%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">1.59%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="61">61<div style="font-size: 10px; color: #aaa">98.39%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">3.23%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">1.61%</div></div></td>
+      <td><div data-sort="9">9<div style="font-size: 10px; color: #aaa">14.52%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="9">9<div style="font-size: 10px; color: #aaa">14.52%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3535815" target="_blank" style="color:#67e8f9;text-decoration:none">_Moridin_</a></td>
+      <td>499</td>
+      <td>16.85</td>
+      <td>11.33</td>
+      <td>44</td>
+      <td><div data-sort="44">44<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="44">44<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">4.55%</div></div></td>
+      <td><div data-sort="10">10<div style="font-size: 10px; color: #aaa">22.73%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">6.82%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3654507" target="_blank" style="color:#67e8f9;text-decoration:none">BlnkoBLNKO</a></td>
+      <td>495</td>
+      <td>13.95</td>
+      <td>7.22</td>
+      <td>71</td>
+      <td><div data-sort="65">65<div style="font-size: 10px; color: #aaa">91.55%</div></div></td>
+      <td><div data-sort="6">6<div style="font-size: 10px; color: #aaa">8.45%</div></div></td>
+      <td>5</td>
+      <td>59.30</td>
+      <td><div data-sort="66">66<div style="font-size: 10px; color: #aaa">101.54%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">1.54%</div></div></td>
+      <td><div data-sort="4">4<div style="font-size: 10px; color: #aaa">6.15%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="12">12<div style="font-size: 10px; color: #aaa">18.46%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="10">10<div style="font-size: 10px; color: #aaa">15.38%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="9">9<div style="font-size: 10px; color: #aaa">13.85%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2806010" target="_blank" style="color:#67e8f9;text-decoration:none">MandaMANDA</a></td>
+      <td>483</td>
+      <td>19.57</td>
+      <td>9.46</td>
+      <td>51</td>
+      <td><div data-sort="51">51<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="40">40<div style="font-size: 10px; color: #aaa">78.43%</div></div></td>
+      <td><div data-sort="11">11<div style="font-size: 10px; color: #aaa">21.57%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="8">8<div style="font-size: 10px; color: #aaa">15.69%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="9">9<div style="font-size: 10px; color: #aaa">17.65%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="5">5<div style="font-size: 10px; color: #aaa">9.80%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3269984" target="_blank" style="color:#67e8f9;text-decoration:none">Pokeballer</a></td>
+      <td>475</td>
+      <td>14.82</td>
+      <td>8.79</td>
+      <td>54</td>
+      <td><div data-sort="54">54<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="50">50<div style="font-size: 10px; color: #aaa">92.59%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">5.56%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">1.85%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="4">4<div style="font-size: 10px; color: #aaa">7.41%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="10">10<div style="font-size: 10px; color: #aaa">18.52%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3158789" target="_blank" style="color:#67e8f9;text-decoration:none">Hotspoon</a></td>
+      <td>467</td>
+      <td>15.18</td>
+      <td>6.89</td>
+      <td>63</td>
+      <td><div data-sort="59">59<div style="font-size: 10px; color: #aaa">93.65%</div></div></td>
+      <td><div data-sort="4">4<div style="font-size: 10px; color: #aaa">6.35%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="59">59<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="4">4<div style="font-size: 10px; color: #aaa">6.78%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="4">4<div style="font-size: 10px; color: #aaa">6.78%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">5.08%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=1858055" target="_blank" style="color:#67e8f9;text-decoration:none">AnthonyLoretto</a></td>
+      <td>437</td>
+      <td>13.86</td>
+      <td>6.94</td>
+      <td>63</td>
+      <td><div data-sort="63">63<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="62">62<div style="font-size: 10px; color: #aaa">98.41%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">1.59%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">1.59%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">1.59%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">1.59%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2882495" target="_blank" style="color:#67e8f9;text-decoration:none">Ichaerus</a></td>
+      <td>411</td>
+      <td>18.94</td>
+      <td>7.75</td>
+      <td>53</td>
+      <td><div data-sort="53">53<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="37">37<div style="font-size: 10px; color: #aaa">69.81%</div></div></td>
+      <td><div data-sort="16">16<div style="font-size: 10px; color: #aaa">30.19%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="12">12<div style="font-size: 10px; color: #aaa">22.64%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">1.89%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="4">4<div style="font-size: 10px; color: #aaa">7.55%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">3.77%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3251350" target="_blank" style="color:#67e8f9;text-decoration:none">ImSoFoolish</a></td>
+      <td>390</td>
+      <td>13.87</td>
+      <td>11.47</td>
+      <td>34</td>
+      <td><div data-sort="34">34<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="34">34<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="5">5<div style="font-size: 10px; color: #aaa">14.71%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">5.88%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">8.82%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2880827" target="_blank" style="color:#67e8f9;text-decoration:none">JudgeFudge</a></td>
+      <td>344</td>
+      <td>13.23</td>
+      <td>6.74</td>
+      <td>51</td>
+      <td><div data-sort="51">51<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="49">49<div style="font-size: 10px; color: #aaa">96.08%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">3.92%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">1.96%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">5.88%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=140444" target="_blank" style="color:#67e8f9;text-decoration:none">Williams</a></td>
+      <td>334</td>
+      <td>17.79</td>
+      <td>9.56</td>
+      <td>35</td>
+      <td><div data-sort="35">35<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="35">35<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">5.71%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">5.71%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="4">4<div style="font-size: 10px; color: #aaa">11.43%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3746198" target="_blank" style="color:#67e8f9;text-decoration:none">EhrzvvEHRZVV</a></td>
+      <td>328</td>
+      <td>16.51</td>
+      <td>7.95</td>
+      <td>46</td>
+      <td><div data-sort="36">36<div style="font-size: 10px; color: #aaa">78.26%</div></div></td>
+      <td><div data-sort="10">10<div style="font-size: 10px; color: #aaa">21.74%</div></div></td>
+      <td>1</td>
+      <td>11.86</td>
+      <td><div data-sort="43">43<div style="font-size: 10px; color: #aaa">119.44%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">8.33%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="10">10<div style="font-size: 10px; color: #aaa">27.78%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="9">9<div style="font-size: 10px; color: #aaa">25.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">2.78%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3317890" target="_blank" style="color:#67e8f9;text-decoration:none">Xx_Eugene_xX</a></td>
+      <td>287</td>
+      <td>13.57</td>
+      <td>9.11</td>
+      <td>37</td>
+      <td><div data-sort="28">28<div style="font-size: 10px; color: #aaa">75.68%</div></div></td>
+      <td><div data-sort="9">9<div style="font-size: 10px; color: #aaa">24.32%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="37">37<div style="font-size: 10px; color: #aaa">132.14%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">7.14%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="12">12<div style="font-size: 10px; color: #aaa">42.86%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2272830" target="_blank" style="color:#67e8f9;text-decoration:none">taliesTALIES</a></td>
+      <td>284</td>
+      <td>17.55</td>
+      <td>11.85</td>
+      <td>24</td>
+      <td><div data-sort="24">24<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="20">20<div style="font-size: 10px; color: #aaa">83.33%</div></div></td>
+      <td><div data-sort="4">4<div style="font-size: 10px; color: #aaa">16.67%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">12.50%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="4">4<div style="font-size: 10px; color: #aaa">16.67%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2790420" target="_blank" style="color:#67e8f9;text-decoration:none">Chang_ECHANG_E</a></td>
+      <td>261</td>
+      <td>17.83</td>
+      <td>10.03</td>
+      <td>26</td>
+      <td><div data-sort="26">26<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="22">22<div style="font-size: 10px; color: #aaa">84.62%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">11.54%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">3.85%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">3.85%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="8">8<div style="font-size: 10px; color: #aaa">30.77%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3251071" target="_blank" style="color:#67e8f9;text-decoration:none">TheCreature</a></td>
+      <td>259</td>
+      <td>15.04</td>
+      <td>13.65</td>
+      <td>19</td>
+      <td><div data-sort="19">19<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="19">19<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="13">13<div style="font-size: 10px; color: #aaa">68.42%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="8">8<div style="font-size: 10px; color: #aaa">42.11%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2973461" target="_blank" style="color:#67e8f9;text-decoration:none">Frank3nst3in</a></td>
+      <td>254</td>
+      <td>13.31</td>
+      <td>7.33</td>
+      <td>36</td>
+      <td><div data-sort="34">34<div style="font-size: 10px; color: #aaa">94.44%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">5.56%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="27">27<div style="font-size: 10px; color: #aaa">79.41%</div></div></td>
+      <td><div data-sort="8">8<div style="font-size: 10px; color: #aaa">23.53%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">2.94%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">5.88%</div></div></td>
+      <td><div data-sort="13">13<div style="font-size: 10px; color: #aaa">38.24%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">2.94%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">2.94%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3263240" target="_blank" style="color:#67e8f9;text-decoration:none">MorninGlory</a></td>
+      <td>233</td>
+      <td>14.91</td>
+      <td>10.11</td>
+      <td>23</td>
+      <td><div data-sort="23">23<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="23">23<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">4.35%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">4.35%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3654210" target="_blank" style="color:#67e8f9;text-decoration:none">BeerBandit40</a></td>
+      <td>233</td>
+      <td>11.92</td>
+      <td>6.46</td>
+      <td>36</td>
+      <td><div data-sort="36">36<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="36">36<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">5.56%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">8.33%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2899757" target="_blank" style="color:#67e8f9;text-decoration:none">PurpleCatnip</a></td>
+      <td>214</td>
+      <td>14.12</td>
+      <td>8.58</td>
+      <td>25</td>
+      <td><div data-sort="25">25<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="25">25<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="9">9<div style="font-size: 10px; color: #aaa">36.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">8.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2899384" target="_blank" style="color:#67e8f9;text-decoration:none">aarontrepus</a></td>
+      <td>187</td>
+      <td>9.21</td>
+      <td>4.66</td>
+      <td>40</td>
+      <td><div data-sort="40">40<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="40">40<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">2.50%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2196526" target="_blank" style="color:#67e8f9;text-decoration:none">Saltheart</a></td>
+      <td>182</td>
+      <td>15.91</td>
+      <td>9.09</td>
+      <td>20</td>
+      <td><div data-sort="20">20<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="10">10<div style="font-size: 10px; color: #aaa">50.00%</div></div></td>
+      <td><div data-sort="10">10<div style="font-size: 10px; color: #aaa">50.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">15.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="6">6<div style="font-size: 10px; color: #aaa">30.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2765265" target="_blank" style="color:#67e8f9;text-decoration:none">RabbitBrain</a></td>
+      <td>170</td>
+      <td>11.79</td>
+      <td>8.11</td>
+      <td>21</td>
+      <td><div data-sort="21">21<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="21">21<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">9.52%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">4.76%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3076983" target="_blank" style="color:#67e8f9;text-decoration:none">Furnace_Funeral</a></td>
+      <td>168</td>
+      <td>13.07</td>
+      <td>6.98</td>
+      <td>24</td>
+      <td><div data-sort="24">24<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="20">20<div style="font-size: 10px; color: #aaa">83.33%</div></div></td>
+      <td><div data-sort="4">4<div style="font-size: 10px; color: #aaa">16.67%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">12.50%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">12.50%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">4.17%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=1775453" target="_blank" style="color:#67e8f9;text-decoration:none">ItBeLewis</a></td>
+      <td>167</td>
+      <td>15.34</td>
+      <td>7.95</td>
+      <td>21</td>
+      <td><div data-sort="21">21<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="21">21<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">4.76%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">9.52%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3517148" target="_blank" style="color:#67e8f9;text-decoration:none">DopplisDOPPLIS</a></td>
+      <td>156</td>
+      <td>17.10</td>
+      <td>9.22</td>
+      <td>18</td>
+      <td><div data-sort="15">15<div style="font-size: 10px; color: #aaa">83.33%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">16.67%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="15">15<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">20.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="12">12<div style="font-size: 10px; color: #aaa">80.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">13.33%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">20.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2338906" target="_blank" style="color:#67e8f9;text-decoration:none">sinbSINB</a></td>
+      <td>145</td>
+      <td>13.11</td>
+      <td>8.05</td>
+      <td>18</td>
+      <td><div data-sort="18">18<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="17">17<div style="font-size: 10px; color: #aaa">94.44%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">5.56%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">5.56%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">11.11%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">11.11%</div></div></td>
+      <td><div data-sort="5">5<div style="font-size: 10px; color: #aaa">27.78%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3715900" target="_blank" style="color:#67e8f9;text-decoration:none">GaloSengen</a></td>
+      <td>141</td>
+      <td>10.07</td>
+      <td>5.75</td>
+      <td>30</td>
+      <td><div data-sort="22">22<div style="font-size: 10px; color: #aaa">73.33%</div></div></td>
+      <td><div data-sort="8">8<div style="font-size: 10px; color: #aaa">26.67%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="25">25<div style="font-size: 10px; color: #aaa">113.64%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="5">5<div style="font-size: 10px; color: #aaa">22.73%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="7">7<div style="font-size: 10px; color: #aaa">31.82%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">4.55%</div></div></td>
+      <td><div data-sort="4">4<div style="font-size: 10px; color: #aaa">18.18%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">13.64%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3650111" target="_blank" style="color:#67e8f9;text-decoration:none">Lazy_seal</a></td>
+      <td>135</td>
+      <td>13.61</td>
+      <td>7.31</td>
+      <td>23</td>
+      <td><div data-sort="17">17<div style="font-size: 10px; color: #aaa">73.91%</div></div></td>
+      <td><div data-sort="6">6<div style="font-size: 10px; color: #aaa">26.09%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="22">22<div style="font-size: 10px; color: #aaa">129.41%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">5.88%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="5">5<div style="font-size: 10px; color: #aaa">29.41%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">17.65%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="4">4<div style="font-size: 10px; color: #aaa">23.53%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2418310" target="_blank" style="color:#67e8f9;text-decoration:none">B3Dr1ChB3DR1CH</a></td>
+      <td>122</td>
+      <td>15.68</td>
+      <td>7.20</td>
+      <td>17</td>
+      <td><div data-sort="17">17<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="14">14<div style="font-size: 10px; color: #aaa">82.35%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">17.65%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">17.65%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">11.76%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2671955" target="_blank" style="color:#67e8f9;text-decoration:none">DocHammerMD</a></td>
+      <td>119</td>
+      <td>16.04</td>
+      <td>9.91</td>
+      <td>12</td>
+      <td><div data-sort="12">12<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="8">8<div style="font-size: 10px; color: #aaa">66.67%</div></div></td>
+      <td><div data-sort="4">4<div style="font-size: 10px; color: #aaa">33.33%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="4">4<div style="font-size: 10px; color: #aaa">33.33%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3177305" target="_blank" style="color:#67e8f9;text-decoration:none">Skunkymonkey69</a></td>
+      <td>115</td>
+      <td>18.17</td>
+      <td>5.62</td>
+      <td>21</td>
+      <td><div data-sort="20">20<div style="font-size: 10px; color: #aaa">95.24%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">4.76%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="17">17<div style="font-size: 10px; color: #aaa">85.00%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">15.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">5.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">5.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">5.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">5.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">10.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2752990" target="_blank" style="color:#67e8f9;text-decoration:none">RinnXRINNX</a></td>
+      <td>102</td>
+      <td>7.00</td>
+      <td>4.85</td>
+      <td>21</td>
+      <td><div data-sort="21">21<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="21">21<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">4.76%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">4.76%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">4.76%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="8">8<div style="font-size: 10px; color: #aaa">38.10%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3021017" target="_blank" style="color:#67e8f9;text-decoration:none">KABOOSE96</a></td>
+      <td>99</td>
+      <td>7.14</td>
+      <td>4.63</td>
+      <td>25</td>
+      <td><div data-sort="19">19<div style="font-size: 10px; color: #aaa">76.00%</div></div></td>
+      <td><div data-sort="6">6<div style="font-size: 10px; color: #aaa">24.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="19">19<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="6">6<div style="font-size: 10px; color: #aaa">31.58%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="23">23<div style="font-size: 10px; color: #aaa">121.05%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">5.26%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2660709" target="_blank" style="color:#67e8f9;text-decoration:none">-Poenie-</a></td>
+      <td>92</td>
+      <td>12.32</td>
+      <td>7.23</td>
+      <td>13</td>
+      <td><div data-sort="12">12<div style="font-size: 10px; color: #aaa">92.31%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">7.69%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="12">12<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">8.33%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="9">9<div style="font-size: 10px; color: #aaa">75.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3672395" target="_blank" style="color:#67e8f9;text-decoration:none">Bloodrose3</a></td>
+      <td>91</td>
+      <td>12.84</td>
+      <td>8.73</td>
+      <td>11</td>
+      <td><div data-sort="10">10<div style="font-size: 10px; color: #aaa">90.91%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">9.09%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="11">11<div style="font-size: 10px; color: #aaa">110.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="4">4<div style="font-size: 10px; color: #aaa">40.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3786193" target="_blank" style="color:#67e8f9;text-decoration:none">Blckmonarch</a></td>
+      <td>87</td>
+      <td>9.58</td>
+      <td>7.06</td>
+      <td>15</td>
+      <td><div data-sort="10">10<div style="font-size: 10px; color: #aaa">66.67%</div></div></td>
+      <td><div data-sort="5">5<div style="font-size: 10px; color: #aaa">33.33%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="12">12<div style="font-size: 10px; color: #aaa">120.00%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">30.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">10.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">10.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3000530" target="_blank" style="color:#67e8f9;text-decoration:none">Bob937BOB937</a></td>
+      <td>82</td>
+      <td>9.26</td>
+      <td>5.85</td>
+      <td>14</td>
+      <td><div data-sort="14">14<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="14">14<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2326128" target="_blank" style="color:#67e8f9;text-decoration:none">DanniDraven</a></td>
+      <td>79</td>
+      <td>12.67</td>
+      <td>6.56</td>
+      <td>12</td>
+      <td><div data-sort="12">12<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="12">12<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">8.33%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2369794" target="_blank" style="color:#67e8f9;text-decoration:none">rocco_saint1</a></td>
+      <td>66</td>
+      <td>8.67</td>
+      <td>4.71</td>
+      <td>14</td>
+      <td><div data-sort="14">14<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="14">14<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">7.14%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3700645" target="_blank" style="color:#67e8f9;text-decoration:none">0Bane00BANE0</a></td>
+      <td>59</td>
+      <td>10.76</td>
+      <td>9.85</td>
+      <td>6</td>
+      <td><div data-sort="6">6<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="5">5<div style="font-size: 10px; color: #aaa">83.33%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">16.67%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3301709" target="_blank" style="color:#67e8f9;text-decoration:none">Teej136TEEJ136</a></td>
+      <td>55</td>
+      <td>10.94</td>
+      <td>9.21</td>
+      <td>6</td>
+      <td><div data-sort="6">6<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="6">6<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">33.33%</div></div></td>
+      <td><div data-sort="5">5<div style="font-size: 10px; color: #aaa">83.33%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">50.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2161745" target="_blank" style="color:#67e8f9;text-decoration:none">bolthead0070</a></td>
+      <td>52</td>
+      <td>12.85</td>
+      <td>7.18</td>
+      <td>8</td>
+      <td><div data-sort="7">7<div style="font-size: 10px; color: #aaa">87.50%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">12.50%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="8">8<div style="font-size: 10px; color: #aaa">114.29%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">14.29%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2866126" target="_blank" style="color:#67e8f9;text-decoration:none">BETA-BETA-</a></td>
+      <td>44</td>
+      <td>12.08</td>
+      <td>7.30</td>
+      <td>6</td>
+      <td><div data-sort="6">6<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="6">6<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">16.67%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2407136" target="_blank" style="color:#67e8f9;text-decoration:none">The-Silence</a></td>
+      <td>42</td>
+      <td>10.35</td>
+      <td>7.02</td>
+      <td>6</td>
+      <td><div data-sort="6">6<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="6">6<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3744400" target="_blank" style="color:#67e8f9;text-decoration:none">PacificDragon</a></td>
+      <td>41</td>
+      <td>12.44</td>
+      <td>8.24</td>
+      <td>5</td>
+      <td><div data-sort="5">5<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="5">5<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">20.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">40.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=1923612" target="_blank" style="color:#67e8f9;text-decoration:none">Mahibuki</a></td>
+      <td>39</td>
+      <td>9.23</td>
+      <td>5.63</td>
+      <td>7</td>
+      <td><div data-sort="7">7<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="7">7<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">14.29%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3316436" target="_blank" style="color:#67e8f9;text-decoration:none">JumanneStruggle</a></td>
+      <td>36</td>
+      <td>13.80</td>
+      <td>12.07</td>
+      <td>3</td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">33.33%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3182308" target="_blank" style="color:#67e8f9;text-decoration:none">FarmstFARMST</a></td>
+      <td>33</td>
+      <td>5.93</td>
+      <td>4.75</td>
+      <td>7</td>
+      <td><div data-sort="7">7<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="7">7<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2522325" target="_blank" style="color:#67e8f9;text-decoration:none">IOIIIIIOI</a></td>
+      <td>28</td>
+      <td>11.88</td>
+      <td>6.98</td>
+      <td>4</td>
+      <td><div data-sort="4">4<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="4">4<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">25.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3694822" target="_blank" style="color:#67e8f9;text-decoration:none">crazypilot</a></td>
+      <td>25</td>
+      <td>12.57</td>
+      <td>4.44</td>
+      <td>29</td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">6.90%</div></div></td>
+      <td><div data-sort="27">27<div style="font-size: 10px; color: #aaa">93.10%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="16">16<div style="font-size: 10px; color: #aaa">800.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">50.00%</div></div></td>
+      <td><div data-sort="12">12<div style="font-size: 10px; color: #aaa">600.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="27">27<div style="font-size: 10px; color: #aaa">1350.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">50.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3776266" target="_blank" style="color:#67e8f9;text-decoration:none">AfterEight</a></td>
+      <td>20</td>
+      <td>10.27</td>
+      <td>10.22</td>
+      <td>2</td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="18">18<div style="font-size: 10px; color: #aaa">900.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="13">13<div style="font-size: 10px; color: #aaa">650.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3751400" target="_blank" style="color:#67e8f9;text-decoration:none">PaddeyyPADDEYY</a></td>
+      <td>17</td>
+      <td>9.27</td>
+      <td>8.56</td>
+      <td>2</td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2728756" target="_blank" style="color:#67e8f9;text-decoration:none">alirhlALIRHL</a></td>
+      <td>17</td>
+      <td>10.10</td>
+      <td>8.37</td>
+      <td>2</td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">50.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">50.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2799812" target="_blank" style="color:#67e8f9;text-decoration:none">sogunubica</a></td>
+      <td>17</td>
+      <td>4.53</td>
+      <td>4.16</td>
+      <td>4</td>
+      <td><div data-sort="4">4<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="4">4<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">50.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3675061" target="_blank" style="color:#67e8f9;text-decoration:none">Lykaios1</a></td>
+      <td>15</td>
+      <td>10.02</td>
+      <td>5.37</td>
+      <td>14</td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">14.29%</div></div></td>
+      <td><div data-sort="12">12<div style="font-size: 10px; color: #aaa">85.71%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="14">14<div style="font-size: 10px; color: #aaa">700.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">50.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2105039" target="_blank" style="color:#67e8f9;text-decoration:none">Doofenshmirtz</a></td>
+      <td>11</td>
+      <td>4.08</td>
+      <td>3.80</td>
+      <td>3</td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">33.33%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">33.33%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3705449" target="_blank" style="color:#67e8f9;text-decoration:none">GrayFoxIRL</a></td>
+      <td>11</td>
+      <td>6.05</td>
+      <td>4.27</td>
+      <td>4</td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">50.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">50.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="4">4<div style="font-size: 10px; color: #aaa">200.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3785490" target="_blank" style="color:#67e8f9;text-decoration:none">Maxey9320</a></td>
+      <td>10</td>
+      <td>9.64</td>
+      <td>4.45</td>
+      <td>10</td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">10.00%</div></div></td>
+      <td><div data-sort="9">9<div style="font-size: 10px; color: #aaa">90.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="7">7<div style="font-size: 10px; color: #aaa">700.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">200.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">200.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="9">9<div style="font-size: 10px; color: #aaa">900.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3612329" target="_blank" style="color:#67e8f9;text-decoration:none">QlasQLAS</a></td>
+      <td>6</td>
+      <td>6.30</td>
+      <td>3.74</td>
+      <td>5</td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">20.00%</div></div></td>
+      <td><div data-sort="4">4<div style="font-size: 10px; color: #aaa">80.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="5">5<div style="font-size: 10px; color: #aaa">500.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2864324" target="_blank" style="color:#67e8f9;text-decoration:none">Ebenz33EBENZ33</a></td>
+      <td>6</td>
+      <td>6.23</td>
+      <td>4.78</td>
+      <td>2</td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">50.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">50.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3786518" target="_blank" style="color:#67e8f9;text-decoration:none">DaimiyoDeath</a></td>
+      <td>0</td>
+      <td>5.34</td>
+      <td>4.38</td>
+      <td>26</td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="26">26<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="25">25<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3803892" target="_blank" style="color:#67e8f9;text-decoration:none">JoePaletta</a></td>
+      <td>0</td>
+      <td>4.25</td>
+      <td>2.99</td>
+      <td>11</td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="11">11<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="11">11<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3811041" target="_blank" style="color:#67e8f9;text-decoration:none">BIspBISP</a></td>
+      <td>0</td>
+      <td>5.25</td>
+      <td>4.77</td>
+      <td>7</td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="7">7<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="7">7<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3803354" target="_blank" style="color:#67e8f9;text-decoration:none">IjatSD1IJATSD1</a></td>
+      <td>0</td>
+      <td>4.99</td>
+      <td>4.36</td>
+      <td>3</td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="3">3<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3781782" target="_blank" style="color:#67e8f9;text-decoration:none">21Bam21BAM</a></td>
+      <td>0</td>
+      <td>4.99</td>
+      <td>4.74</td>
+      <td>2</td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="1">1<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3798738" target="_blank" style="color:#67e8f9;text-decoration:none">Dummy999</a></td>
+      <td>0</td>
+      <td>4.08</td>
+      <td>3.41</td>
+      <td>2</td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">100.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3795407" target="_blank" style="color:#67e8f9;text-decoration:none">AI-AI-</a></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="2">2<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="7">7<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=1995664" target="_blank" style="color:#67e8f9;text-decoration:none">JNIXIEJNIXIE</a></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3002536" target="_blank" style="color:#67e8f9;text-decoration:none">Sherezada</a></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3689656" target="_blank" style="color:#67e8f9;text-decoration:none">ColeX6COLEX6</a></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3710950" target="_blank" style="color:#67e8f9;text-decoration:none">JarredGOONS</a></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3743832" target="_blank" style="color:#67e8f9;text-decoration:none">DeezPanda</a></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3766372" target="_blank" style="color:#67e8f9;text-decoration:none">Arlechinul</a></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3800713" target="_blank" style="color:#67e8f9;text-decoration:none">BraydenOswell</a></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3810545" target="_blank" style="color:#67e8f9;text-decoration:none">Areywings</a></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td>0</td>
+      <td>0.00</td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+      <td><div data-sort="0">0<div style="font-size: 10px; color: #aaa">0.00%</div></div></td>
+    </tr>
+  </tbody>
+</table>
+  </div>
+
+  <script>
+    function sortTable(columnIndex) {
+      const table = document.querySelector('table.war_report');
+      if (!table) return;
+      
+      const tbody = table.querySelector('tbody');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      const header = table.querySelectorAll('th')[columnIndex];
+      
+      const actualHeaders = table.querySelectorAll('thead tr:first-child th');
+      const actualHeader = actualHeaders[columnIndex];
+      
+      let isAscending = !actualHeader.classList.contains('sort-asc');
+      
+      actualHeaders.forEach(th => {
+        th.classList.remove('sort-asc', 'sort-desc');
+      });
+      
+      actualHeader.classList.add(isAscending ? 'sort-asc' : 'sort-desc');
+      
+      const dataRows = rows.filter(row => !row.textContent.includes('TOTALS'));
+      
+      dataRows.sort((a, b) => {
+        let aValue = a.cells[columnIndex].textContent.trim();
+        let bValue = b.cells[columnIndex].textContent.trim();
+        
+        const aDiv = a.cells[columnIndex].querySelector('div[data-sort]');
+        const bDiv = b.cells[columnIndex].querySelector('div[data-sort]');
+        if (aDiv && bDiv) {
+          aValue = parseFloat(aDiv.getAttribute('data-sort')) || 0;
+          bValue = parseFloat(bDiv.getAttribute('data-sort')) || 0;
+          return isAscending ? aValue - bValue : bValue - aValue;
+        }
+        
+        if (aValue.match(/^[\d,]+\.?\d*$/)) {
+          aValue = parseFloat(aValue.replace(/,/g, '')) || 0;
+          bValue = parseFloat(bValue.replace(/,/g, '')) || 0;
+          return isAscending ? aValue - bValue : bValue - aValue;
+        }
+        
+        if (aValue.includes('%')) {
+          aValue = parseFloat(aValue.replace('%', '')) || 0;
+          bValue = parseFloat(bValue.replace('%', '')) || 0;
+          return isAscending ? aValue - bValue : bValue - aValue;
+        }
+        
+        return isAscending ? 
+          aValue.localeCompare(bValue) : 
+          bValue.localeCompare(aValue);
+      });
+      
+      tbody.innerHTML = '';
+      dataRows.forEach(row => tbody.appendChild(row));
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function() {
+        const headers = document.querySelectorAll('table.war_report thead tr:first-child th');
+        headers.forEach((header, index) => {
+          header.addEventListener('click', () => sortTable(index));
+        });
+      }, 100);
+    });
+  </script>
+</body>
+</html>

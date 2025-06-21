@@ -1,0 +1,1915 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Earnings Estimate</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;600;700&family=Crimson+Text:wght@400;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Oswald', sans-serif;
+            background: 
+                radial-gradient(ellipse at top, rgba(20, 20, 20, 0.9) 0%, rgba(0, 0, 0, 0.95) 100%),
+                linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+            color: #d4c5a0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 15% 25%, rgba(218, 165, 32, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 75%, rgba(255, 215, 0, 0.05) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(45, 45, 45, 0.7) 100%);
+            border: 2px solid #DAA520;
+            border-radius: 15px;
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #DAA520, #FFD700, #DAA520);
+        }
+        
+        .header h1 {
+            font-size: clamp(2.5em, 6vw, 4em);
+            font-weight: 700;
+            color: #d4c5a0;
+            text-shadow: 3px 3px 0px #DAA520, 6px 6px 10px rgba(0, 0, 0, 0.8);
+            margin-bottom: 15px;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+        }
+        
+        /* Back Button */
+        .back-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(45, 45, 45, 0.7) 100%);
+            border: 2px solid #FF8C00;
+            border-radius: 25px;
+            padding: 12px 20px;
+            color: #FF8C00;
+            text-decoration: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .back-button:hover {
+            background: linear-gradient(135deg, rgba(255, 140, 0, 0.1) 0%, rgba(255, 140, 0, 0.05) 100%);
+            box-shadow: 0 0 20px rgba(255, 140, 0, 0.3);
+            transform: scale(1.05);
+        }
+        
+        /* Summary Stats Grid */
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(45, 45, 45, 0.6) 100%);
+            border: 2px solid #DAA520;
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #DAA520, #FFD700, #DAA520);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            border-color: #FFD700;
+            box-shadow: 0 8px 25px rgba(218, 165, 32, 0.2);
+        }
+        
+        .stat-card:hover::before {
+            background: linear-gradient(90deg, #FFD700, #DAA520, #FFD700);
+        }
+        
+        .stat-card h3 {
+            margin-top: 0;
+            color: #FFD700;
+            border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(68, 68, 68, 0.3);
+        }
+        
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+        
+        .stat-label {
+            color: #CCCCCC;
+            font-weight: 400;
+        }
+        
+        .stat-value {
+            color: #d4c5a0;
+            font-weight: 600;
+        }
+        
+        /* Earnings Table */
+        table.earnings_report {
+            width: 100%;
+            border-collapse: collapse;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(45, 45, 45, 0.7) 100%);
+            color: #d4c5a0;
+            border-radius: 15px;
+            overflow: hidden;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            margin-bottom: 40px;
+        }
+        
+        table.earnings_report th {
+            background: linear-gradient(135deg, rgba(218, 165, 32, 0.4) 0%, rgba(255, 215, 0, 0.3) 100%);
+            color: #d4c5a0;
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.95em;
+            border-bottom: 2px solid rgba(218, 165, 32, 0.4);
+            border-right: 1px solid rgba(68, 68, 68, 0.5);
+            cursor: pointer;
+            user-select: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+        
+        table.earnings_report th:last-child {
+            border-right: none;
+        }
+        
+        table.earnings_report th:hover {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(218, 165, 32, 0.1) 100%);
+        }
+        
+        table.earnings_report th::after {
+            content: ' ↕';
+            font-size: 0.8em;
+            opacity: 0.6;
+        }
+        
+        table.earnings_report th.sort-asc::after {
+            content: ' ↑';
+            opacity: 1;
+        }
+        
+        table.earnings_report th.sort-desc::after {
+            content: ' ↓';
+            opacity: 1;
+        }
+        
+        table.earnings_report td {
+            padding: 12px 10px;
+            border-bottom: 1px solid rgba(68, 68, 68, 0.3);
+            border-right: 1px solid rgba(68, 68, 68, 0.3);
+            font-size: 0.95em;
+            text-align: center;
+            transition: background-color 0.2s ease;
+        }
+        
+        table.earnings_report td:last-child {
+            border-right: none;
+        }
+        
+        table.earnings_report tr:nth-child(even) {
+            background-color: rgba(51, 51, 51, 0.3);
+        }
+        
+        table.earnings_report tr:hover {
+            background-color: rgba(218, 165, 32, 0.1);
+        }
+        
+        table.earnings_report td a {
+            color: #FFD700;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        table.earnings_report td a:hover {
+            color: #FFF;
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+        }
+        
+        /* Calculations Section */
+        .calculations {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(45, 45, 45, 0.6) 100%);
+            border: 2px solid #FF8C00;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 40px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .calculations::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #FF8C00, #DAA520, #FF8C00);
+        }
+        
+        .calculations h3 {
+            margin-top: 0;
+            color: #FF8C00;
+            border-bottom: 2px solid rgba(255, 140, 0, 0.3);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            font-size: 1.6em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .calc-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(68, 68, 68, 0.3);
+        }
+        
+        .calc-row:last-child {
+            border-bottom: none;
+        }
+        
+        .calc-label {
+            color: #CCCCCC;
+            font-weight: 400;
+        }
+        
+        .calc-value {
+            color: #d4c5a0;
+            font-weight: 600;
+        }
+        
+        .calc-formula {
+            color: #FFD700;
+            font-size: 1em;
+            font-style: italic;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                letter-spacing: 3px;
+            }
+            
+            .summary-stats {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            table.earnings_report th,
+            table.earnings_report td {
+                padding: 8px 6px;
+                font-size: 0.85em;
+            }
+            
+            .back-button {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin-bottom: 20px;
+                display: inline-block;
+            }
+            
+            .calc-row {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-button">← Back</a>
+    
+    <div class="container">
+        <div class="header">
+            <h1>💵 Earnings Estimate</h1>
+        </div>
+        
+        <div class="summary-stats">
+            <div class="stat-card">
+                <h3>Cache Information</h3>
+                <div class="stat-row">
+                    <span class="stat-label">Total Caches:</span>
+                    <span class="stat-value">$4,209,000,000.00</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Tax (5%):</span>
+                    <span class="stat-value">$210,450,000.00</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Total Payout:</span>
+                    <span class="stat-value">$3,998,550,000.00</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>Chain Statistics</h3>
+                <div class="stat-row">
+                    <span class="stat-label">Total War Hits:</span>
+                    <span class="stat-value">3,429.0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Total War Score:</span>
+                    <span class="stat-value">36,410.36</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Avg Score/Hit:</span>
+                    <span class="stat-value">10.62</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>🆘 Save Information</h3>
+                <div class="stat-row">
+                    <span class="stat-label">Total Saves:</span>
+                    <span class="stat-value">19.00</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Save Score:</span>
+                    <span class="stat-value">225.34</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Save Pay:</span>
+                    <span class="stat-value">$0.00</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>Pay Rates</h3>
+                <div class="stat-row">
+                    <span class="stat-label">Pay per Hit:</span>
+                    <span class="stat-value">$388,699.33</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Pay per Score:</span>
+                    <span class="stat-value">$73,212.68</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Distribution:</span>
+                    <span class="stat-value">60/30</span>
+                </div>
+            </div>
+        </div>
+
+        <table class="dataframe earnings_report">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Member</th>
+      <th>Respect</th>
+      <th>War Hits</th>
+      <th>Total Score</th>
+      <th>Saves</th>
+      <th>Save Score</th>
+      <th>Respect %</th>
+      <th>Hit %</th>
+      <th>Respect Earnings</th>
+      <th>Hit Earnings</th>
+      <th>Total Earnings</th>
+      <th>Total %</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2189677" target="_blank" style="color:#67e8f9;text-decoration:none">Monst3rous</a></td>
+      <td>2742.01</td>
+      <td>140</td>
+      <td>2742.01</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>7.53%</td>
+      <td>4.08%</td>
+      <td>$200,749,898.02</td>
+      <td>$54,417,906.10</td>
+      <td>$255,167,804.12</td>
+      <td>6.38%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3212903" target="_blank" style="color:#67e8f9;text-decoration:none">JlambJLAMB</a></td>
+      <td>2367.69</td>
+      <td>195</td>
+      <td>2367.69</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>6.50%</td>
+      <td>5.69%</td>
+      <td>$173,344,928.01</td>
+      <td>$75,796,369.20</td>
+      <td>$249,141,297.21</td>
+      <td>6.23%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2125322" target="_blank" style="color:#67e8f9;text-decoration:none">daprinceomar</a></td>
+      <td>2280.95</td>
+      <td>150</td>
+      <td>2280.95</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>6.26%</td>
+      <td>4.37%</td>
+      <td>$166,994,460.23</td>
+      <td>$58,304,899.39</td>
+      <td>$225,299,359.62</td>
+      <td>5.63%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=1953965" target="_blank" style="color:#67e8f9;text-decoration:none">RipTheJacker</a></td>
+      <td>1901.20</td>
+      <td>185</td>
+      <td>1972.36</td>
+      <td>6</td>
+      <td>71.16</td>
+      <td>5.42%</td>
+      <td>5.40%</td>
+      <td>$144,401,759.61</td>
+      <td>$71,909,375.91</td>
+      <td>$216,311,135.52</td>
+      <td>5.41%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2228876" target="_blank" style="color:#67e8f9;text-decoration:none">FuzzyRight1</a></td>
+      <td>1752.39</td>
+      <td>142</td>
+      <td>1752.39</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>4.81%</td>
+      <td>4.14%</td>
+      <td>$128,297,166.60</td>
+      <td>$55,195,304.75</td>
+      <td>$183,492,471.36</td>
+      <td>4.59%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3155566" target="_blank" style="color:#67e8f9;text-decoration:none">Shindig7</a></td>
+      <td>1410.44</td>
+      <td>115</td>
+      <td>1410.44</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>3.87%</td>
+      <td>3.35%</td>
+      <td>$103,262,091.01</td>
+      <td>$44,700,422.86</td>
+      <td>$147,962,513.87</td>
+      <td>3.70%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2325363" target="_blank" style="color:#67e8f9;text-decoration:none">JetBeanJETBEAN</a></td>
+      <td>1449.79</td>
+      <td>95</td>
+      <td>1449.79</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>3.98%</td>
+      <td>2.77%</td>
+      <td>$106,143,009.93</td>
+      <td>$36,926,436.28</td>
+      <td>$143,069,446.21</td>
+      <td>3.58%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2752336" target="_blank" style="color:#67e8f9;text-decoration:none">CheJCHEJ</a></td>
+      <td>1212.44</td>
+      <td>103</td>
+      <td>1212.44</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>3.33%</td>
+      <td>3.00%</td>
+      <td>$88,765,980.56</td>
+      <td>$40,036,030.91</td>
+      <td>$128,802,011.47</td>
+      <td>3.22%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3521451" target="_blank" style="color:#67e8f9;text-decoration:none">Caz27CAZ27</a></td>
+      <td>1055.57</td>
+      <td>97</td>
+      <td>1055.57</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>2.90%</td>
+      <td>2.83%</td>
+      <td>$77,281,107.60</td>
+      <td>$37,703,834.94</td>
+      <td>$114,984,942.54</td>
+      <td>2.88%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3143592" target="_blank" style="color:#67e8f9;text-decoration:none">sloojSLOOJ</a></td>
+      <td>984.72</td>
+      <td>93</td>
+      <td>1020.30</td>
+      <td>3</td>
+      <td>35.58</td>
+      <td>2.80%</td>
+      <td>2.71%</td>
+      <td>$74,698,896.41</td>
+      <td>$36,149,037.62</td>
+      <td>$110,847,934.03</td>
+      <td>2.77%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3399414" target="_blank" style="color:#67e8f9;text-decoration:none">Renderhp</a></td>
+      <td>977.48</td>
+      <td>86</td>
+      <td>977.48</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>2.68%</td>
+      <td>2.51%</td>
+      <td>$71,563,929.50</td>
+      <td>$33,428,142.32</td>
+      <td>$104,992,071.81</td>
+      <td>2.63%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2176411" target="_blank" style="color:#67e8f9;text-decoration:none">kirbKIRB</a></td>
+      <td>950.24</td>
+      <td>87</td>
+      <td>950.24</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>2.61%</td>
+      <td>2.54%</td>
+      <td>$69,569,616.12</td>
+      <td>$33,816,841.64</td>
+      <td>$103,386,457.77</td>
+      <td>2.59%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2599153" target="_blank" style="color:#67e8f9;text-decoration:none">SouthieSOUTHIE</a></td>
+      <td>944.93</td>
+      <td>77</td>
+      <td>944.93</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>2.60%</td>
+      <td>2.25%</td>
+      <td>$69,180,856.79</td>
+      <td>$29,929,848.35</td>
+      <td>$99,110,705.15</td>
+      <td>2.48%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2608152" target="_blank" style="color:#67e8f9;text-decoration:none">neonredNEONRED</a></td>
+      <td>861.28</td>
+      <td>70</td>
+      <td>873.14</td>
+      <td>1</td>
+      <td>11.86</td>
+      <td>2.40%</td>
+      <td>2.04%</td>
+      <td>$63,924,918.57</td>
+      <td>$27,208,953.05</td>
+      <td>$91,133,871.61</td>
+      <td>2.28%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2646329" target="_blank" style="color:#67e8f9;text-decoration:none">Cyb3rpunkx</a></td>
+      <td>758.87</td>
+      <td>86</td>
+      <td>758.87</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>2.08%</td>
+      <td>2.51%</td>
+      <td>$55,558,905.73</td>
+      <td>$33,428,142.32</td>
+      <td>$88,987,048.05</td>
+      <td>2.23%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3709844" target="_blank" style="color:#67e8f9;text-decoration:none">SlayersApex</a></td>
+      <td>741.27</td>
+      <td>82</td>
+      <td>764.99</td>
+      <td>2</td>
+      <td>23.72</td>
+      <td>2.10%</td>
+      <td>2.39%</td>
+      <td>$56,006,967.33</td>
+      <td>$31,873,345.00</td>
+      <td>$87,880,312.33</td>
+      <td>2.20%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2015888" target="_blank" style="color:#67e8f9;text-decoration:none">DarthBelloq</a></td>
+      <td>671.18</td>
+      <td>74</td>
+      <td>671.18</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>1.84%</td>
+      <td>2.16%</td>
+      <td>$49,138,885.91</td>
+      <td>$28,763,750.36</td>
+      <td>$77,902,636.28</td>
+      <td>1.95%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3027058" target="_blank" style="color:#67e8f9;text-decoration:none">Elswicka</a></td>
+      <td>624.22</td>
+      <td>59</td>
+      <td>636.08</td>
+      <td>1</td>
+      <td>11.86</td>
+      <td>1.75%</td>
+      <td>1.72%</td>
+      <td>$46,569,120.88</td>
+      <td>$22,933,260.43</td>
+      <td>$69,502,381.30</td>
+      <td>1.74%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2080360" target="_blank" style="color:#67e8f9;text-decoration:none">hells_nells</a></td>
+      <td>659.32</td>
+      <td>52</td>
+      <td>659.32</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>1.81%</td>
+      <td>1.52%</td>
+      <td>$48,270,583.54</td>
+      <td>$20,212,365.12</td>
+      <td>$68,482,948.66</td>
+      <td>1.71%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3654507" target="_blank" style="color:#67e8f9;text-decoration:none">BlnkoBLNKO</a></td>
+      <td>494.76</td>
+      <td>65</td>
+      <td>554.06</td>
+      <td>5</td>
+      <td>59.30</td>
+      <td>1.52%</td>
+      <td>1.90%</td>
+      <td>$40,564,216.94</td>
+      <td>$25,265,456.40</td>
+      <td>$65,829,673.34</td>
+      <td>1.65%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3537137" target="_blank" style="color:#67e8f9;text-decoration:none">Leadeatinmaniac</a></td>
+      <td>543.72</td>
+      <td>61</td>
+      <td>543.72</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>1.49%</td>
+      <td>1.78%</td>
+      <td>$39,807,197.84</td>
+      <td>$23,710,659.08</td>
+      <td>$63,517,856.93</td>
+      <td>1.59%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3637762" target="_blank" style="color:#67e8f9;text-decoration:none">AktashAKTASH</a></td>
+      <td>502.66</td>
+      <td>62</td>
+      <td>502.66</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>1.38%</td>
+      <td>1.81%</td>
+      <td>$36,801,085.24</td>
+      <td>$24,099,358.41</td>
+      <td>$60,900,443.65</td>
+      <td>1.52%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3158789" target="_blank" style="color:#67e8f9;text-decoration:none">Hotspoon</a></td>
+      <td>466.79</td>
+      <td>59</td>
+      <td>466.79</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>1.28%</td>
+      <td>1.72%</td>
+      <td>$34,174,946.44</td>
+      <td>$22,933,260.43</td>
+      <td>$57,108,206.87</td>
+      <td>1.43%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2955185" target="_blank" style="color:#67e8f9;text-decoration:none">SoulHunter8</a></td>
+      <td>512.83</td>
+      <td>50</td>
+      <td>512.83</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>1.41%</td>
+      <td>1.46%</td>
+      <td>$37,545,658.19</td>
+      <td>$19,434,966.46</td>
+      <td>$56,980,624.65</td>
+      <td>1.43%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=1719132" target="_blank" style="color:#67e8f9;text-decoration:none">HeartsPrincess</a></td>
+      <td>505.47</td>
+      <td>51</td>
+      <td>505.47</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>1.39%</td>
+      <td>1.49%</td>
+      <td>$37,006,812.87</td>
+      <td>$19,823,665.79</td>
+      <td>$56,830,478.66</td>
+      <td>1.42%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=1858055" target="_blank" style="color:#67e8f9;text-decoration:none">AnthonyLoretto</a></td>
+      <td>437.05</td>
+      <td>63</td>
+      <td>437.05</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>1.20%</td>
+      <td>1.84%</td>
+      <td>$31,997,601.37</td>
+      <td>$24,488,057.74</td>
+      <td>$56,485,659.11</td>
+      <td>1.41%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3269984" target="_blank" style="color:#67e8f9;text-decoration:none">Pokeballer</a></td>
+      <td>474.91</td>
+      <td>54</td>
+      <td>474.91</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>1.30%</td>
+      <td>1.57%</td>
+      <td>$34,769,433.40</td>
+      <td>$20,989,763.78</td>
+      <td>$55,759,197.18</td>
+      <td>1.39%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2806010" target="_blank" style="color:#67e8f9;text-decoration:none">MandaMANDA</a></td>
+      <td>482.57</td>
+      <td>51</td>
+      <td>482.57</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>1.33%</td>
+      <td>1.49%</td>
+      <td>$35,330,242.52</td>
+      <td>$19,823,665.79</td>
+      <td>$55,153,908.31</td>
+      <td>1.38%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3535815" target="_blank" style="color:#67e8f9;text-decoration:none">_Moridin_</a></td>
+      <td>498.69</td>
+      <td>44</td>
+      <td>498.69</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>1.37%</td>
+      <td>1.28%</td>
+      <td>$36,510,430.90</td>
+      <td>$17,102,770.49</td>
+      <td>$53,613,201.39</td>
+      <td>1.34%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2882495" target="_blank" style="color:#67e8f9;text-decoration:none">Ichaerus</a></td>
+      <td>410.97</td>
+      <td>53</td>
+      <td>410.97</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>1.13%</td>
+      <td>1.55%</td>
+      <td>$30,088,214.70</td>
+      <td>$20,601,064.45</td>
+      <td>$50,689,279.15</td>
+      <td>1.27%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2880827" target="_blank" style="color:#67e8f9;text-decoration:none">JudgeFudge</a></td>
+      <td>343.82</td>
+      <td>51</td>
+      <td>343.82</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.94%</td>
+      <td>1.49%</td>
+      <td>$25,171,983.30</td>
+      <td>$19,823,665.79</td>
+      <td>$44,995,649.10</td>
+      <td>1.13%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3251350" target="_blank" style="color:#67e8f9;text-decoration:none">ImSoFoolish</a></td>
+      <td>389.89</td>
+      <td>34</td>
+      <td>389.89</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>1.07%</td>
+      <td>0.99%</td>
+      <td>$28,544,891.43</td>
+      <td>$13,215,777.19</td>
+      <td>$41,760,668.62</td>
+      <td>1.04%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3746198" target="_blank" style="color:#67e8f9;text-decoration:none">EhrzvvEHRZVV</a></td>
+      <td>327.71</td>
+      <td>36</td>
+      <td>339.57</td>
+      <td>1</td>
+      <td>11.86</td>
+      <td>0.93%</td>
+      <td>1.05%</td>
+      <td>$24,860,829.42</td>
+      <td>$13,993,175.85</td>
+      <td>$38,854,005.27</td>
+      <td>0.97%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=140444" target="_blank" style="color:#67e8f9;text-decoration:none">Williams</a></td>
+      <td>334.46</td>
+      <td>35</td>
+      <td>334.46</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.92%</td>
+      <td>1.02%</td>
+      <td>$24,486,712.63</td>
+      <td>$13,604,476.52</td>
+      <td>$38,091,189.15</td>
+      <td>0.95%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3317890" target="_blank" style="color:#67e8f9;text-decoration:none">Xx_Eugene_xX</a></td>
+      <td>286.64</td>
+      <td>28</td>
+      <td>286.64</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.79%</td>
+      <td>0.82%</td>
+      <td>$20,985,682.32</td>
+      <td>$10,883,581.22</td>
+      <td>$31,869,263.54</td>
+      <td>0.80%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2973461" target="_blank" style="color:#67e8f9;text-decoration:none">Frank3nst3in</a></td>
+      <td>253.73</td>
+      <td>34</td>
+      <td>253.73</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.70%</td>
+      <td>0.99%</td>
+      <td>$18,576,253.05</td>
+      <td>$13,215,777.19</td>
+      <td>$31,792,030.24</td>
+      <td>0.80%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3654210" target="_blank" style="color:#67e8f9;text-decoration:none">BeerBandit40</a></td>
+      <td>232.53</td>
+      <td>36</td>
+      <td>232.53</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.64%</td>
+      <td>1.05%</td>
+      <td>$17,024,144.25</td>
+      <td>$13,993,175.85</td>
+      <td>$31,017,320.11</td>
+      <td>0.78%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2272830" target="_blank" style="color:#67e8f9;text-decoration:none">taliesTALIES</a></td>
+      <td>284.40</td>
+      <td>24</td>
+      <td>284.40</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.78%</td>
+      <td>0.70%</td>
+      <td>$20,821,685.92</td>
+      <td>$9,328,783.90</td>
+      <td>$30,150,469.82</td>
+      <td>0.75%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2899384" target="_blank" style="color:#67e8f9;text-decoration:none">aarontrepus</a></td>
+      <td>186.59</td>
+      <td>40</td>
+      <td>186.59</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.51%</td>
+      <td>1.17%</td>
+      <td>$13,660,753.78</td>
+      <td>$15,547,973.17</td>
+      <td>$29,208,726.95</td>
+      <td>0.73%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2790420" target="_blank" style="color:#67e8f9;text-decoration:none">Chang_ECHANG_E</a></td>
+      <td>260.88</td>
+      <td>26</td>
+      <td>260.88</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.72%</td>
+      <td>0.76%</td>
+      <td>$19,099,723.71</td>
+      <td>$10,106,182.56</td>
+      <td>$29,205,906.27</td>
+      <td>0.73%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3251071" target="_blank" style="color:#67e8f9;text-decoration:none">TheCreature</a></td>
+      <td>259.41</td>
+      <td>19</td>
+      <td>259.41</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.71%</td>
+      <td>0.55%</td>
+      <td>$18,992,101.07</td>
+      <td>$7,385,287.26</td>
+      <td>$26,377,388.32</td>
+      <td>0.66%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3263240" target="_blank" style="color:#67e8f9;text-decoration:none">MorninGlory</a></td>
+      <td>232.64</td>
+      <td>23</td>
+      <td>232.64</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.64%</td>
+      <td>0.67%</td>
+      <td>$17,032,197.65</td>
+      <td>$8,940,084.57</td>
+      <td>$25,972,282.22</td>
+      <td>0.65%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2899757" target="_blank" style="color:#67e8f9;text-decoration:none">PurpleCatnip</a></td>
+      <td>214.40</td>
+      <td>25</td>
+      <td>214.40</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.59%</td>
+      <td>0.73%</td>
+      <td>$15,696,798.38</td>
+      <td>$9,717,483.23</td>
+      <td>$25,414,281.62</td>
+      <td>0.64%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3076983" target="_blank" style="color:#67e8f9;text-decoration:none">Furnace_Funeral</a></td>
+      <td>167.51</td>
+      <td>24</td>
+      <td>167.51</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.46%</td>
+      <td>0.70%</td>
+      <td>$12,263,855.86</td>
+      <td>$9,328,783.90</td>
+      <td>$21,592,639.77</td>
+      <td>0.54%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2196526" target="_blank" style="color:#67e8f9;text-decoration:none">Saltheart</a></td>
+      <td>181.86</td>
+      <td>20</td>
+      <td>181.86</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.50%</td>
+      <td>0.58%</td>
+      <td>$13,314,457.81</td>
+      <td>$7,773,986.59</td>
+      <td>$21,088,444.39</td>
+      <td>0.53%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2765265" target="_blank" style="color:#67e8f9;text-decoration:none">RabbitBrain</a></td>
+      <td>170.22</td>
+      <td>21</td>
+      <td>170.22</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.47%</td>
+      <td>0.61%</td>
+      <td>$12,462,262.22</td>
+      <td>$8,162,685.91</td>
+      <td>$20,624,948.14</td>
+      <td>0.52%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=1775453" target="_blank" style="color:#67e8f9;text-decoration:none">ItBeLewis</a></td>
+      <td>166.90</td>
+      <td>21</td>
+      <td>166.90</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.46%</td>
+      <td>0.61%</td>
+      <td>$12,219,196.13</td>
+      <td>$8,162,685.91</td>
+      <td>$20,381,882.04</td>
+      <td>0.51%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3715900" target="_blank" style="color:#67e8f9;text-decoration:none">GaloSengen</a></td>
+      <td>140.88</td>
+      <td>22</td>
+      <td>140.88</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.39%</td>
+      <td>0.64%</td>
+      <td>$10,314,202.22</td>
+      <td>$8,551,385.24</td>
+      <td>$18,865,587.47</td>
+      <td>0.47%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2338906" target="_blank" style="color:#67e8f9;text-decoration:none">sinbSINB</a></td>
+      <td>144.92</td>
+      <td>18</td>
+      <td>144.92</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.40%</td>
+      <td>0.52%</td>
+      <td>$10,609,981.44</td>
+      <td>$6,996,587.93</td>
+      <td>$17,606,569.37</td>
+      <td>0.44%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3517148" target="_blank" style="color:#67e8f9;text-decoration:none">DopplisDOPPLIS</a></td>
+      <td>155.96</td>
+      <td>15</td>
+      <td>155.96</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.43%</td>
+      <td>0.44%</td>
+      <td>$11,418,249.42</td>
+      <td>$5,830,489.94</td>
+      <td>$17,248,739.36</td>
+      <td>0.43%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3650111" target="_blank" style="color:#67e8f9;text-decoration:none">Lazy_seal</a></td>
+      <td>135.41</td>
+      <td>17</td>
+      <td>135.41</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.37%</td>
+      <td>0.50%</td>
+      <td>$9,913,728.87</td>
+      <td>$6,607,888.60</td>
+      <td>$16,521,617.46</td>
+      <td>0.41%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3177305" target="_blank" style="color:#67e8f9;text-decoration:none">Skunkymonkey69</a></td>
+      <td>114.72</td>
+      <td>20</td>
+      <td>114.72</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.32%</td>
+      <td>0.58%</td>
+      <td>$8,398,958.54</td>
+      <td>$7,773,986.59</td>
+      <td>$16,172,945.12</td>
+      <td>0.40%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2752990" target="_blank" style="color:#67e8f9;text-decoration:none">RinnXRINNX</a></td>
+      <td>101.81</td>
+      <td>21</td>
+      <td>101.81</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.28%</td>
+      <td>0.61%</td>
+      <td>$7,453,782.85</td>
+      <td>$8,162,685.91</td>
+      <td>$15,616,468.77</td>
+      <td>0.39%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2418310" target="_blank" style="color:#67e8f9;text-decoration:none">B3Dr1ChB3DR1CH</a></td>
+      <td>122.35</td>
+      <td>17</td>
+      <td>122.35</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.34%</td>
+      <td>0.50%</td>
+      <td>$8,957,571.28</td>
+      <td>$6,607,888.60</td>
+      <td>$15,565,459.88</td>
+      <td>0.39%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3021017" target="_blank" style="color:#67e8f9;text-decoration:none">KABOOSE96</a></td>
+      <td>98.96</td>
+      <td>19</td>
+      <td>98.96</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.27%</td>
+      <td>0.55%</td>
+      <td>$7,245,126.72</td>
+      <td>$7,385,287.26</td>
+      <td>$14,630,413.97</td>
+      <td>0.37%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2671955" target="_blank" style="color:#67e8f9;text-decoration:none">DocHammerMD</a></td>
+      <td>118.86</td>
+      <td>12</td>
+      <td>118.86</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.33%</td>
+      <td>0.35%</td>
+      <td>$8,702,059.03</td>
+      <td>$4,664,391.95</td>
+      <td>$13,366,450.98</td>
+      <td>0.33%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3000530" target="_blank" style="color:#67e8f9;text-decoration:none">Bob937BOB937</a></td>
+      <td>81.85</td>
+      <td>14</td>
+      <td>81.85</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.22%</td>
+      <td>0.41%</td>
+      <td>$5,992,457.78</td>
+      <td>$5,441,790.61</td>
+      <td>$11,434,248.39</td>
+      <td>0.29%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2660709" target="_blank" style="color:#67e8f9;text-decoration:none">-Poenie-</a></td>
+      <td>91.64</td>
+      <td>12</td>
+      <td>91.64</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.25%</td>
+      <td>0.35%</td>
+      <td>$6,709,209.91</td>
+      <td>$4,664,391.95</td>
+      <td>$11,373,601.86</td>
+      <td>0.28%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3672395" target="_blank" style="color:#67e8f9;text-decoration:none">Bloodrose3</a></td>
+      <td>90.81</td>
+      <td>10</td>
+      <td>90.81</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.25%</td>
+      <td>0.29%</td>
+      <td>$6,648,443.38</td>
+      <td>$3,886,993.29</td>
+      <td>$10,535,436.68</td>
+      <td>0.26%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2326128" target="_blank" style="color:#67e8f9;text-decoration:none">DanniDraven</a></td>
+      <td>78.71</td>
+      <td>12</td>
+      <td>78.71</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.22%</td>
+      <td>0.35%</td>
+      <td>$5,762,569.97</td>
+      <td>$4,664,391.95</td>
+      <td>$10,426,961.92</td>
+      <td>0.26%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2369794" target="_blank" style="color:#67e8f9;text-decoration:none">rocco_saint1</a></td>
+      <td>65.93</td>
+      <td>14</td>
+      <td>65.93</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.18%</td>
+      <td>0.41%</td>
+      <td>$4,826,911.93</td>
+      <td>$5,441,790.61</td>
+      <td>$10,268,702.54</td>
+      <td>0.26%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3786193" target="_blank" style="color:#67e8f9;text-decoration:none">Blckmonarch</a></td>
+      <td>86.54</td>
+      <td>10</td>
+      <td>86.54</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.24%</td>
+      <td>0.29%</td>
+      <td>$6,335,825.24</td>
+      <td>$3,886,993.29</td>
+      <td>$10,222,818.54</td>
+      <td>0.26%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3700645" target="_blank" style="color:#67e8f9;text-decoration:none">0Bane00BANE0</a></td>
+      <td>59.08</td>
+      <td>6</td>
+      <td>59.08</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.16%</td>
+      <td>0.17%</td>
+      <td>$4,325,405.08</td>
+      <td>$2,332,195.98</td>
+      <td>$6,657,601.05</td>
+      <td>0.17%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2161745" target="_blank" style="color:#67e8f9;text-decoration:none">bolthead0070</a></td>
+      <td>51.90</td>
+      <td>7</td>
+      <td>51.90</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.14%</td>
+      <td>0.20%</td>
+      <td>$3,799,738.04</td>
+      <td>$2,720,895.30</td>
+      <td>$6,520,633.35</td>
+      <td>0.16%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3301709" target="_blank" style="color:#67e8f9;text-decoration:none">Teej136TEEJ136</a></td>
+      <td>55.26</td>
+      <td>6</td>
+      <td>55.26</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.15%</td>
+      <td>0.17%</td>
+      <td>$4,045,732.64</td>
+      <td>$2,332,195.98</td>
+      <td>$6,377,928.62</td>
+      <td>0.16%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=1923612" target="_blank" style="color:#67e8f9;text-decoration:none">Mahibuki</a></td>
+      <td>39.43</td>
+      <td>7</td>
+      <td>39.43</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.11%</td>
+      <td>0.20%</td>
+      <td>$2,886,775.93</td>
+      <td>$2,720,895.30</td>
+      <td>$5,607,671.24</td>
+      <td>0.14%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2866126" target="_blank" style="color:#67e8f9;text-decoration:none">BETA-BETA-</a></td>
+      <td>43.78</td>
+      <td>6</td>
+      <td>43.78</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.12%</td>
+      <td>0.17%</td>
+      <td>$3,205,251.09</td>
+      <td>$2,332,195.98</td>
+      <td>$5,537,447.06</td>
+      <td>0.14%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2407136" target="_blank" style="color:#67e8f9;text-decoration:none">The-Silence</a></td>
+      <td>42.10</td>
+      <td>6</td>
+      <td>42.10</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.12%</td>
+      <td>0.17%</td>
+      <td>$3,082,253.79</td>
+      <td>$2,332,195.98</td>
+      <td>$5,414,449.76</td>
+      <td>0.14%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3182308" target="_blank" style="color:#67e8f9;text-decoration:none">FarmstFARMST</a></td>
+      <td>33.28</td>
+      <td>7</td>
+      <td>33.28</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.09%</td>
+      <td>0.20%</td>
+      <td>$2,436,517.96</td>
+      <td>$2,720,895.30</td>
+      <td>$5,157,413.26</td>
+      <td>0.13%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3744400" target="_blank" style="color:#67e8f9;text-decoration:none">PacificDragon</a></td>
+      <td>41.22</td>
+      <td>5</td>
+      <td>41.22</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.11%</td>
+      <td>0.15%</td>
+      <td>$3,017,826.63</td>
+      <td>$1,943,496.65</td>
+      <td>$4,961,323.28</td>
+      <td>0.12%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3316436" target="_blank" style="color:#67e8f9;text-decoration:none">JumanneStruggle</a></td>
+      <td>36.22</td>
+      <td>3</td>
+      <td>36.22</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.10%</td>
+      <td>0.09%</td>
+      <td>$2,651,763.23</td>
+      <td>$1,166,097.99</td>
+      <td>$3,817,861.22</td>
+      <td>0.10%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2522325" target="_blank" style="color:#67e8f9;text-decoration:none">IOIIIIIOI</a></td>
+      <td>27.92</td>
+      <td>4</td>
+      <td>27.92</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.08%</td>
+      <td>0.12%</td>
+      <td>$2,044,098.00</td>
+      <td>$1,554,797.32</td>
+      <td>$3,598,895.32</td>
+      <td>0.09%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2799812" target="_blank" style="color:#67e8f9;text-decoration:none">sogunubica</a></td>
+      <td>16.63</td>
+      <td>4</td>
+      <td>16.63</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.05%</td>
+      <td>0.12%</td>
+      <td>$1,217,526.85</td>
+      <td>$1,554,797.32</td>
+      <td>$2,772,324.17</td>
+      <td>0.07%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3694822" target="_blank" style="color:#67e8f9;text-decoration:none">crazypilot</a></td>
+      <td>25.14</td>
+      <td>2</td>
+      <td>25.14</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.07%</td>
+      <td>0.06%</td>
+      <td>$1,840,566.75</td>
+      <td>$777,398.66</td>
+      <td>$2,617,965.41</td>
+      <td>0.07%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3776266" target="_blank" style="color:#67e8f9;text-decoration:none">AfterEight</a></td>
+      <td>20.44</td>
+      <td>2</td>
+      <td>20.44</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.06%</td>
+      <td>0.06%</td>
+      <td>$1,496,467.16</td>
+      <td>$777,398.66</td>
+      <td>$2,273,865.82</td>
+      <td>0.06%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3751400" target="_blank" style="color:#67e8f9;text-decoration:none">PaddeyyPADDEYY</a></td>
+      <td>17.11</td>
+      <td>2</td>
+      <td>17.11</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.05%</td>
+      <td>0.06%</td>
+      <td>$1,252,668.94</td>
+      <td>$777,398.66</td>
+      <td>$2,030,067.60</td>
+      <td>0.05%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2728756" target="_blank" style="color:#67e8f9;text-decoration:none">alirhlALIRHL</a></td>
+      <td>16.74</td>
+      <td>2</td>
+      <td>16.74</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.05%</td>
+      <td>0.06%</td>
+      <td>$1,225,580.25</td>
+      <td>$777,398.66</td>
+      <td>$2,002,978.91</td>
+      <td>0.05%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2105039" target="_blank" style="color:#67e8f9;text-decoration:none">Doofenshmirtz</a></td>
+      <td>11.40</td>
+      <td>3</td>
+      <td>11.40</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.03%</td>
+      <td>0.09%</td>
+      <td>$834,624.54</td>
+      <td>$1,166,097.99</td>
+      <td>$2,000,722.53</td>
+      <td>0.05%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3675061" target="_blank" style="color:#67e8f9;text-decoration:none">Lykaios1</a></td>
+      <td>14.79</td>
+      <td>2</td>
+      <td>14.79</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.04%</td>
+      <td>0.06%</td>
+      <td>$1,082,815.52</td>
+      <td>$777,398.66</td>
+      <td>$1,860,214.18</td>
+      <td>0.05%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3705449" target="_blank" style="color:#67e8f9;text-decoration:none">GrayFoxIRL</a></td>
+      <td>11.06</td>
+      <td>2</td>
+      <td>11.06</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.03%</td>
+      <td>0.06%</td>
+      <td>$809,732.23</td>
+      <td>$777,398.66</td>
+      <td>$1,587,130.89</td>
+      <td>0.04%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3785490" target="_blank" style="color:#67e8f9;text-decoration:none">Maxey9320</a></td>
+      <td>9.64</td>
+      <td>1</td>
+      <td>9.64</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.03%</td>
+      <td>0.03%</td>
+      <td>$705,770.23</td>
+      <td>$388,699.33</td>
+      <td>$1,094,469.56</td>
+      <td>0.03%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3612329" target="_blank" style="color:#67e8f9;text-decoration:none">QlasQLAS</a></td>
+      <td>6.30</td>
+      <td>1</td>
+      <td>6.30</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.02%</td>
+      <td>0.03%</td>
+      <td>$461,239.88</td>
+      <td>$388,699.33</td>
+      <td>$849,939.21</td>
+      <td>0.02%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=2864324" target="_blank" style="color:#67e8f9;text-decoration:none">Ebenz33EBENZ33</a></td>
+      <td>6.23</td>
+      <td>1</td>
+      <td>6.23</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.02%</td>
+      <td>0.03%</td>
+      <td>$456,114.99</td>
+      <td>$388,699.33</td>
+      <td>$844,814.32</td>
+      <td>0.02%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3786518" target="_blank" style="color:#67e8f9;text-decoration:none">DaimiyoDeath</a></td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.00%</td>
+      <td>0.00%</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3803892" target="_blank" style="color:#67e8f9;text-decoration:none">JoePaletta</a></td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.00%</td>
+      <td>0.00%</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3811041" target="_blank" style="color:#67e8f9;text-decoration:none">BIspBISP</a></td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.00%</td>
+      <td>0.00%</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3803354" target="_blank" style="color:#67e8f9;text-decoration:none">IjatSD1IJATSD1</a></td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.00%</td>
+      <td>0.00%</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3781782" target="_blank" style="color:#67e8f9;text-decoration:none">21Bam21BAM</a></td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.00%</td>
+      <td>0.00%</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3798738" target="_blank" style="color:#67e8f9;text-decoration:none">Dummy999</a></td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.00%</td>
+      <td>0.00%</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3795407" target="_blank" style="color:#67e8f9;text-decoration:none">AI-AI-</a></td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.00%</td>
+      <td>0.00%</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=1995664" target="_blank" style="color:#67e8f9;text-decoration:none">JNIXIEJNIXIE</a></td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.00%</td>
+      <td>0.00%</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3002536" target="_blank" style="color:#67e8f9;text-decoration:none">Sherezada</a></td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.00%</td>
+      <td>0.00%</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3689656" target="_blank" style="color:#67e8f9;text-decoration:none">ColeX6COLEX6</a></td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.00%</td>
+      <td>0.00%</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3710950" target="_blank" style="color:#67e8f9;text-decoration:none">JarredGOONS</a></td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.00%</td>
+      <td>0.00%</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3743832" target="_blank" style="color:#67e8f9;text-decoration:none">DeezPanda</a></td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.00%</td>
+      <td>0.00%</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3766372" target="_blank" style="color:#67e8f9;text-decoration:none">Arlechinul</a></td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.00%</td>
+      <td>0.00%</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3800713" target="_blank" style="color:#67e8f9;text-decoration:none">BraydenOswell</a></td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.00%</td>
+      <td>0.00%</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.torn.com/profiles.php?XID=3810545" target="_blank" style="color:#67e8f9;text-decoration:none">Areywings</a></td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0.00%</td>
+      <td>0.00%</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>$0.00</td>
+      <td>0.00%</td>
+    </tr>
+  </tbody>
+</table>
+
+        <div class="calculations">
+            <h3>Calculation Details</h3>
+            
+            <div class="calc-row">
+                <span class="calc-label">Modified Score (War + Saves):</span>
+                <span class="calc-value">36,410.36</span>
+            </div>
+            
+            <div class="calc-row">
+                <span class="calc-label">Modified Hits (War + Bonus):</span>
+                <span class="calc-value">3,429.0</span>
+            </div>
+            
+            <div class="calc-row">
+                <span class="calc-label">Score Pool (60%):</span>
+                <span class="calc-value">$2,665,700,000.00</span>
+            </div>
+            
+            <div class="calc-row">
+                <span class="calc-label">Hit Pool (30%):</span>
+                <span class="calc-value">$1,332,850,000.00</span>
+            </div>
+            
+            <div class="calc-formula">
+                <strong>Formula:</strong> Member Earnings = (War Hits × $388,699.33) + ((War Respect + Save Score) × $73,212.68)
+            </div>
+            
+            <div style="margin-top: 15px;">
+                <div class="calc-formula">
+                    <strong>Total Members:</strong> 98
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function sortTable(columnIndex) {
+            const table = document.querySelector('table.earnings_report');
+            if (!table) return;
+            
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const header = table.querySelectorAll('th')[columnIndex];
+            
+            let isAscending = !header.classList.contains('sort-asc');
+            
+            table.querySelectorAll('th').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+            });
+            
+            header.classList.add(isAscending ? 'sort-asc' : 'sort-desc');
+            
+            rows.sort((a, b) => {
+                let aValue = a.cells[columnIndex].textContent.trim();
+                let bValue = b.cells[columnIndex].textContent.trim();
+                
+                if (aValue.includes('$')) {
+                    aValue = parseFloat(aValue.replace(/[$,]/g, '')) || 0;
+                    bValue = parseFloat(bValue.replace(/[$,]/g, '')) || 0;
+                    return isAscending ? aValue - bValue : bValue - aValue;
+                }
+                
+                if (aValue.includes('%')) {
+                    aValue = parseFloat(aValue.replace('%', '')) || 0;
+                    bValue = parseFloat(bValue.replace('%', '')) || 0;
+                    return isAscending ? aValue - bValue : bValue - aValue;
+                }
+                
+                if (aValue.match(/^[\d,]+\.?\d*$/)) {
+                    aValue = parseFloat(aValue.replace(/,/g, '')) || 0;
+                    bValue = parseFloat(bValue.replace(/,/g, '')) || 0;
+                    return isAscending ? aValue - bValue : bValue - aValue;
+                }
+                
+                return isAscending ? 
+                    aValue.localeCompare(bValue) : 
+                    bValue.localeCompare(aValue);
+            });
+            
+            rows.forEach(row => tbody.appendChild(row));
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const headers = document.querySelectorAll('table.earnings_report th');
+            headers.forEach((header, index) => {
+                header.addEventListener('click', () => sortTable(index));
+            });
+        });
+    </script>
+</body>
+</html>
