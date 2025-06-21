@@ -516,7 +516,7 @@ class TornReportGenerator:
 def main():
     API_KEY = "XrSNtZr7UKlaOXFT"
     FACTION_ID = 40959
-    WAR_ID = 27008
+    WAR_ID = 26833
 
     print("=== EPIC MAFIA WAR INTELLIGENCE SYSTEM ===")
     print("Collecting comprehensive intelligence data...")

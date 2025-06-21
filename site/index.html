@@ -123,16 +123,16 @@
         }
         
         .intel-report {
-            border-left-color: #8B0000;
-            box-shadow: 0 5px 20px rgba(139, 0, 0, 0.2);
+            border-left-color: #1e90ff;
+            box-shadow: 0 5px 20px rgba(30, 144, 255, 0.2);
         }
         
         .intel-report:hover {
-            border-left-color: #DC143C;
+            border-left-color: #0a5a9c;
             transform: translateX(10px);
             box-shadow: 
-                -5px 5px 30px rgba(139, 0, 0, 0.4),
-                0 0 20px rgba(220, 20, 60, 0.2);
+                -5px 5px 30px rgba(30, 144, 255, 0.4),
+                0 0 20px rgba(10, 90, 156, 0.2);
         }
         
         .war-report {
@@ -180,6 +180,9 @@
             text-decoration: none;
             color: inherit;
             width: 100%;
+            cursor: pointer;
+            z-index: 10;
+            position: relative;
         }
         
         .report-icon {
@@ -188,13 +191,13 @@
             transition: transform 0.4s ease;
         }
         
-        .intel-report .report-icon { color: #DC143C; }
+        .intel-report .report-icon { color: #1e90ff; }
         .war-report .report-icon { color: #DC143C; }
         .chain-report .report-icon { color: #6B8E23; }
         .earnings-report .report-icon { color: #FFD700; }
         
         .report-item:hover .report-icon {
-            transform: scale(1.2);
+            transform: translateX(10px);
         }
         
         .report-content h3 {
@@ -327,7 +330,7 @@
         
         <nav class="reports-nav">
             <div class="report-item intel-report">
-                <a href="intel_report.html" class="report-link">
+                <a href="intel_report.html" class="report-link" style="display: block; width: 100%; height: 100%; text-decoration: none; color: inherit;">
                     <div class="report-icon">🔍</div>
                     <div class="report-content">
                         <h3>War Intel</h3>
@@ -337,7 +340,7 @@
             </div>
             
             <div class="report-item war-report">
-                <a href="war_report.html" class="report-link">
+                <a href="war_report.html" class="report-link" style="display: block; width: 100%; height: 100%; text-decoration: none; color: inherit;">
                     <div class="report-icon">⚔️</div>
                     <div class="report-content">
                         <h3>War Report</h3>
@@ -347,7 +350,7 @@
             </div>
             
             <div class="report-item chain-report">
-                <a href="chain_report.html" class="report-link">
+                <a href="chain_report.html" class="report-link" style="display: block; width: 100%; height: 100%; text-decoration: none; color: inherit;">
                     <div class="report-icon">⛓️</div>
                     <div class="report-content">
                         <h3>Chain Report</h3>
@@ -357,7 +360,7 @@
             </div>
             
             <div class="report-item earnings-report">
-                <a href="earnings_report.html" class="report-link">
+                <a href="earnings_report.html" class="report-link" style="display: block; width: 100%; height: 100%; text-decoration: none; color: inherit;">
                     <div class="report-icon">💵</div>
                     <div class="report-content">
                         <h3>Earnings Estimate</h3>

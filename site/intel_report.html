@@ -77,7 +77,7 @@
         
         .header p {
             font-size: 1.2em;
-            color: #0a5a9c;
+            color: #1e90ff;
             font-weight: 300;
             letter-spacing: 2px;
         }
@@ -105,6 +105,143 @@
             background: linear-gradient(135deg, rgba(255, 140, 0, 0.1) 0%, rgba(255, 140, 0, 0.05) 100%);
             box-shadow: 0 0 20px rgba(255, 140, 0, 0.3);
             transform: scale(1.05);
+        }
+
+        /* Faction Averages Section */
+        .faction-averages {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .faction-avg-section {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(45, 45, 45, 0.6) 100%);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .our-faction-avg {
+            border: 2px solid #00ff7f;
+        }
+
+        .our-faction-avg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #00ff7f, #32cd32, #00ff7f);
+        }
+
+        .enemy-faction-avg {
+            border: 2px solid #ff5555;
+        }
+
+        .enemy-faction-avg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff5555, #dc143c, #ff5555);
+        }
+
+        .faction-avg-section h3 {
+            color: #FFD700;
+            margin-bottom: 20px;
+            font-size: 1.6em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+
+        .our-faction-avg h3 {
+            color: #00ff7f;
+        }
+
+        .enemy-faction-avg h3 {
+            color: #ff5555;
+        }
+
+        .avg-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+        }
+
+        .avg-stat {
+            text-align: center;
+            padding: 10px;
+            background: linear-gradient(135deg, rgba(10, 10, 10, 0.8) 0%, rgba(20, 20, 20, 0.6) 100%);
+            border-radius: 8px;
+            border: 2px solid rgba(68, 68, 68, 0.5);
+        }
+
+        .avg-stat-label {
+            font-size: 0.8em;
+            color: #999;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .avg-stat-value {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #d4c5a0;
+        }
+
+        .comparison-score {
+            font-size: 0.8em;
+            font-weight: 400;
+            margin-left: 8px;
+        }
+
+        .comparison-positive {
+            color: #00ff7f;
+        }
+
+        .comparison-negative {
+            color: #ff5555;
+        }
+
+        /* Stats Tabs */
+        .stats-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            background: linear-gradient(135deg, rgba(10, 10, 10, 0.8) 0%, rgba(20, 20, 20, 0.6) 100%);
+            border: 2px solid rgba(68, 68, 68, 0.5);
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: #d4c5a0;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .tab-btn:hover {
+            border-color: #1e90ff;
+        }
+
+        .tab-btn.active {
+            border-color: #FFD700;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(218, 165, 32, 0.1) 100%);
+            color: #FFD700;
         }
         
         /* Controls Section */
@@ -248,13 +385,13 @@
         
         .intel-table th {
             background: linear-gradient(135deg, rgba(10, 80, 160, 0.6) 0%, rgba(30, 144, 255, 0.4) 100%);
-            border-bottom: 2px solid rgba(10, 80, 160, 0.4);
+            border-bottom: 3px solid rgba(10, 80, 160, 0.4);
             color: #d4c5a0;
             padding: 15px 8px;
             text-align: center;
             font-weight: 600;
             font-size: 0.9em;
-            border-right: 1px solid rgba(68, 68, 68, 0.5);
+            border-right: 3px solid rgba(68, 68, 68, 0.5);
             cursor: pointer;
             user-select: none;
             text-transform: uppercase;
@@ -288,8 +425,8 @@
         
         .intel-table td {
             padding: 12px 8px;
-            border-bottom: 1px solid rgba(68, 68, 68, 0.3);
-            border-right: 1px solid rgba(68, 68, 68, 0.3);
+            border-bottom: 2px solid rgba(68, 68, 68, 0.3);
+            border-right: 2px solid rgba(68, 68, 68, 0.3);
             font-size: 0.9em;
             text-align: center;
             transition: background-color 0.2s ease;
@@ -360,6 +497,16 @@
             .control-row {
                 flex-direction: column;
             }
+
+            .faction-averages {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .avg-grid {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                gap: 10px;
+            }
             
             .intel-table th,
             .intel-table td {
@@ -382,8 +529,39 @@
     
     <div class="container">
         <div class="header">
-            <h1>🔍 War Intel</h1>
+            <h1>War Intel</h1>
             <p>Comprehensive Intelligence Analysis</p>
+        </div>
+
+        <!-- Faction Averages Section -->
+        <div class="faction-averages" id="factionAverages">
+            <div class="faction-avg-section our-faction-avg">
+                <h3>Our Faction Stats</h3>
+                <div class="stats-tabs">
+                    <button class="tab-btn active" onclick="showStats('our', 'averages')">Averages</button>
+                    <button class="tab-btn" onclick="showStats('our', 'totals')">Totals</button>
+                </div>
+                <div class="avg-grid" id="ourAverages">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+                <div class="avg-grid" id="ourTotals" style="display: none;">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="faction-avg-section enemy-faction-avg">
+                <h3>Enemy Faction Stats</h3>
+                <div class="stats-tabs">
+                    <button class="tab-btn active" onclick="showStats('enemy', 'averages')">Averages</button>
+                    <button class="tab-btn" onclick="showStats('enemy', 'totals')">Totals</button>
+                </div>
+                <div class="avg-grid" id="enemyAverages">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+                <div class="avg-grid" id="enemyTotals" style="display: none;">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
         </div>
         
         <div class="controls">
@@ -447,7 +625,7 @@
     "player_id": "140444",
     "profile_link": "https://www.torn.com/profiles.php?XID=140444",
     "level": 97,
-    "age": 7224,
+    "age": 7225,
     "life": 7162,
     "faction_type": "our",
     "attacks_won": 3864,
@@ -469,7 +647,7 @@
     "total_drug_usage": 0,
     "overdoses": 0,
     "networth_total": 76847805983,
-    "last_updated": "2025-06-21 14:24:06"
+    "last_updated": "2025-06-21 18:39:19"
   },
   "1719132": {
     "member": "HeartsPrincess",
@@ -498,7 +676,7 @@
     "total_drug_usage": 5486,
     "overdoses": 40,
     "networth_total": 22212680617,
-    "last_updated": "2025-06-21 14:24:09"
+    "last_updated": "2025-06-21 18:39:21"
   },
   "1775453": {
     "member": "ItBeLewis",
@@ -527,15 +705,15 @@
     "total_drug_usage": 1299,
     "overdoses": 32,
     "networth_total": 11857035649,
-    "last_updated": "2025-06-21 14:24:11"
+    "last_updated": "2025-06-21 18:39:22"
   },
   "1858055": {
     "member": "AnthonyLoretto",
     "player_id": "1858055",
     "profile_link": "https://www.torn.com/profiles.php?XID=1858055",
     "level": 79,
-    "age": 4007,
-    "life": 2982,
+    "age": 4008,
+    "life": 5737,
     "faction_type": "our",
     "attacks_won": 14688,
     "win_loss_ratio": 20.038,
@@ -556,7 +734,7 @@
     "total_drug_usage": 4163,
     "overdoses": 87,
     "networth_total": 20651165877,
-    "last_updated": "2025-06-21 14:24:14"
+    "last_updated": "2025-06-21 18:39:24"
   },
   "1923612": {
     "member": "Mahibuki",
@@ -585,7 +763,7 @@
     "total_drug_usage": 51,
     "overdoses": 0,
     "networth_total": 16663594547,
-    "last_updated": "2025-06-21 14:24:16"
+    "last_updated": "2025-06-21 18:39:26"
   },
   "1953965": {
     "member": "RipTheJacker",
@@ -614,7 +792,7 @@
     "total_drug_usage": 7163,
     "overdoses": 101,
     "networth_total": 45019833372,
-    "last_updated": "2025-06-21 14:24:18"
+    "last_updated": "2025-06-21 18:39:27"
   },
   "1995664": {
     "member": "JNIXIE",
@@ -643,7 +821,7 @@
     "total_drug_usage": 607,
     "overdoses": 15,
     "networth_total": 18223379672,
-    "last_updated": "2025-06-21 14:24:21"
+    "last_updated": "2025-06-21 18:39:29"
   },
   "2015888": {
     "member": "DarthBelloq",
@@ -672,7 +850,7 @@
     "total_drug_usage": 4098,
     "overdoses": 110,
     "networth_total": 22155507193,
-    "last_updated": "2025-06-21 14:24:24"
+    "last_updated": "2025-06-21 18:39:31"
   },
   "2080360": {
     "member": "hells_nells",
@@ -701,7 +879,7 @@
     "total_drug_usage": 4129,
     "overdoses": 85,
     "networth_total": 16857928099,
-    "last_updated": "2025-06-21 14:24:26"
+    "last_updated": "2025-06-21 18:39:32"
   },
   "2105039": {
     "member": "Doofenshmirtz",
@@ -730,7 +908,7 @@
     "total_drug_usage": 1957,
     "overdoses": 36,
     "networth_total": 2309369093,
-    "last_updated": "2025-06-21 14:24:28"
+    "last_updated": "2025-06-21 18:39:34"
   },
   "2125322": {
     "member": "daprinceomar",
@@ -759,7 +937,7 @@
     "total_drug_usage": 4771,
     "overdoses": 88,
     "networth_total": 20579095810,
-    "last_updated": "2025-06-21 14:24:31"
+    "last_updated": "2025-06-21 18:39:36"
   },
   "2161745": {
     "member": "bolthead0070",
@@ -788,14 +966,14 @@
     "total_drug_usage": 4301,
     "overdoses": 90,
     "networth_total": 14557312857,
-    "last_updated": "2025-06-21 14:24:33"
+    "last_updated": "2025-06-21 18:39:37"
   },
   "2176411": {
     "member": "kirb",
     "player_id": "2176411",
     "profile_link": "https://www.torn.com/profiles.php?XID=2176411",
     "level": 89,
-    "age": 2444,
+    "age": 2445,
     "life": 7135,
     "faction_type": "our",
     "attacks_won": 10013,
@@ -817,7 +995,7 @@
     "total_drug_usage": 723,
     "overdoses": 17,
     "networth_total": 16124487223,
-    "last_updated": "2025-06-21 14:24:38"
+    "last_updated": "2025-06-21 18:39:39"
   },
   "2189677": {
     "member": "Monst3rous",
@@ -846,7 +1024,7 @@
     "total_drug_usage": 1366,
     "overdoses": 29,
     "networth_total": 3874222991,
-    "last_updated": "2025-06-21 14:24:44"
+    "last_updated": "2025-06-21 18:39:41"
   },
   "2196526": {
     "member": "Saltheart",
@@ -875,7 +1053,7 @@
     "total_drug_usage": 3188,
     "overdoses": 67,
     "networth_total": 20755463932,
-    "last_updated": "2025-06-21 14:24:48"
+    "last_updated": "2025-06-21 18:39:42"
   },
   "2228876": {
     "member": "FuzzyRight1",
@@ -904,7 +1082,7 @@
     "total_drug_usage": 1074,
     "overdoses": 17,
     "networth_total": 25006087338,
-    "last_updated": "2025-06-21 14:24:50"
+    "last_updated": "2025-06-21 18:39:44"
   },
   "2272830": {
     "member": "talies",
@@ -933,7 +1111,7 @@
     "total_drug_usage": 3190,
     "overdoses": 67,
     "networth_total": 17985936963,
-    "last_updated": "2025-06-21 14:24:52"
+    "last_updated": "2025-06-21 18:39:46"
   },
   "2325363": {
     "member": "JetBean",
@@ -962,7 +1140,7 @@
     "total_drug_usage": 3706,
     "overdoses": 60,
     "networth_total": 14073675941,
-    "last_updated": "2025-06-21 14:24:53"
+    "last_updated": "2025-06-21 18:39:47"
   },
   "2326128": {
     "member": "DanniDraven",
@@ -991,7 +1169,7 @@
     "total_drug_usage": 1043,
     "overdoses": 17,
     "networth_total": 8265578085,
-    "last_updated": "2025-06-21 14:24:57"
+    "last_updated": "2025-06-21 18:39:49"
   },
   "2338906": {
     "member": "sinb",
@@ -1020,7 +1198,7 @@
     "total_drug_usage": 1080,
     "overdoses": 27,
     "networth_total": 2281470597,
-    "last_updated": "2025-06-21 14:24:59"
+    "last_updated": "2025-06-21 18:39:51"
   },
   "2369794": {
     "member": "rocco_saint1",
@@ -1049,7 +1227,7 @@
     "total_drug_usage": 1042,
     "overdoses": 29,
     "networth_total": 6596386628,
-    "last_updated": "2025-06-21 14:25:00"
+    "last_updated": "2025-06-21 18:39:52"
   },
   "2407136": {
     "member": "The-Silence",
@@ -1078,7 +1256,7 @@
     "total_drug_usage": 1839,
     "overdoses": 37,
     "networth_total": 16491056688,
-    "last_updated": "2025-06-21 14:25:02"
+    "last_updated": "2025-06-21 18:39:54"
   },
   "2418310": {
     "member": "B3Dr1Ch",
@@ -1107,7 +1285,7 @@
     "total_drug_usage": 3426,
     "overdoses": 59,
     "networth_total": 13897703688,
-    "last_updated": "2025-06-21 14:25:04"
+    "last_updated": "2025-06-21 18:39:57"
   },
   "2522325": {
     "member": "IOIIIIIOI",
@@ -1136,7 +1314,7 @@
     "total_drug_usage": 643,
     "overdoses": 15,
     "networth_total": 2810810606,
-    "last_updated": "2025-06-21 14:25:06"
+    "last_updated": "2025-06-21 18:39:59"
   },
   "2599153": {
     "member": "Southie",
@@ -1144,7 +1322,7 @@
     "profile_link": "https://www.torn.com/profiles.php?XID=2599153",
     "level": 92,
     "age": 1769,
-    "life": 3021,
+    "life": 6712,
     "faction_type": "our",
     "attacks_won": 9692,
     "win_loss_ratio": 22.28,
@@ -1165,7 +1343,7 @@
     "total_drug_usage": 3161,
     "overdoses": 87,
     "networth_total": 19269838978,
-    "last_updated": "2025-06-21 14:25:07"
+    "last_updated": "2025-06-21 18:40:01"
   },
   "2608152": {
     "member": "neonred",
@@ -1194,7 +1372,7 @@
     "total_drug_usage": 4191,
     "overdoses": 76,
     "networth_total": 14599982107,
-    "last_updated": "2025-06-21 14:25:09"
+    "last_updated": "2025-06-21 18:40:02"
   },
   "2646329": {
     "member": "Cyb3rpunkx",
@@ -1223,7 +1401,7 @@
     "total_drug_usage": 3225,
     "overdoses": 63,
     "networth_total": 15024786374,
-    "last_updated": "2025-06-21 14:25:11"
+    "last_updated": "2025-06-21 18:40:04"
   },
   "2660709": {
     "member": "-Poenie-",
@@ -1252,7 +1430,7 @@
     "total_drug_usage": 1364,
     "overdoses": 15,
     "networth_total": 19711448557,
-    "last_updated": "2025-06-21 14:25:12"
+    "last_updated": "2025-06-21 18:40:06"
   },
   "2671955": {
     "member": "DocHammerMD",
@@ -1281,7 +1459,7 @@
     "total_drug_usage": 1763,
     "overdoses": 33,
     "networth_total": 5734900435,
-    "last_updated": "2025-06-21 14:25:14"
+    "last_updated": "2025-06-21 18:40:07"
   },
   "2728756": {
     "member": "alirhl",
@@ -1310,14 +1488,14 @@
     "total_drug_usage": 169,
     "overdoses": 4,
     "networth_total": 1466569089,
-    "last_updated": "2025-06-21 14:25:15"
+    "last_updated": "2025-06-21 18:40:09"
   },
   "2752336": {
     "member": "CheJ",
     "player_id": "2752336",
     "profile_link": "https://www.torn.com/profiles.php?XID=2752336",
     "level": 42,
-    "age": 1235,
+    "age": 1236,
     "life": 2962,
     "faction_type": "our",
     "attacks_won": 7900,
@@ -1339,14 +1517,14 @@
     "total_drug_usage": 1513,
     "overdoses": 27,
     "networth_total": 13107219464,
-    "last_updated": "2025-06-21 14:25:17"
+    "last_updated": "2025-06-21 18:40:11"
   },
   "2752990": {
     "member": "RinnX",
     "player_id": "2752990",
     "profile_link": "https://www.torn.com/profiles.php?XID=2752990",
     "level": 75,
-    "age": 1232,
+    "age": 1233,
     "life": 4350,
     "faction_type": "our",
     "attacks_won": 5885,
@@ -1368,7 +1546,7 @@
     "total_drug_usage": 2283,
     "overdoses": 48,
     "networth_total": 11147633746,
-    "last_updated": "2025-06-21 14:25:19"
+    "last_updated": "2025-06-21 18:40:12"
   },
   "2765265": {
     "member": "RabbitBrain",
@@ -1376,7 +1554,7 @@
     "profile_link": "https://www.torn.com/profiles.php?XID=2765265",
     "level": 53,
     "age": 1180,
-    "life": 2777,
+    "life": 2000,
     "faction_type": "our",
     "attacks_won": 1879,
     "win_loss_ratio": 16.628,
@@ -1397,7 +1575,7 @@
     "total_drug_usage": 499,
     "overdoses": 14,
     "networth_total": 1927265877,
-    "last_updated": "2025-06-21 14:25:21"
+    "last_updated": "2025-06-21 18:40:14"
   },
   "2790420": {
     "member": "Chang_E",
@@ -1426,15 +1604,15 @@
     "total_drug_usage": 388,
     "overdoses": 9,
     "networth_total": 1138109681,
-    "last_updated": "2025-06-21 14:25:22"
+    "last_updated": "2025-06-21 18:40:16"
   },
   "2799812": {
     "member": "sogunubica",
     "player_id": "2799812",
     "profile_link": "https://www.torn.com/profiles.php?XID=2799812",
     "level": 66,
-    "age": 1071,
-    "life": 1651,
+    "age": 1072,
+    "life": 4127,
     "faction_type": "our",
     "attacks_won": 5351,
     "win_loss_ratio": 11.195,
@@ -1455,7 +1633,7 @@
     "total_drug_usage": 2405,
     "overdoses": 52,
     "networth_total": 6322803290,
-    "last_updated": "2025-06-21 14:25:24"
+    "last_updated": "2025-06-21 18:40:18"
   },
   "2806010": {
     "member": "Manda",
@@ -1484,14 +1662,14 @@
     "total_drug_usage": 2044,
     "overdoses": 45,
     "networth_total": 3581280981,
-    "last_updated": "2025-06-21 14:25:26"
+    "last_updated": "2025-06-21 18:40:20"
   },
   "2864324": {
     "member": "Ebenz33",
     "player_id": "2864324",
     "profile_link": "https://www.torn.com/profiles.php?XID=2864324",
     "level": 28,
-    "age": 909,
+    "age": 910,
     "life": 1402,
     "faction_type": "our",
     "attacks_won": 648,
@@ -1513,7 +1691,7 @@
     "total_drug_usage": 78,
     "overdoses": 2,
     "networth_total": 49643656,
-    "last_updated": "2025-06-21 14:25:27"
+    "last_updated": "2025-06-21 18:40:21"
   },
   "2866126": {
     "member": "BETA-",
@@ -1542,7 +1720,7 @@
     "total_drug_usage": 1250,
     "overdoses": 23,
     "networth_total": 239095156,
-    "last_updated": "2025-06-21 14:25:29"
+    "last_updated": "2025-06-21 18:40:23"
   },
   "2880827": {
     "member": "JudgeFudge",
@@ -1571,7 +1749,7 @@
     "total_drug_usage": 1547,
     "overdoses": 27,
     "networth_total": 4595785043,
-    "last_updated": "2025-06-21 14:25:31"
+    "last_updated": "2025-06-21 18:40:25"
   },
   "2882495": {
     "member": "Ichaerus",
@@ -1600,7 +1778,7 @@
     "total_drug_usage": 3001,
     "overdoses": 59,
     "networth_total": 10487963871,
-    "last_updated": "2025-06-21 14:25:32"
+    "last_updated": "2025-06-21 18:40:26"
   },
   "2899384": {
     "member": "aarontrepus",
@@ -1629,14 +1807,14 @@
     "total_drug_usage": 1594,
     "overdoses": 46,
     "networth_total": 2841770226,
-    "last_updated": "2025-06-21 14:25:34"
+    "last_updated": "2025-06-21 18:40:28"
   },
   "2899757": {
     "member": "PurpleCatnip",
     "player_id": "2899757",
     "profile_link": "https://www.torn.com/profiles.php?XID=2899757",
     "level": 35,
-    "age": 817,
+    "age": 818,
     "life": 2437,
     "faction_type": "our",
     "attacks_won": 1374,
@@ -1658,7 +1836,7 @@
     "total_drug_usage": 793,
     "overdoses": 19,
     "networth_total": 5330557189,
-    "last_updated": "2025-06-21 14:25:36"
+    "last_updated": "2025-06-21 18:40:30"
   },
   "2926165": {
     "member": "Paryauuua",
@@ -1687,7 +1865,7 @@
     "total_drug_usage": 104,
     "overdoses": 4,
     "networth_total": 24494005,
-    "last_updated": "2025-06-21 14:25:37"
+    "last_updated": "2025-06-21 18:40:31"
   },
   "2955185": {
     "member": "SoulHunter8",
@@ -1716,14 +1894,14 @@
     "total_drug_usage": 793,
     "overdoses": 21,
     "networth_total": 3457081393,
-    "last_updated": "2025-06-21 14:25:39"
+    "last_updated": "2025-06-21 18:40:33"
   },
   "2973461": {
     "member": "Frank3nst3in",
     "player_id": "2973461",
     "profile_link": "https://www.torn.com/profiles.php?XID=2973461",
     "level": 68,
-    "age": 723,
+    "age": 724,
     "life": 4912,
     "faction_type": "our",
     "attacks_won": 3107,
@@ -1734,7 +1912,7 @@
     "energy_drinks_drunk": 514,
     "stat_enhancers_used": 0,
     "xanax_taken": 1162,
-    "avg_xanax_per_day": 1.61,
+    "avg_xanax_per_day": 1.6,
     "time_played_days": 80.9,
     "current_activity_streak": 574,
     "best_activity_streak": 574,
@@ -1745,7 +1923,7 @@
     "total_drug_usage": 1464,
     "overdoses": 37,
     "networth_total": 5887579395,
-    "last_updated": "2025-06-21 14:25:40"
+    "last_updated": "2025-06-21 18:40:35"
   },
   "3000530": {
     "member": "Bob937",
@@ -1774,7 +1952,7 @@
     "total_drug_usage": 987,
     "overdoses": 10,
     "networth_total": 5449180966,
-    "last_updated": "2025-06-21 14:25:42"
+    "last_updated": "2025-06-21 18:40:36"
   },
   "3002536": {
     "member": "Sherezada",
@@ -1803,7 +1981,7 @@
     "total_drug_usage": 628,
     "overdoses": 8,
     "networth_total": 2660253663,
-    "last_updated": "2025-06-21 14:25:43"
+    "last_updated": "2025-06-21 18:40:38"
   },
   "3021017": {
     "member": "KABOOSE96",
@@ -1832,7 +2010,7 @@
     "total_drug_usage": 1467,
     "overdoses": 21,
     "networth_total": 3080660862,
-    "last_updated": "2025-06-21 14:25:45"
+    "last_updated": "2025-06-21 18:40:39"
   },
   "3027058": {
     "member": "Elswicka",
@@ -1861,7 +2039,7 @@
     "total_drug_usage": 1394,
     "overdoses": 30,
     "networth_total": 2805475501,
-    "last_updated": "2025-06-21 14:25:47"
+    "last_updated": "2025-06-21 18:40:41"
   },
   "3076983": {
     "member": "Furnace_Funeral",
@@ -1890,14 +2068,14 @@
     "total_drug_usage": 1389,
     "overdoses": 21,
     "networth_total": 1134892521,
-    "last_updated": "2025-06-21 14:25:48"
+    "last_updated": "2025-06-21 18:40:42"
   },
   "3143592": {
     "member": "slooj",
     "player_id": "3143592",
     "profile_link": "https://www.torn.com/profiles.php?XID=3143592",
     "level": 69,
-    "age": 587,
+    "age": 588,
     "life": 3990,
     "faction_type": "our",
     "attacks_won": 4364,
@@ -1919,7 +2097,7 @@
     "total_drug_usage": 1434,
     "overdoses": 23,
     "networth_total": 3009030912,
-    "last_updated": "2025-06-21 14:25:50"
+    "last_updated": "2025-06-21 18:40:44"
   },
   "3155566": {
     "member": "Shindig7",
@@ -1927,7 +2105,7 @@
     "profile_link": "https://www.torn.com/profiles.php?XID=3155566",
     "level": 40,
     "age": 572,
-    "life": 1181,
+    "life": 2812,
     "faction_type": "our",
     "attacks_won": 4613,
     "win_loss_ratio": 18.676,
@@ -1948,7 +2126,7 @@
     "total_drug_usage": 1292,
     "overdoses": 25,
     "networth_total": 27761488930,
-    "last_updated": "2025-06-21 14:25:51"
+    "last_updated": "2025-06-21 18:40:46"
   },
   "3158789": {
     "member": "Hotspoon",
@@ -1977,7 +2155,7 @@
     "total_drug_usage": 1187,
     "overdoses": 27,
     "networth_total": 4002546536,
-    "last_updated": "2025-06-21 14:25:53"
+    "last_updated": "2025-06-21 18:40:47"
   },
   "3182308": {
     "member": "Farmst",
@@ -2006,7 +2184,7 @@
     "total_drug_usage": 978,
     "overdoses": 13,
     "networth_total": 1974357986,
-    "last_updated": "2025-06-21 14:25:55"
+    "last_updated": "2025-06-21 18:40:49"
   },
   "3212903": {
     "member": "Jlamb",
@@ -2035,7 +2213,7 @@
     "total_drug_usage": 593,
     "overdoses": 12,
     "networth_total": 520536081,
-    "last_updated": "2025-06-21 14:25:57"
+    "last_updated": "2025-06-21 18:40:50"
   },
   "3244911": {
     "member": "YourAverageJoe",
@@ -2064,14 +2242,14 @@
     "total_drug_usage": 620,
     "overdoses": 13,
     "networth_total": 2213602793,
-    "last_updated": "2025-06-21 14:25:59"
+    "last_updated": "2025-06-21 18:40:52"
   },
   "3251071": {
     "member": "TheCreature",
     "player_id": "3251071",
     "profile_link": "https://www.torn.com/profiles.php?XID=3251071",
     "level": 40,
-    "age": 450,
+    "age": 451,
     "life": 2718,
     "faction_type": "our",
     "attacks_won": 2253,
@@ -2093,7 +2271,7 @@
     "total_drug_usage": 619,
     "overdoses": 17,
     "networth_total": 2187237010,
-    "last_updated": "2025-06-21 14:26:01"
+    "last_updated": "2025-06-21 18:40:54"
   },
   "3251350": {
     "member": "ImSoFoolish",
@@ -2122,7 +2300,7 @@
     "total_drug_usage": 570,
     "overdoses": 15,
     "networth_total": 848687930,
-    "last_updated": "2025-06-21 14:26:02"
+    "last_updated": "2025-06-21 18:40:56"
   },
   "3263240": {
     "member": "MorninGlory",
@@ -2151,7 +2329,7 @@
     "total_drug_usage": 748,
     "overdoses": 8,
     "networth_total": 2018271747,
-    "last_updated": "2025-06-21 14:26:04"
+    "last_updated": "2025-06-21 18:40:58"
   },
   "3269984": {
     "member": "Pokeballer",
@@ -2180,7 +2358,7 @@
     "total_drug_usage": 647,
     "overdoses": 12,
     "networth_total": 337328685,
-    "last_updated": "2025-06-21 14:26:06"
+    "last_updated": "2025-06-21 18:41:00"
   },
   "3301709": {
     "member": "Teej136",
@@ -2209,7 +2387,7 @@
     "total_drug_usage": 452,
     "overdoses": 12,
     "networth_total": 1519480471,
-    "last_updated": "2025-06-21 14:26:07"
+    "last_updated": "2025-06-21 18:41:01"
   },
   "3316436": {
     "member": "JumanneStruggle",
@@ -2238,14 +2416,14 @@
     "total_drug_usage": 413,
     "overdoses": 5,
     "networth_total": 216923440,
-    "last_updated": "2025-06-21 14:26:09"
+    "last_updated": "2025-06-21 18:41:04"
   },
   "3317890": {
     "member": "Xx_Eugene_xX",
     "player_id": "3317890",
     "profile_link": "https://www.torn.com/profiles.php?XID=3317890",
     "level": 45,
-    "age": 379,
+    "age": 380,
     "life": 3187,
     "faction_type": "our",
     "attacks_won": 1386,
@@ -2267,14 +2445,14 @@
     "total_drug_usage": 615,
     "overdoses": 13,
     "networth_total": 885218578,
-    "last_updated": "2025-06-21 14:26:11"
+    "last_updated": "2025-06-21 18:41:05"
   },
   "3399414": {
     "member": "Renderhp",
     "player_id": "3399414",
     "profile_link": "https://www.torn.com/profiles.php?XID=3399414",
     "level": 50,
-    "age": 297,
+    "age": 298,
     "life": 3562,
     "faction_type": "our",
     "attacks_won": 3458,
@@ -2296,7 +2474,7 @@
     "total_drug_usage": 925,
     "overdoses": 19,
     "networth_total": 8375128454,
-    "last_updated": "2025-06-21 14:26:12"
+    "last_updated": "2025-06-21 18:41:08"
   },
   "3517148": {
     "member": "Dopplis",
@@ -2325,7 +2503,7 @@
     "total_drug_usage": 270,
     "overdoses": 6,
     "networth_total": 455339046,
-    "last_updated": "2025-06-21 14:26:14"
+    "last_updated": "2025-06-21 18:41:10"
   },
   "3521451": {
     "member": "Caz27",
@@ -2354,15 +2532,15 @@
     "total_drug_usage": 424,
     "overdoses": 10,
     "networth_total": 845241033,
-    "last_updated": "2025-06-21 14:26:16"
+    "last_updated": "2025-06-21 18:41:11"
   },
   "3535815": {
     "member": "_Moridin_",
     "player_id": "3535815",
     "profile_link": "https://www.torn.com/profiles.php?XID=3535815",
     "level": 25,
-    "age": 178,
-    "life": 1154,
+    "age": 179,
+    "life": 1518,
     "faction_type": "our",
     "attacks_won": 1120,
     "win_loss_ratio": 10.667,
@@ -2372,7 +2550,7 @@
     "energy_drinks_drunk": 31,
     "stat_enhancers_used": 0,
     "xanax_taken": 280,
-    "avg_xanax_per_day": 1.57,
+    "avg_xanax_per_day": 1.56,
     "time_played_days": 27.1,
     "current_activity_streak": 178,
     "best_activity_streak": 178,
@@ -2383,14 +2561,14 @@
     "total_drug_usage": 406,
     "overdoses": 5,
     "networth_total": 748831541,
-    "last_updated": "2025-06-21 14:26:17"
+    "last_updated": "2025-06-21 18:41:13"
   },
   "3537137": {
     "member": "Leadeatinmaniac",
     "player_id": "3537137",
     "profile_link": "https://www.torn.com/profiles.php?XID=3537137",
     "level": 35,
-    "age": 177,
+    "age": 178,
     "life": 1625,
     "faction_type": "our",
     "attacks_won": 846,
@@ -2401,7 +2579,7 @@
     "energy_drinks_drunk": 57,
     "stat_enhancers_used": 0,
     "xanax_taken": 274,
-    "avg_xanax_per_day": 1.55,
+    "avg_xanax_per_day": 1.54,
     "time_played_days": 20.0,
     "current_activity_streak": 177,
     "best_activity_streak": 177,
@@ -2412,7 +2590,7 @@
     "total_drug_usage": 403,
     "overdoses": 13,
     "networth_total": 396122774,
-    "last_updated": "2025-06-21 14:26:19"
+    "last_updated": "2025-06-21 18:41:15"
   },
   "3612329": {
     "member": "Qlas",
@@ -2441,7 +2619,7 @@
     "total_drug_usage": 251,
     "overdoses": 1,
     "networth_total": 333471344,
-    "last_updated": "2025-06-21 14:26:21"
+    "last_updated": "2025-06-21 18:41:16"
   },
   "3637762": {
     "member": "Aktash",
@@ -2449,7 +2627,7 @@
     "profile_link": "https://www.torn.com/profiles.php?XID=3637762",
     "level": 28,
     "age": 108,
-    "life": 1912,
+    "life": 1146,
     "faction_type": "our",
     "attacks_won": 789,
     "win_loss_ratio": 31.56,
@@ -2470,7 +2648,7 @@
     "total_drug_usage": 265,
     "overdoses": 6,
     "networth_total": 157275295,
-    "last_updated": "2025-06-21 14:26:22"
+    "last_updated": "2025-06-21 18:41:18"
   },
   "3650111": {
     "member": "Lazy_seal",
@@ -2499,7 +2677,7 @@
     "total_drug_usage": 430,
     "overdoses": 4,
     "networth_total": 96458471,
-    "last_updated": "2025-06-21 14:26:24"
+    "last_updated": "2025-06-21 18:41:20"
   },
   "3654210": {
     "member": "BeerBandit40",
@@ -2528,7 +2706,7 @@
     "total_drug_usage": 186,
     "overdoses": 4,
     "networth_total": 1182316822,
-    "last_updated": "2025-06-21 14:26:25"
+    "last_updated": "2025-06-21 18:41:21"
   },
   "3654507": {
     "member": "Blnko",
@@ -2557,7 +2735,7 @@
     "total_drug_usage": 259,
     "overdoses": 9,
     "networth_total": 911074407,
-    "last_updated": "2025-06-21 14:26:27"
+    "last_updated": "2025-06-21 18:41:23"
   },
   "3672395": {
     "member": "Bloodrose3",
@@ -2586,7 +2764,7 @@
     "total_drug_usage": 102,
     "overdoses": 2,
     "networth_total": 206237997,
-    "last_updated": "2025-06-21 14:26:29"
+    "last_updated": "2025-06-21 18:41:25"
   },
   "3675061": {
     "member": "Lykaios1",
@@ -2615,7 +2793,7 @@
     "total_drug_usage": 157,
     "overdoses": 1,
     "networth_total": 422114889,
-    "last_updated": "2025-06-21 14:26:31"
+    "last_updated": "2025-06-21 18:41:27"
   },
   "3689656": {
     "member": "ColeX6",
@@ -2644,14 +2822,14 @@
     "total_drug_usage": 72,
     "overdoses": 3,
     "networth_total": 50483856,
-    "last_updated": "2025-06-21 14:26:32"
+    "last_updated": "2025-06-21 18:41:28"
   },
   "3694822": {
     "member": "crazypilot",
     "player_id": "3694822",
     "profile_link": "https://www.torn.com/profiles.php?XID=3694822",
     "level": 20,
-    "age": 69,
+    "age": 70,
     "life": 918,
     "faction_type": "our",
     "attacks_won": 267,
@@ -2673,7 +2851,7 @@
     "total_drug_usage": 50,
     "overdoses": 0,
     "networth_total": 1296801990,
-    "last_updated": "2025-06-21 14:26:34"
+    "last_updated": "2025-06-21 18:41:30"
   },
   "3700645": {
     "member": "0Bane0",
@@ -2702,7 +2880,7 @@
     "total_drug_usage": 85,
     "overdoses": 0,
     "networth_total": 117147873,
-    "last_updated": "2025-06-21 14:26:35"
+    "last_updated": "2025-06-21 18:41:31"
   },
   "3705449": {
     "member": "GrayFoxIRL",
@@ -2710,7 +2888,7 @@
     "profile_link": "https://www.torn.com/profiles.php?XID=3705449",
     "level": 19,
     "age": 63,
-    "life": 825,
+    "life": 783,
     "faction_type": "our",
     "attacks_won": 109,
     "win_loss_ratio": 15.571,
@@ -2731,14 +2909,14 @@
     "total_drug_usage": 44,
     "overdoses": 0,
     "networth_total": 729910227,
-    "last_updated": "2025-06-21 14:26:37"
+    "last_updated": "2025-06-21 18:41:33"
   },
   "3709844": {
     "member": "SlayersApex",
     "player_id": "3709844",
     "profile_link": "https://www.torn.com/profiles.php?XID=3709844",
     "level": 20,
-    "age": 60,
+    "age": 61,
     "life": 1181,
     "faction_type": "our",
     "attacks_won": 480,
@@ -2749,7 +2927,7 @@
     "energy_drinks_drunk": 6,
     "stat_enhancers_used": 0,
     "xanax_taken": 104,
-    "avg_xanax_per_day": 1.73,
+    "avg_xanax_per_day": 1.7,
     "time_played_days": 9.2,
     "current_activity_streak": 45,
     "best_activity_streak": 45,
@@ -2760,7 +2938,7 @@
     "total_drug_usage": 135,
     "overdoses": 5,
     "networth_total": 576773673,
-    "last_updated": "2025-06-21 14:26:39"
+    "last_updated": "2025-06-21 18:41:35"
   },
   "3710950": {
     "member": "JarredGOONS",
@@ -2789,7 +2967,7 @@
     "total_drug_usage": 43,
     "overdoses": 1,
     "networth_total": 38480013,
-    "last_updated": "2025-06-21 14:26:40"
+    "last_updated": "2025-06-21 18:41:36"
   },
   "3715900": {
     "member": "GaloSengen",
@@ -2797,7 +2975,7 @@
     "profile_link": "https://www.torn.com/profiles.php?XID=3715900",
     "level": 21,
     "age": 56,
-    "life": 446,
+    "life": 971,
     "faction_type": "our",
     "attacks_won": 247,
     "win_loss_ratio": 8.233,
@@ -2806,19 +2984,19 @@
     "ranked_war_hits": 22,
     "energy_drinks_drunk": 0,
     "stat_enhancers_used": 0,
-    "xanax_taken": 32,
-    "avg_xanax_per_day": 0.57,
-    "time_played_days": 6.6,
+    "xanax_taken": 33,
+    "avg_xanax_per_day": 0.59,
+    "time_played_days": 6.7,
     "current_activity_streak": 57,
     "best_activity_streak": 57,
     "energy_refills": 4,
     "merits_bought": 0,
-    "donator_days": 55,
+    "donator_days": 56,
     "estimated_battle_stats": "94,447",
-    "total_drug_usage": 140,
+    "total_drug_usage": 141,
     "overdoses": 4,
     "networth_total": 94978638,
-    "last_updated": "2025-06-21 14:26:42"
+    "last_updated": "2025-06-21 18:41:38"
   },
   "3743466": {
     "member": "LadyHermosa",
@@ -2826,7 +3004,7 @@
     "profile_link": "https://www.torn.com/profiles.php?XID=3743466",
     "level": 14,
     "age": 39,
-    "life": 632,
+    "life": 569,
     "faction_type": "our",
     "attacks_won": 323,
     "win_loss_ratio": 7.022,
@@ -2847,7 +3025,7 @@
     "total_drug_usage": 21,
     "overdoses": 0,
     "networth_total": 6658896,
-    "last_updated": "2025-06-21 14:26:44"
+    "last_updated": "2025-06-21 18:41:40"
   },
   "3743832": {
     "member": "DeezPanda",
@@ -2876,7 +3054,7 @@
     "total_drug_usage": 40,
     "overdoses": 2,
     "networth_total": 1023767963,
-    "last_updated": "2025-06-21 14:26:46"
+    "last_updated": "2025-06-21 18:41:41"
   },
   "3744400": {
     "member": "PacificDragon",
@@ -2905,7 +3083,7 @@
     "total_drug_usage": 35,
     "overdoses": 2,
     "networth_total": 10839580,
-    "last_updated": "2025-06-21 14:26:47"
+    "last_updated": "2025-06-21 18:41:43"
   },
   "3746198": {
     "member": "Ehrzvv",
@@ -2913,7 +3091,7 @@
     "profile_link": "https://www.torn.com/profiles.php?XID=3746198",
     "level": 20,
     "age": 38,
-    "life": 808,
+    "life": 918,
     "faction_type": "our",
     "attacks_won": 291,
     "win_loss_ratio": 13.857,
@@ -2934,14 +3112,14 @@
     "total_drug_usage": 75,
     "overdoses": 1,
     "networth_total": 57736804,
-    "last_updated": "2025-06-21 14:26:49"
+    "last_updated": "2025-06-21 18:41:45"
   },
   "3751400": {
     "member": "Paddeyy",
     "player_id": "3751400",
     "profile_link": "https://www.torn.com/profiles.php?XID=3751400",
     "level": 18,
-    "age": 36,
+    "age": 37,
     "life": 775,
     "faction_type": "our",
     "attacks_won": 179,
@@ -2952,7 +3130,7 @@
     "energy_drinks_drunk": 0,
     "stat_enhancers_used": 0,
     "xanax_taken": 11,
-    "avg_xanax_per_day": 0.31,
+    "avg_xanax_per_day": 0.3,
     "time_played_days": 3.6,
     "current_activity_streak": 36,
     "best_activity_streak": 36,
@@ -2963,7 +3141,7 @@
     "total_drug_usage": 31,
     "overdoses": 2,
     "networth_total": 44325338,
-    "last_updated": "2025-06-21 14:26:50"
+    "last_updated": "2025-06-21 18:41:46"
   },
   "3765617": {
     "member": "AmirVision",
@@ -2992,7 +3170,7 @@
     "total_drug_usage": 54,
     "overdoses": 1,
     "networth_total": 17388115,
-    "last_updated": "2025-06-21 14:26:52"
+    "last_updated": "2025-06-21 18:41:48"
   },
   "3776266": {
     "member": "AfterEight",
@@ -3000,7 +3178,7 @@
     "profile_link": "https://www.torn.com/profiles.php?XID=3776266",
     "level": 15,
     "age": 28,
-    "life": 778,
+    "life": 843,
     "faction_type": "our",
     "attacks_won": 130,
     "win_loss_ratio": 1.857,
@@ -3021,7 +3199,7 @@
     "total_drug_usage": 24,
     "overdoses": 1,
     "networth_total": 7795165,
-    "last_updated": "2025-06-21 14:26:54"
+    "last_updated": "2025-06-21 18:41:50"
   },
   "3781782": {
     "member": "21Bam",
@@ -3050,7 +3228,7 @@
     "total_drug_usage": 27,
     "overdoses": 0,
     "networth_total": 152153010,
-    "last_updated": "2025-06-21 14:26:56"
+    "last_updated": "2025-06-21 18:41:51"
   },
   "3785490": {
     "member": "Maxey9320",
@@ -3079,7 +3257,7 @@
     "total_drug_usage": 17,
     "overdoses": 1,
     "networth_total": 7769618,
-    "last_updated": "2025-06-21 14:26:58"
+    "last_updated": "2025-06-21 18:41:53"
   },
   "3786518": {
     "member": "DaimiyoDeath",
@@ -3087,7 +3265,7 @@
     "profile_link": "https://www.torn.com/profiles.php?XID=3786518",
     "level": 17,
     "age": 24,
-    "life": 400,
+    "life": 725,
     "faction_type": "our",
     "attacks_won": 219,
     "win_loss_ratio": 8.76,
@@ -3108,7 +3286,7 @@
     "total_drug_usage": 16,
     "overdoses": 1,
     "networth_total": 111300820,
-    "last_updated": "2025-06-21 14:26:59"
+    "last_updated": "2025-06-21 18:41:54"
   },
   "3795407": {
     "member": "AI-",
@@ -3137,14 +3315,14 @@
     "total_drug_usage": 0,
     "overdoses": 0,
     "networth_total": 8034211,
-    "last_updated": "2025-06-21 14:27:01"
+    "last_updated": "2025-06-21 18:41:57"
   },
   "3798738": {
     "member": "Dummy999",
     "player_id": "3798738",
     "profile_link": "https://www.torn.com/profiles.php?XID=3798738",
     "level": 11,
-    "age": 19,
+    "age": 20,
     "life": 425,
     "faction_type": "our",
     "attacks_won": 57,
@@ -3166,14 +3344,14 @@
     "total_drug_usage": 9,
     "overdoses": 0,
     "networth_total": 18779024,
-    "last_updated": "2025-06-21 14:27:02"
+    "last_updated": "2025-06-21 18:41:59"
   },
   "3803354": {
     "member": "IjatSD1",
     "player_id": "3803354",
     "profile_link": "https://www.torn.com/profiles.php?XID=3803354",
     "level": 15,
-    "age": 17,
+    "age": 18,
     "life": 718,
     "faction_type": "our",
     "attacks_won": 126,
@@ -3184,7 +3362,7 @@
     "energy_drinks_drunk": 0,
     "stat_enhancers_used": 0,
     "xanax_taken": 5,
-    "avg_xanax_per_day": 0.29,
+    "avg_xanax_per_day": 0.28,
     "time_played_days": 0.5,
     "current_activity_streak": 17,
     "best_activity_streak": 17,
@@ -3195,7 +3373,7 @@
     "total_drug_usage": 10,
     "overdoses": 0,
     "networth_total": 4782846,
-    "last_updated": "2025-06-21 14:27:04"
+    "last_updated": "2025-06-21 18:42:00"
   },
   "3803892": {
     "member": "JoePaletta",
@@ -3203,7 +3381,7 @@
     "profile_link": "https://www.torn.com/profiles.php?XID=3803892",
     "level": 13,
     "age": 17,
-    "life": 509,
+    "life": 525,
     "faction_type": "our",
     "attacks_won": 97,
     "win_loss_ratio": 6.467,
@@ -3224,7 +3402,7 @@
     "total_drug_usage": 15,
     "overdoses": 0,
     "networth_total": 12352919,
-    "last_updated": "2025-06-21 14:27:06"
+    "last_updated": "2025-06-21 18:42:02"
   },
   "3809424": {
     "member": "IzzAmirul",
@@ -3253,7 +3431,7 @@
     "total_drug_usage": 10,
     "overdoses": 0,
     "networth_total": 35668166,
-    "last_updated": "2025-06-21 14:27:07"
+    "last_updated": "2025-06-21 18:42:04"
   },
   "3811041": {
     "member": "BIsp",
@@ -3282,14 +3460,14 @@
     "total_drug_usage": 12,
     "overdoses": 1,
     "networth_total": 4510287,
-    "last_updated": "2025-06-21 14:27:09"
+    "last_updated": "2025-06-21 18:42:05"
   },
   "2718606": {
     "member": "Mjolnir-Bot",
     "player_id": "2718606",
     "profile_link": "https://www.torn.com/profiles.php?XID=2718606",
     "level": 100,
-    "age": 1363,
+    "age": 1364,
     "life": 7500,
     "faction_type": "enemy",
     "attacks_won": 13987,
@@ -3311,7 +3489,7 @@
     "total_drug_usage": 3416,
     "overdoses": 76,
     "networth_total": 15240474422,
-    "last_updated": "2025-06-21 14:27:10"
+    "last_updated": "2025-06-21 18:42:07"
   },
   "2609400": {
     "member": "dbailz31",
@@ -3340,7 +3518,7 @@
     "total_drug_usage": 3584,
     "overdoses": 73,
     "networth_total": 11587248271,
-    "last_updated": "2025-06-21 14:27:12"
+    "last_updated": "2025-06-21 18:42:08"
   },
   "2587548": {
     "member": "Ebling",
@@ -3369,7 +3547,7 @@
     "total_drug_usage": 3636,
     "overdoses": 71,
     "networth_total": 11942552377,
-    "last_updated": "2025-06-21 14:27:14"
+    "last_updated": "2025-06-21 18:42:10"
   },
   "2578434": {
     "member": "Palestine",
@@ -3398,7 +3576,7 @@
     "total_drug_usage": 3642,
     "overdoses": 66,
     "networth_total": 15267480503,
-    "last_updated": "2025-06-21 14:27:15"
+    "last_updated": "2025-06-21 18:42:11"
   },
   "2518745": {
     "member": "Canariano",
@@ -3427,7 +3605,7 @@
     "total_drug_usage": 5052,
     "overdoses": 91,
     "networth_total": 114883445178,
-    "last_updated": "2025-06-21 14:27:17"
+    "last_updated": "2025-06-21 18:42:13"
   },
   "2518285": {
     "member": "Gregorian",
@@ -3456,7 +3634,7 @@
     "total_drug_usage": 3527,
     "overdoses": 69,
     "networth_total": 18937987179,
-    "last_updated": "2025-06-21 14:27:19"
+    "last_updated": "2025-06-21 18:42:15"
   },
   "2354402": {
     "member": "valrak66",
@@ -3485,7 +3663,7 @@
     "total_drug_usage": 4022,
     "overdoses": 80,
     "networth_total": 16686905190,
-    "last_updated": "2025-06-21 14:27:21"
+    "last_updated": "2025-06-21 18:42:16"
   },
   "2342371": {
     "member": "Noblewolf",
@@ -3514,7 +3692,7 @@
     "total_drug_usage": 5193,
     "overdoses": 91,
     "networth_total": 46958891447,
-    "last_updated": "2025-06-21 14:27:22"
+    "last_updated": "2025-06-21 18:42:18"
   },
   "2326653": {
     "member": "Gesing",
@@ -3543,7 +3721,7 @@
     "total_drug_usage": 4946,
     "overdoses": 101,
     "networth_total": 41823041062,
-    "last_updated": "2025-06-21 14:27:24"
+    "last_updated": "2025-06-21 18:42:20"
   },
   "1778676": {
     "member": "oraN",
@@ -3572,7 +3750,7 @@
     "total_drug_usage": 9268,
     "overdoses": 178,
     "networth_total": 66486289953,
-    "last_updated": "2025-06-21 14:27:25"
+    "last_updated": "2025-06-21 18:42:21"
   },
   "969221": {
     "member": "Froster",
@@ -3580,7 +3758,7 @@
     "profile_link": "https://www.torn.com/profiles.php?XID=969221",
     "level": 100,
     "age": 6110,
-    "life": 2100,
+    "life": 7500,
     "faction_type": "enemy",
     "attacks_won": 18165,
     "win_loss_ratio": 18.46,
@@ -3601,7 +3779,7 @@
     "total_drug_usage": 5346,
     "overdoses": 105,
     "networth_total": 48346414870,
-    "last_updated": "2025-06-21 14:27:27"
+    "last_updated": "2025-06-21 18:42:23"
   },
   "68109": {
     "member": "badrock",
@@ -3630,7 +3808,7 @@
     "total_drug_usage": 2937,
     "overdoses": 74,
     "networth_total": 29980221286,
-    "last_updated": "2025-06-21 14:27:28"
+    "last_updated": "2025-06-21 18:42:25"
   },
   "2355486": {
     "member": "Cosaka",
@@ -3659,14 +3837,14 @@
     "total_drug_usage": 4017,
     "overdoses": 79,
     "networth_total": 19507748841,
-    "last_updated": "2025-06-21 14:27:30"
+    "last_updated": "2025-06-21 18:42:26"
   },
   "2592979": {
     "member": "TOXICLEGACY",
     "player_id": "2592979",
     "profile_link": "https://www.torn.com/profiles.php?XID=2592979",
     "level": 98,
-    "age": 1791,
+    "age": 1792,
     "life": 6402,
     "faction_type": "enemy",
     "attacks_won": 10998,
@@ -3688,7 +3866,7 @@
     "total_drug_usage": 2812,
     "overdoses": 61,
     "networth_total": 5801074135,
-    "last_updated": "2025-06-21 14:27:32"
+    "last_updated": "2025-06-21 18:42:28"
   },
   "2396833": {
     "member": "B_Wheezy",
@@ -3717,14 +3895,14 @@
     "total_drug_usage": 2294,
     "overdoses": 40,
     "networth_total": 22322262707,
-    "last_updated": "2025-06-21 14:27:33"
+    "last_updated": "2025-06-21 18:42:30"
   },
   "2352193": {
     "member": "StullenBob",
     "player_id": "2352193",
     "profile_link": "https://www.torn.com/profiles.php?XID=2352193",
     "level": 98,
-    "age": 2147,
+    "age": 2148,
     "life": 4850,
     "faction_type": "enemy",
     "attacks_won": 10362,
@@ -3746,7 +3924,7 @@
     "total_drug_usage": 3961,
     "overdoses": 82,
     "networth_total": 16968027171,
-    "last_updated": "2025-06-21 14:27:35"
+    "last_updated": "2025-06-21 18:42:31"
   },
   "2314870": {
     "member": "inVader_by",
@@ -3775,7 +3953,7 @@
     "total_drug_usage": 3154,
     "overdoses": 63,
     "networth_total": 2399731705,
-    "last_updated": "2025-06-21 14:27:36"
+    "last_updated": "2025-06-21 18:42:33"
   },
   "2078645": {
     "member": "NegoistBot",
@@ -3804,14 +3982,14 @@
     "total_drug_usage": 2204,
     "overdoses": 30,
     "networth_total": 5699180773,
-    "last_updated": "2025-06-21 14:27:38"
+    "last_updated": "2025-06-21 18:42:35"
   },
   "2655335": {
     "member": "LastLaugh",
     "player_id": "2655335",
     "profile_link": "https://www.torn.com/profiles.php?XID=2655335",
     "level": 96,
-    "age": 1595,
+    "age": 1596,
     "life": 6110,
     "faction_type": "enemy",
     "attacks_won": 9752,
@@ -3833,7 +4011,7 @@
     "total_drug_usage": 2111,
     "overdoses": 40,
     "networth_total": 6654434431,
-    "last_updated": "2025-06-21 14:27:40"
+    "last_updated": "2025-06-21 18:42:36"
   },
   "2596958": {
     "member": "PaprikaBot",
@@ -3862,7 +4040,7 @@
     "total_drug_usage": 4536,
     "overdoses": 73,
     "networth_total": 12412090210,
-    "last_updated": "2025-06-21 14:27:41"
+    "last_updated": "2025-06-21 18:42:38"
   },
   "2532040": {
     "member": "BigTasty420",
@@ -3891,7 +4069,7 @@
     "total_drug_usage": 2813,
     "overdoses": 46,
     "networth_total": 5290477027,
-    "last_updated": "2025-06-21 14:27:43"
+    "last_updated": "2025-06-21 18:42:40"
   },
   "2765713": {
     "member": "mrocznooki",
@@ -3899,7 +4077,7 @@
     "profile_link": "https://www.torn.com/profiles.php?XID=2765713",
     "level": 92,
     "age": 1178,
-    "life": 1148,
+    "life": 6041,
     "faction_type": "enemy",
     "attacks_won": 6103,
     "win_loss_ratio": 50.438,
@@ -3920,15 +4098,15 @@
     "total_drug_usage": 3345,
     "overdoses": 67,
     "networth_total": 20619446750,
-    "last_updated": "2025-06-21 14:27:45"
+    "last_updated": "2025-06-21 18:42:41"
   },
   "2637690": {
     "member": "vinye1mustaine",
     "player_id": "2637690",
     "profile_link": "https://www.torn.com/profiles.php?XID=2637690",
     "level": 91,
-    "age": 1635,
-    "life": 7300,
+    "age": 1636,
+    "life": 6424,
     "faction_type": "enemy",
     "attacks_won": 7406,
     "win_loss_ratio": 8.22,
@@ -3938,7 +4116,7 @@
     "energy_drinks_drunk": 264,
     "stat_enhancers_used": 0,
     "xanax_taken": 2838,
-    "avg_xanax_per_day": 1.74,
+    "avg_xanax_per_day": 1.73,
     "time_played_days": 41.6,
     "current_activity_streak": 1635,
     "best_activity_streak": 1635,
@@ -3949,7 +4127,7 @@
     "total_drug_usage": 3183,
     "overdoses": 62,
     "networth_total": 7208283053,
-    "last_updated": "2025-06-21 14:27:46"
+    "last_updated": "2025-06-21 18:42:43"
   },
   "2647407": {
     "member": "KevGreenoak",
@@ -3978,7 +4156,7 @@
     "total_drug_usage": 3226,
     "overdoses": 68,
     "networth_total": 8731107742,
-    "last_updated": "2025-06-21 14:27:48"
+    "last_updated": "2025-06-21 18:42:45"
   },
   "2252488": {
     "member": "Big_Willy",
@@ -4007,7 +4185,7 @@
     "total_drug_usage": 1784,
     "overdoses": 36,
     "networth_total": 918607808,
-    "last_updated": "2025-06-21 14:27:56"
+    "last_updated": "2025-06-21 18:42:47"
   },
   "2798231": {
     "member": "Illgill89",
@@ -4036,7 +4214,7 @@
     "total_drug_usage": 2581,
     "overdoses": 56,
     "networth_total": 13120362889,
-    "last_updated": "2025-06-21 14:28:02"
+    "last_updated": "2025-06-21 18:42:48"
   },
   "2793357": {
     "member": "Rakdan",
@@ -4065,7 +4243,7 @@
     "total_drug_usage": 2188,
     "overdoses": 41,
     "networth_total": 10306787183,
-    "last_updated": "2025-06-21 14:28:06"
+    "last_updated": "2025-06-21 18:42:50"
   },
   "2819464": {
     "member": "Riffek",
@@ -4073,7 +4251,7 @@
     "profile_link": "https://www.torn.com/profiles.php?XID=2819464",
     "level": 88,
     "age": 1017,
-    "life": 2566,
+    "life": 6412,
     "faction_type": "enemy",
     "attacks_won": 5945,
     "win_loss_ratio": 17.853,
@@ -4094,7 +4272,7 @@
     "total_drug_usage": 2583,
     "overdoses": 42,
     "networth_total": 8929586491,
-    "last_updated": "2025-06-21 14:28:09"
+    "last_updated": "2025-06-21 18:42:51"
   },
   "2958211": {
     "member": "Angry_mum",
@@ -4123,7 +4301,7 @@
     "total_drug_usage": 1931,
     "overdoses": 35,
     "networth_total": 4473492004,
-    "last_updated": "2025-06-21 14:28:12"
+    "last_updated": "2025-06-21 18:42:53"
   },
   "2542122": {
     "member": "Dr-Frog",
@@ -4152,14 +4330,14 @@
     "total_drug_usage": 2254,
     "overdoses": 48,
     "networth_total": 9490143189,
-    "last_updated": "2025-06-21 14:28:14"
+    "last_updated": "2025-06-21 18:42:55"
   },
   "2872546": {
     "member": "MogulMoe",
     "player_id": "2872546",
     "profile_link": "https://www.torn.com/profiles.php?XID=2872546",
     "level": 79,
-    "age": 881,
+    "age": 882,
     "life": 5737,
     "faction_type": "enemy",
     "attacks_won": 5145,
@@ -4181,7 +4359,7 @@
     "total_drug_usage": 1848,
     "overdoses": 34,
     "networth_total": 5065051120,
-    "last_updated": "2025-06-21 14:28:15"
+    "last_updated": "2025-06-21 18:42:58"
   },
   "2856498": {
     "member": "Furai",
@@ -4210,7 +4388,7 @@
     "total_drug_usage": 2215,
     "overdoses": 51,
     "networth_total": 1603137865,
-    "last_updated": "2025-06-21 14:28:17"
+    "last_updated": "2025-06-21 18:43:00"
   },
   "2633137": {
     "member": "Rabiwolf1895",
@@ -4239,7 +4417,7 @@
     "total_drug_usage": 791,
     "overdoses": 16,
     "networth_total": 7763818204,
-    "last_updated": "2025-06-21 14:28:18"
+    "last_updated": "2025-06-21 18:43:01"
   },
   "2876930": {
     "member": "FuzzyNaga",
@@ -4268,7 +4446,7 @@
     "total_drug_usage": 1083,
     "overdoses": 10,
     "networth_total": 6470995595,
-    "last_updated": "2025-06-21 14:28:20"
+    "last_updated": "2025-06-21 18:43:03"
   },
   "2029878": {
     "member": "Branson",
@@ -4297,7 +4475,7 @@
     "total_drug_usage": 2939,
     "overdoses": 60,
     "networth_total": 6503526319,
-    "last_updated": "2025-06-21 14:28:21"
+    "last_updated": "2025-06-21 18:43:05"
   },
   "3210051": {
     "member": "Oola",
@@ -4326,7 +4504,7 @@
     "total_drug_usage": 1163,
     "overdoses": 22,
     "networth_total": 2894754832,
-    "last_updated": "2025-06-21 14:28:23"
+    "last_updated": "2025-06-21 18:43:06"
   },
   "3122486": {
     "member": "Pochita",
@@ -4334,7 +4512,7 @@
     "profile_link": "https://www.torn.com/profiles.php?XID=3122486",
     "level": 63,
     "age": 609,
-    "life": 3025,
+    "life": 2843,
     "faction_type": "enemy",
     "attacks_won": 3604,
     "win_loss_ratio": 9.611,
@@ -4355,7 +4533,7 @@
     "total_drug_usage": 1401,
     "overdoses": 33,
     "networth_total": 2365592184,
-    "last_updated": "2025-06-21 14:28:25"
+    "last_updated": "2025-06-21 18:43:08"
   },
   "3179917": {
     "member": "Fox12_",
@@ -4384,7 +4562,7 @@
     "total_drug_usage": 1223,
     "overdoses": 30,
     "networth_total": 1990252803,
-    "last_updated": "2025-06-21 14:28:26"
+    "last_updated": "2025-06-21 18:43:10"
   },
   "2518498": {
     "member": "DJ_Bruh",
@@ -4392,7 +4570,7 @@
     "profile_link": "https://www.torn.com/profiles.php?XID=2518498",
     "level": 58,
     "age": 1909,
-    "life": 3814,
+    "life": 3661,
     "faction_type": "enemy",
     "attacks_won": 5382,
     "win_loss_ratio": 10.917,
@@ -4413,7 +4591,7 @@
     "total_drug_usage": 1143,
     "overdoses": 24,
     "networth_total": 3954541025,
-    "last_updated": "2025-06-21 14:28:28"
+    "last_updated": "2025-06-21 18:43:11"
   },
   "3285017": {
     "member": "DonnieTheDrugga",
@@ -4442,7 +4620,7 @@
     "total_drug_usage": 959,
     "overdoses": 21,
     "networth_total": 1951088717,
-    "last_updated": "2025-06-21 14:28:30"
+    "last_updated": "2025-06-21 18:43:13"
   },
   "3172896": {
     "member": "ImmuneAura",
@@ -4471,7 +4649,7 @@
     "total_drug_usage": 897,
     "overdoses": 18,
     "networth_total": 1269153330,
-    "last_updated": "2025-06-21 14:28:31"
+    "last_updated": "2025-06-21 18:43:15"
   },
   "3289625": {
     "member": "SysiphusD",
@@ -4500,7 +4678,7 @@
     "total_drug_usage": 892,
     "overdoses": 21,
     "networth_total": 612319189,
-    "last_updated": "2025-06-21 14:28:33"
+    "last_updated": "2025-06-21 18:43:16"
   },
   "3144926": {
     "member": "RubberyDuck",
@@ -4529,7 +4707,7 @@
     "total_drug_usage": 843,
     "overdoses": 17,
     "networth_total": 1119054067,
-    "last_updated": "2025-06-21 14:28:35"
+    "last_updated": "2025-06-21 18:43:18"
   },
   "3451351": {
     "member": "MediBlade",
@@ -4558,7 +4736,7 @@
     "total_drug_usage": 717,
     "overdoses": 17,
     "networth_total": 46328606751,
-    "last_updated": "2025-06-21 14:28:36"
+    "last_updated": "2025-06-21 18:43:20"
   },
   "3385517": {
     "member": "Lemonaade",
@@ -4587,15 +4765,15 @@
     "total_drug_usage": 793,
     "overdoses": 13,
     "networth_total": 535752472,
-    "last_updated": "2025-06-21 14:28:38"
+    "last_updated": "2025-06-21 18:43:21"
   },
   "3335309": {
     "member": "JohnTempo",
     "player_id": "3335309",
     "profile_link": "https://www.torn.com/profiles.php?XID=3335309",
     "level": 50,
-    "age": 362,
-    "life": 1722,
+    "age": 363,
+    "life": 2968,
     "faction_type": "enemy",
     "attacks_won": 1819,
     "win_loss_ratio": 7.424,
@@ -4605,7 +4783,7 @@
     "energy_drinks_drunk": 87,
     "stat_enhancers_used": 0,
     "xanax_taken": 767,
-    "avg_xanax_per_day": 2.12,
+    "avg_xanax_per_day": 2.11,
     "time_played_days": 77.1,
     "current_activity_streak": 362,
     "best_activity_streak": 362,
@@ -4616,7 +4794,7 @@
     "total_drug_usage": 1091,
     "overdoses": 17,
     "networth_total": 3791514420,
-    "last_updated": "2025-06-21 14:28:40"
+    "last_updated": "2025-06-21 18:43:23"
   },
   "3322509": {
     "member": "LimmyBeGood",
@@ -4645,7 +4823,7 @@
     "total_drug_usage": 1219,
     "overdoses": 7,
     "networth_total": 1997957007,
-    "last_updated": "2025-06-21 14:28:41"
+    "last_updated": "2025-06-21 18:43:25"
   },
   "3122775": {
     "member": "BennyButtFawk",
@@ -4674,7 +4852,7 @@
     "total_drug_usage": 246,
     "overdoses": 6,
     "networth_total": 1166378205,
-    "last_updated": "2025-06-21 14:28:43"
+    "last_updated": "2025-06-21 18:43:26"
   },
   "3452107": {
     "member": "Solomission",
@@ -4703,7 +4881,7 @@
     "total_drug_usage": 674,
     "overdoses": 13,
     "networth_total": 13264559180,
-    "last_updated": "2025-06-21 14:28:44"
+    "last_updated": "2025-06-21 18:43:28"
   },
   "2942195": {
     "member": "mugshoot",
@@ -4732,7 +4910,7 @@
     "total_drug_usage": 316,
     "overdoses": 4,
     "networth_total": 2420049345,
-    "last_updated": "2025-06-21 14:28:46"
+    "last_updated": "2025-06-21 18:43:30"
   },
   "3445243": {
     "member": "Jigs",
@@ -4761,14 +4939,14 @@
     "total_drug_usage": 662,
     "overdoses": 15,
     "networth_total": 4334721915,
-    "last_updated": "2025-06-21 14:28:47"
+    "last_updated": "2025-06-21 18:43:31"
   },
   "3351941": {
     "member": "xmanflocka",
     "player_id": "3351941",
     "profile_link": "https://www.torn.com/profiles.php?XID=3351941",
     "level": 43,
-    "age": 344,
+    "age": 345,
     "life": 2025,
     "faction_type": "enemy",
     "attacks_won": 1447,
@@ -4790,7 +4968,7 @@
     "total_drug_usage": 1222,
     "overdoses": 4,
     "networth_total": 1418562210,
-    "last_updated": "2025-06-21 14:28:49"
+    "last_updated": "2025-06-21 18:43:33"
   },
   "3331441": {
     "member": "SinfulSmok",
@@ -4819,7 +4997,7 @@
     "total_drug_usage": 710,
     "overdoses": 17,
     "networth_total": 1758226317,
-    "last_updated": "2025-06-21 14:28:51"
+    "last_updated": "2025-06-21 18:43:35"
   },
   "2981755": {
     "member": "WhiskerBisket",
@@ -4827,7 +5005,7 @@
     "profile_link": "https://www.torn.com/profiles.php?XID=2981755",
     "level": 40,
     "age": 715,
-    "life": 2437,
+    "life": 680,
     "faction_type": "enemy",
     "attacks_won": 950,
     "win_loss_ratio": 6.129,
@@ -4848,7 +5026,7 @@
     "total_drug_usage": 503,
     "overdoses": 8,
     "networth_total": 517176495,
-    "last_updated": "2025-06-21 14:28:52"
+    "last_updated": "2025-06-21 18:43:36"
   },
   "2233900": {
     "member": "BlueD666Wolf",
@@ -4877,14 +5055,14 @@
     "total_drug_usage": 554,
     "overdoses": 6,
     "networth_total": 621097777,
-    "last_updated": "2025-06-21 14:28:54"
+    "last_updated": "2025-06-21 18:43:38"
   },
   "3448492": {
     "member": "DarkBandit",
     "player_id": "3448492",
     "profile_link": "https://www.torn.com/profiles.php?XID=3448492",
     "level": 39,
-    "age": 255,
+    "age": 256,
     "life": 1916,
     "faction_type": "enemy",
     "attacks_won": 1598,
@@ -4906,7 +5084,7 @@
     "total_drug_usage": 593,
     "overdoses": 6,
     "networth_total": 811315946,
-    "last_updated": "2025-06-21 14:28:56"
+    "last_updated": "2025-06-21 18:43:40"
   },
   "3442138": {
     "member": "DonKosi",
@@ -4914,7 +5092,7 @@
     "profile_link": "https://www.torn.com/profiles.php?XID=3442138",
     "level": 39,
     "age": 262,
-    "life": 2281,
+    "life": 1916,
     "faction_type": "enemy",
     "attacks_won": 595,
     "win_loss_ratio": 7.933,
@@ -4935,7 +5113,7 @@
     "total_drug_usage": 92,
     "overdoses": 1,
     "networth_total": 856984179,
-    "last_updated": "2025-06-21 14:28:58"
+    "last_updated": "2025-06-21 18:43:41"
   },
   "3423026": {
     "member": "Brama",
@@ -4964,7 +5142,7 @@
     "total_drug_usage": 461,
     "overdoses": 5,
     "networth_total": 480688818,
-    "last_updated": "2025-06-21 14:29:00"
+    "last_updated": "2025-06-21 18:43:43"
   },
   "3444185": {
     "member": "YraelFishmonger",
@@ -4993,7 +5171,7 @@
     "total_drug_usage": 445,
     "overdoses": 6,
     "networth_total": 2139359114,
-    "last_updated": "2025-06-21 14:29:01"
+    "last_updated": "2025-06-21 18:43:45"
   },
   "3466633": {
     "member": "Andy_GCC",
@@ -5001,7 +5179,7 @@
     "profile_link": "https://www.torn.com/profiles.php?XID=3466633",
     "level": 35,
     "age": 238,
-    "life": 352,
+    "life": 1950,
     "faction_type": "enemy",
     "attacks_won": 992,
     "win_loss_ratio": 9.92,
@@ -5022,7 +5200,7 @@
     "total_drug_usage": 204,
     "overdoses": 1,
     "networth_total": 872707968,
-    "last_updated": "2025-06-21 14:29:03"
+    "last_updated": "2025-06-21 18:43:46"
   },
   "2104915": {
     "member": "Mr_Foxley",
@@ -5051,7 +5229,7 @@
     "total_drug_usage": 534,
     "overdoses": 3,
     "networth_total": 256897248,
-    "last_updated": "2025-06-21 14:29:05"
+    "last_updated": "2025-06-21 18:43:48"
   },
   "3530041": {
     "member": "rawrCass",
@@ -5080,7 +5258,7 @@
     "total_drug_usage": 360,
     "overdoses": 4,
     "networth_total": 213266353,
-    "last_updated": "2025-06-21 14:29:06"
+    "last_updated": "2025-06-21 18:43:50"
   },
   "3393553": {
     "member": "Masterboi9000",
@@ -5109,7 +5287,7 @@
     "total_drug_usage": 490,
     "overdoses": 19,
     "networth_total": 1228314018,
-    "last_updated": "2025-06-21 14:29:08"
+    "last_updated": "2025-06-21 18:43:51"
   },
   "3593196": {
     "member": "Maddow",
@@ -5117,7 +5295,7 @@
     "profile_link": "https://www.torn.com/profiles.php?XID=3593196",
     "level": 33,
     "age": 137,
-    "life": 622,
+    "life": 1830,
     "faction_type": "enemy",
     "attacks_won": 474,
     "win_loss_ratio": 15.8,
@@ -5138,7 +5316,7 @@
     "total_drug_usage": 281,
     "overdoses": 7,
     "networth_total": 2651893224,
-    "last_updated": "2025-06-21 14:29:10"
+    "last_updated": "2025-06-21 18:43:53"
   },
   "3447755": {
     "member": "DiegoCastilla",
@@ -5146,7 +5324,7 @@
     "profile_link": "https://www.torn.com/profiles.php?XID=3447755",
     "level": 32,
     "age": 256,
-    "life": 1917,
+    "life": 346,
     "faction_type": "enemy",
     "attacks_won": 485,
     "win_loss_ratio": 7.462,
@@ -5167,14 +5345,14 @@
     "total_drug_usage": 328,
     "overdoses": 6,
     "networth_total": 110949492,
-    "last_updated": "2025-06-21 14:29:11"
+    "last_updated": "2025-06-21 18:43:55"
   },
   "3424468": {
     "member": "Hoight",
     "player_id": "3424468",
     "profile_link": "https://www.torn.com/profiles.php?XID=3424468",
     "level": 32,
-    "age": 277,
+    "age": 278,
     "life": 1696,
     "faction_type": "enemy",
     "attacks_won": 527,
@@ -5185,7 +5363,7 @@
     "energy_drinks_drunk": 0,
     "stat_enhancers_used": 0,
     "xanax_taken": 129,
-    "avg_xanax_per_day": 0.47,
+    "avg_xanax_per_day": 0.46,
     "time_played_days": 11.7,
     "current_activity_streak": 277,
     "best_activity_streak": 277,
@@ -5196,14 +5374,14 @@
     "total_drug_usage": 212,
     "overdoses": 4,
     "networth_total": 182329537,
-    "last_updated": "2025-06-21 14:29:13"
+    "last_updated": "2025-06-21 18:43:57"
   },
   "3331167": {
     "member": "Aphai",
     "player_id": "3331167",
     "profile_link": "https://www.torn.com/profiles.php?XID=3331167",
     "level": 32,
-    "age": 366,
+    "age": 367,
     "life": 1475,
     "faction_type": "enemy",
     "attacks_won": 748,
@@ -5225,7 +5403,7 @@
     "total_drug_usage": 121,
     "overdoses": 5,
     "networth_total": 3534912316,
-    "last_updated": "2025-06-21 14:29:15"
+    "last_updated": "2025-06-21 18:43:59"
   },
   "3606359": {
     "member": "DeGerg",
@@ -5233,7 +5411,7 @@
     "profile_link": "https://www.torn.com/profiles.php?XID=3606359",
     "level": 31,
     "age": 128,
-    "life": 2066,
+    "life": 2137,
     "faction_type": "enemy",
     "attacks_won": 655,
     "win_loss_ratio": 11.102,
@@ -5254,14 +5432,14 @@
     "total_drug_usage": 392,
     "overdoses": 4,
     "networth_total": 113842579,
-    "last_updated": "2025-06-21 14:29:16"
+    "last_updated": "2025-06-21 18:44:00"
   },
   "3593663": {
     "member": "Vertigo-Wren",
     "player_id": "3593663",
     "profile_link": "https://www.torn.com/profiles.php?XID=3593663",
     "level": 31,
-    "age": 136,
+    "age": 137,
     "life": 1923,
     "faction_type": "enemy",
     "attacks_won": 365,
@@ -5272,7 +5450,7 @@
     "energy_drinks_drunk": 13,
     "stat_enhancers_used": 0,
     "xanax_taken": 290,
-    "avg_xanax_per_day": 2.13,
+    "avg_xanax_per_day": 2.12,
     "time_played_days": 18.3,
     "current_activity_streak": 136,
     "best_activity_streak": 136,
@@ -5283,7 +5461,7 @@
     "total_drug_usage": 364,
     "overdoses": 9,
     "networth_total": 1765574426,
-    "last_updated": "2025-06-21 14:29:18"
+    "last_updated": "2025-06-21 18:44:02"
   },
   "3415597": {
     "member": "Blckbuster",
@@ -5312,7 +5490,7 @@
     "total_drug_usage": 100,
     "overdoses": 4,
     "networth_total": 375814494,
-    "last_updated": "2025-06-21 14:29:19"
+    "last_updated": "2025-06-21 18:44:04"
   },
   "3405467": {
     "member": "crawdaddy1",
@@ -5341,7 +5519,7 @@
     "total_drug_usage": 372,
     "overdoses": 7,
     "networth_total": 290683780,
-    "last_updated": "2025-06-21 14:29:21"
+    "last_updated": "2025-06-21 18:44:06"
   },
   "3589987": {
     "member": "MiloMite",
@@ -5370,7 +5548,7 @@
     "total_drug_usage": 122,
     "overdoses": 3,
     "networth_total": 201353095,
-    "last_updated": "2025-06-21 14:29:22"
+    "last_updated": "2025-06-21 18:44:07"
   },
   "3231901": {
     "member": "Uroboros",
@@ -5399,7 +5577,7 @@
     "total_drug_usage": 25,
     "overdoses": 0,
     "networth_total": 118828072,
-    "last_updated": "2025-06-21 14:29:24"
+    "last_updated": "2025-06-21 18:44:09"
   },
   "3667622": {
     "member": "WillJesson",
@@ -5407,7 +5585,7 @@
     "profile_link": "https://www.torn.com/profiles.php?XID=3667622",
     "level": 27,
     "age": 88,
-    "life": 1470,
+    "life": 544,
     "faction_type": "enemy",
     "attacks_won": 443,
     "win_loss_ratio": 7.911,
@@ -5428,7 +5606,7 @@
     "total_drug_usage": 158,
     "overdoses": 4,
     "networth_total": 995144013,
-    "last_updated": "2025-06-21 14:29:25"
+    "last_updated": "2025-06-21 18:44:10"
   },
   "3528757": {
     "member": "97baz",
@@ -5436,7 +5614,7 @@
     "profile_link": "https://www.torn.com/profiles.php?XID=3528757",
     "level": 27,
     "age": 184,
-    "life": 85,
+    "life": 1408,
     "faction_type": "enemy",
     "attacks_won": 361,
     "win_loss_ratio": 4.628,
@@ -5457,7 +5635,7 @@
     "total_drug_usage": 98,
     "overdoses": 0,
     "networth_total": 55601217,
-    "last_updated": "2025-06-21 14:29:27"
+    "last_updated": "2025-06-21 18:44:12"
   },
   "3118065": {
     "member": "SlimFungus",
@@ -5486,14 +5664,14 @@
     "total_drug_usage": 275,
     "overdoses": 4,
     "networth_total": 398855776,
-    "last_updated": "2025-06-21 14:29:28"
+    "last_updated": "2025-06-21 18:44:14"
   },
   "3423507": {
     "member": "NinjaMoose46",
     "player_id": "3423507",
     "profile_link": "https://www.torn.com/profiles.php?XID=3423507",
     "level": 25,
-    "age": 278,
+    "age": 279,
     "life": 1406,
     "faction_type": "enemy",
     "attacks_won": 960,
@@ -5515,7 +5693,7 @@
     "total_drug_usage": 353,
     "overdoses": 8,
     "networth_total": 876339985,
-    "last_updated": "2025-06-21 14:29:30"
+    "last_updated": "2025-06-21 18:44:15"
   },
   "3698462": {
     "member": "Diamond-Hands",
@@ -5544,14 +5722,14 @@
     "total_drug_usage": 242,
     "overdoses": 2,
     "networth_total": 659439784,
-    "last_updated": "2025-06-21 14:29:31"
+    "last_updated": "2025-06-21 18:44:17"
   },
   "3596765": {
     "member": "kalebthe",
     "player_id": "3596765",
     "profile_link": "https://www.torn.com/profiles.php?XID=3596765",
     "level": 24,
-    "age": 134,
+    "age": 135,
     "life": 1075,
     "faction_type": "enemy",
     "attacks_won": 391,
@@ -5562,7 +5740,7 @@
     "energy_drinks_drunk": 0,
     "stat_enhancers_used": 0,
     "xanax_taken": 60,
-    "avg_xanax_per_day": 0.45,
+    "avg_xanax_per_day": 0.44,
     "time_played_days": 4.5,
     "current_activity_streak": 24,
     "best_activity_streak": 108,
@@ -5573,7 +5751,7 @@
     "total_drug_usage": 71,
     "overdoses": 1,
     "networth_total": 238166476,
-    "last_updated": "2025-06-21 14:29:33"
+    "last_updated": "2025-06-21 18:44:19"
   },
   "3717776": {
     "member": "apneatic",
@@ -5602,7 +5780,7 @@
     "total_drug_usage": 277,
     "overdoses": 1,
     "networth_total": 775350757,
-    "last_updated": "2025-06-21 14:29:35"
+    "last_updated": "2025-06-21 18:44:20"
   },
   "3734002": {
     "member": "GammaPosledni",
@@ -5631,14 +5809,14 @@
     "total_drug_usage": 50,
     "overdoses": 3,
     "networth_total": 173334876,
-    "last_updated": "2025-06-21 14:29:36"
+    "last_updated": "2025-06-21 18:44:22"
   },
   "1852518": {
     "member": "Sotilis",
     "player_id": "1852518",
     "profile_link": "https://www.torn.com/profiles.php?XID=1852518",
     "level": 17,
-    "age": 4034,
+    "age": 4035,
     "life": 797,
     "faction_type": "enemy",
     "attacks_won": 194,
@@ -5660,11 +5838,152 @@
     "total_drug_usage": 110,
     "overdoses": 1,
     "networth_total": 1580872684,
-    "last_updated": "2025-06-21 14:29:38"
+    "last_updated": "2025-06-21 18:44:24"
   }
 };
 
    let currentSort = { column: null, ascending: true };
+
+   function formatNumber(num) {
+       if (typeof num !== 'number') return num;
+       // American formatting: comma as thousands separator, period as decimal
+       return num.toLocaleString('en-US');
+   }
+
+   function calculateFactionStats() {
+       const ourPlayers = Object.values(intelData).filter(player => player.faction_type === 'our');
+       const enemyPlayers = Object.values(intelData).filter(player => player.faction_type === 'enemy');
+
+       function calculateAverage(players, field) {
+           if (players.length === 0) return 0;
+           const sum = players.reduce((acc, player) => acc + (player[field] || 0), 0);
+           return sum / players.length;
+       }
+
+       function calculateTotal(players, field) {
+           if (players.length === 0) return 0;
+           return players.reduce((acc, player) => acc + (player[field] || 0), 0);
+       }
+
+       const metrics = [
+           { key: 'level', label: 'Level' },
+           { key: 'age', label: 'Age' },
+           { key: 'life', label: 'Life' },
+           { key: 'attacks_won', label: 'Attacks Won' },
+           { key: 'win_loss_ratio', label: 'W/L Ratio' },
+           { key: 'elo_rating', label: 'Elo Rating' },
+           { key: 'best_damage_made', label: 'Best Damage' },
+           { key: 'xanax_taken', label: 'Xanax Taken' },
+           { key: 'avg_xanax_per_day', label: 'Xanax/Day' },
+           { key: 'donator_days', label: 'Donor Days' },
+           { key: 'energy_drinks_drunk', label: 'Energy Drinks' },
+           { key: 'current_activity_streak', label: 'Activity Streak' }
+       ];
+
+       const ourAverages = {};
+       const enemyAverages = {};
+       const ourTotals = {};
+       const enemyTotals = {};
+
+       metrics.forEach(metric => {
+           ourAverages[metric.key] = calculateAverage(ourPlayers, metric.key);
+           enemyAverages[metric.key] = calculateAverage(enemyPlayers, metric.key);
+           ourTotals[metric.key] = calculateTotal(ourPlayers, metric.key);
+           enemyTotals[metric.key] = calculateTotal(enemyPlayers, metric.key);
+       });
+
+       return { 
+           our: { averages: ourAverages, totals: ourTotals }, 
+           enemy: { averages: enemyAverages, totals: enemyTotals }, 
+           metrics 
+       };
+   }
+
+   function displayFactionStats() {
+       if (Object.keys(intelData).length === 0) return;
+
+       const { our, enemy, metrics } = calculateFactionStats();
+       
+       displayStatsGrid('ourAverages', our.averages, metrics, 'averages', enemy.averages);
+       displayStatsGrid('ourTotals', our.totals, metrics, 'totals', enemy.totals);
+       displayStatsGrid('enemyAverages', enemy.averages, metrics, 'averages', our.averages);
+       displayStatsGrid('enemyTotals', enemy.totals, metrics, 'totals', our.totals);
+   }
+
+   function displayStatsGrid(containerId, data, metrics, type, comparisonData = null) {
+       const container = document.getElementById(containerId);
+       container.innerHTML = '';
+
+       const isOurFaction = containerId.includes('our');
+
+       metrics.forEach(metric => {
+           const statDiv = document.createElement('div');
+           statDiv.className = 'avg-stat';
+           
+           let value = data[metric.key];
+           let formattedValue;
+           if (type === 'averages' && (metric.key === 'win_loss_ratio' || metric.key === 'avg_xanax_per_day')) {
+               formattedValue = value.toFixed(2);
+           } else if (type === 'totals' && metric.key === 'win_loss_ratio') {
+               formattedValue = 'N/A';
+           } else if (type === 'totals' && metric.key === 'avg_xanax_per_day') {
+               formattedValue = 'N/A';
+           } else {
+               formattedValue = formatNumber(Math.round(value));
+           }
+
+           // Calculate comparison if data is provided
+           let comparisonHtml = '';
+           if (comparisonData && metric.key !== 'win_loss_ratio' && metric.key !== 'avg_xanax_per_day') {
+               const ourValue = isOurFaction ? value : comparisonData[metric.key];
+               const enemyValue = isOurFaction ? comparisonData[metric.key] : value;
+               const difference = enemyValue - ourValue;
+
+               if (difference !== 0) {
+                   const sign = isOurFaction ? (difference > 0 ? '-' : '+') : (difference > 0 ? '+' : '-');
+                   const absValue = Math.abs(difference);
+                   const colorClass = isOurFaction ? 
+                       (difference > 0 ? 'comparison-negative' : 'comparison-positive') :
+                       (difference > 0 ? 'comparison-positive' : 'comparison-negative');
+                   
+                   let formattedDiff;
+                   if (type === 'totals') {
+                       formattedDiff = formatNumber(Math.round(absValue));
+                   } else {
+                       formattedDiff = Math.round(absValue).toString();
+                   }
+                   
+                   comparisonHtml = `<span class="comparison-score ${colorClass}">(${sign}${formattedDiff})</span>`;
+               }
+           }
+           
+           statDiv.innerHTML = `
+               <div class="avg-stat-label">${metric.label}</div>
+               <div class="avg-stat-value">${formattedValue}${comparisonHtml}</div>
+           `;
+           container.appendChild(statDiv);
+       });
+   }
+
+   function showStats(faction, type) {
+       // Update tab buttons
+       const factionPrefix = faction === 'our' ? 'our' : 'enemy';
+       const tabBtns = document.querySelectorAll(`#${factionPrefix}Stats .tab-btn, .faction-avg-section.${faction}-faction-avg .tab-btn`);
+       tabBtns.forEach(btn => btn.classList.remove('active'));
+       event.target.classList.add('active');
+
+       // Show/hide appropriate grids
+       const averagesGrid = document.getElementById(`${factionPrefix}Averages`);
+       const totalsGrid = document.getElementById(`${factionPrefix}Totals`);
+
+       if (type === 'averages') {
+           averagesGrid.style.display = 'grid';
+           totalsGrid.style.display = 'none';
+       } else {
+           averagesGrid.style.display = 'none';
+           totalsGrid.style.display = 'grid';
+       }
+   }
 
    function populateFilters() {
        const ourList = document.getElementById('ourMembers');
@@ -5746,12 +6065,6 @@
        displayTable();
    }
 
-   function formatNumber(num) {
-       if (typeof num !== 'number') return num;
-       // Use European formatting: period as thousands separator, comma as decimal
-       return num.toLocaleString('de-DE');
-   }
-
    function createTableRow(player) {
        const row = document.createElement('tr');
        row.className = player.faction_type === 'our' ? 'our-faction' : 'enemy-faction';
@@ -5763,11 +6076,11 @@
            <td>${formatNumber(player.age)}</td>
            <td>${formatNumber(player.life)}</td>
            <td>${formatNumber(player.attacks_won)}</td>
-           <td>${player.win_loss_ratio.toFixed(2).replace('.', ',')}</td>
+           <td>${player.win_loss_ratio.toFixed(2)}</td>
            <td>${formatNumber(player.elo_rating)}</td>
            <td>${formatNumber(player.best_damage_made)}</td>
            <td>${formatNumber(player.xanax_taken)}</td>
-           <td>${player.avg_xanax_per_day.toFixed(2).replace('.', ',')}</td>
+           <td>${player.avg_xanax_per_day.toFixed(2)}</td>
            <td>${formatNumber(player.donator_days)}</td>
            <td>${formatNumber(player.energy_drinks_drunk)}</td>
            <td>${formatNumber(player.current_activity_streak)}</td>
@@ -5836,6 +6149,7 @@
    document.addEventListener('DOMContentLoaded', () => {
        populateFilters();
        displayTable();
+       displayFactionStats();
 
        document.querySelectorAll('.intel-table th[data-column]').forEach(header => {
            header.addEventListener('click', () => handleSort(header.dataset.column));

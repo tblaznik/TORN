@@ -77,7 +77,7 @@
         
         .header p {
             font-size: 1.2em;
-            color: #0a5a9c;
+            color: #1e90ff;
             font-weight: 300;
             letter-spacing: 2px;
         }
@@ -105,6 +105,143 @@
             background: linear-gradient(135deg, rgba(255, 140, 0, 0.1) 0%, rgba(255, 140, 0, 0.05) 100%);
             box-shadow: 0 0 20px rgba(255, 140, 0, 0.3);
             transform: scale(1.05);
+        }
+
+        /* Faction Averages Section */
+        .faction-averages {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .faction-avg-section {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(45, 45, 45, 0.6) 100%);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .our-faction-avg {
+            border: 2px solid #00ff7f;
+        }
+
+        .our-faction-avg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #00ff7f, #32cd32, #00ff7f);
+        }
+
+        .enemy-faction-avg {
+            border: 2px solid #ff5555;
+        }
+
+        .enemy-faction-avg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff5555, #dc143c, #ff5555);
+        }
+
+        .faction-avg-section h3 {
+            color: #FFD700;
+            margin-bottom: 20px;
+            font-size: 1.6em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+
+        .our-faction-avg h3 {
+            color: #00ff7f;
+        }
+
+        .enemy-faction-avg h3 {
+            color: #ff5555;
+        }
+
+        .avg-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+        }
+
+        .avg-stat {
+            text-align: center;
+            padding: 10px;
+            background: linear-gradient(135deg, rgba(10, 10, 10, 0.8) 0%, rgba(20, 20, 20, 0.6) 100%);
+            border-radius: 8px;
+            border: 2px solid rgba(68, 68, 68, 0.5);
+        }
+
+        .avg-stat-label {
+            font-size: 0.8em;
+            color: #999;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .avg-stat-value {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #d4c5a0;
+        }
+
+        .comparison-score {
+            font-size: 0.8em;
+            font-weight: 400;
+            margin-left: 8px;
+        }
+
+        .comparison-positive {
+            color: #00ff7f;
+        }
+
+        .comparison-negative {
+            color: #ff5555;
+        }
+
+        /* Stats Tabs */
+        .stats-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            background: linear-gradient(135deg, rgba(10, 10, 10, 0.8) 0%, rgba(20, 20, 20, 0.6) 100%);
+            border: 2px solid rgba(68, 68, 68, 0.5);
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: #d4c5a0;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .tab-btn:hover {
+            border-color: #1e90ff;
+        }
+
+        .tab-btn.active {
+            border-color: #FFD700;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(218, 165, 32, 0.1) 100%);
+            color: #FFD700;
         }
         
         /* Controls Section */
@@ -248,13 +385,13 @@
         
         .intel-table th {
             background: linear-gradient(135deg, rgba(10, 80, 160, 0.6) 0%, rgba(30, 144, 255, 0.4) 100%);
-            border-bottom: 2px solid rgba(10, 80, 160, 0.4);
+            border-bottom: 3px solid rgba(10, 80, 160, 0.4);
             color: #d4c5a0;
             padding: 15px 8px;
             text-align: center;
             font-weight: 600;
             font-size: 0.9em;
-            border-right: 1px solid rgba(68, 68, 68, 0.5);
+            border-right: 3px solid rgba(68, 68, 68, 0.5);
             cursor: pointer;
             user-select: none;
             text-transform: uppercase;
@@ -288,8 +425,8 @@
         
         .intel-table td {
             padding: 12px 8px;
-            border-bottom: 1px solid rgba(68, 68, 68, 0.3);
-            border-right: 1px solid rgba(68, 68, 68, 0.3);
+            border-bottom: 2px solid rgba(68, 68, 68, 0.3);
+            border-right: 2px solid rgba(68, 68, 68, 0.3);
             font-size: 0.9em;
             text-align: center;
             transition: background-color 0.2s ease;
@@ -360,6 +497,16 @@
             .control-row {
                 flex-direction: column;
             }
+
+            .faction-averages {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .avg-grid {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                gap: 10px;
+            }
             
             .intel-table th,
             .intel-table td {
@@ -382,8 +529,39 @@
     
     <div class="container">
         <div class="header">
-            <h1>🔍 War Intel</h1>
+            <h1>War Intel</h1>
             <p>Comprehensive Intelligence Analysis</p>
+        </div>
+
+        <!-- Faction Averages Section -->
+        <div class="faction-averages" id="factionAverages">
+            <div class="faction-avg-section our-faction-avg">
+                <h3>Our Faction Stats</h3>
+                <div class="stats-tabs">
+                    <button class="tab-btn active" onclick="showStats('our', 'averages')">Averages</button>
+                    <button class="tab-btn" onclick="showStats('our', 'totals')">Totals</button>
+                </div>
+                <div class="avg-grid" id="ourAverages">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+                <div class="avg-grid" id="ourTotals" style="display: none;">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="faction-avg-section enemy-faction-avg">
+                <h3>Enemy Faction Stats</h3>
+                <div class="stats-tabs">
+                    <button class="tab-btn active" onclick="showStats('enemy', 'averages')">Averages</button>
+                    <button class="tab-btn" onclick="showStats('enemy', 'totals')">Totals</button>
+                </div>
+                <div class="avg-grid" id="enemyAverages">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+                <div class="avg-grid" id="enemyTotals" style="display: none;">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
         </div>
         
         <div class="controls">
@@ -444,6 +622,147 @@
    const intelData = {};
 
    let currentSort = { column: null, ascending: true };
+
+   function formatNumber(num) {
+       if (typeof num !== 'number') return num;
+       // American formatting: comma as thousands separator, period as decimal
+       return num.toLocaleString('en-US');
+   }
+
+   function calculateFactionStats() {
+       const ourPlayers = Object.values(intelData).filter(player => player.faction_type === 'our');
+       const enemyPlayers = Object.values(intelData).filter(player => player.faction_type === 'enemy');
+
+       function calculateAverage(players, field) {
+           if (players.length === 0) return 0;
+           const sum = players.reduce((acc, player) => acc + (player[field] || 0), 0);
+           return sum / players.length;
+       }
+
+       function calculateTotal(players, field) {
+           if (players.length === 0) return 0;
+           return players.reduce((acc, player) => acc + (player[field] || 0), 0);
+       }
+
+       const metrics = [
+           { key: 'level', label: 'Level' },
+           { key: 'age', label: 'Age' },
+           { key: 'life', label: 'Life' },
+           { key: 'attacks_won', label: 'Attacks Won' },
+           { key: 'win_loss_ratio', label: 'W/L Ratio' },
+           { key: 'elo_rating', label: 'Elo Rating' },
+           { key: 'best_damage_made', label: 'Best Damage' },
+           { key: 'xanax_taken', label: 'Xanax Taken' },
+           { key: 'avg_xanax_per_day', label: 'Xanax/Day' },
+           { key: 'donator_days', label: 'Donor Days' },
+           { key: 'energy_drinks_drunk', label: 'Energy Drinks' },
+           { key: 'current_activity_streak', label: 'Activity Streak' }
+       ];
+
+       const ourAverages = {};
+       const enemyAverages = {};
+       const ourTotals = {};
+       const enemyTotals = {};
+
+       metrics.forEach(metric => {
+           ourAverages[metric.key] = calculateAverage(ourPlayers, metric.key);
+           enemyAverages[metric.key] = calculateAverage(enemyPlayers, metric.key);
+           ourTotals[metric.key] = calculateTotal(ourPlayers, metric.key);
+           enemyTotals[metric.key] = calculateTotal(enemyPlayers, metric.key);
+       });
+
+       return { 
+           our: { averages: ourAverages, totals: ourTotals }, 
+           enemy: { averages: enemyAverages, totals: enemyTotals }, 
+           metrics 
+       };
+   }
+
+   function displayFactionStats() {
+       if (Object.keys(intelData).length === 0) return;
+
+       const { our, enemy, metrics } = calculateFactionStats();
+       
+       displayStatsGrid('ourAverages', our.averages, metrics, 'averages', enemy.averages);
+       displayStatsGrid('ourTotals', our.totals, metrics, 'totals', enemy.totals);
+       displayStatsGrid('enemyAverages', enemy.averages, metrics, 'averages', our.averages);
+       displayStatsGrid('enemyTotals', enemy.totals, metrics, 'totals', our.totals);
+   }
+
+   function displayStatsGrid(containerId, data, metrics, type, comparisonData = null) {
+       const container = document.getElementById(containerId);
+       container.innerHTML = '';
+
+       const isOurFaction = containerId.includes('our');
+
+       metrics.forEach(metric => {
+           const statDiv = document.createElement('div');
+           statDiv.className = 'avg-stat';
+           
+           let value = data[metric.key];
+           let formattedValue;
+           if (type === 'averages' && (metric.key === 'win_loss_ratio' || metric.key === 'avg_xanax_per_day')) {
+               formattedValue = value.toFixed(2);
+           } else if (type === 'totals' && metric.key === 'win_loss_ratio') {
+               formattedValue = 'N/A';
+           } else if (type === 'totals' && metric.key === 'avg_xanax_per_day') {
+               formattedValue = 'N/A';
+           } else {
+               formattedValue = formatNumber(Math.round(value));
+           }
+
+           // Calculate comparison if data is provided
+           let comparisonHtml = '';
+           if (comparisonData && metric.key !== 'win_loss_ratio' && metric.key !== 'avg_xanax_per_day') {
+               const ourValue = isOurFaction ? value : comparisonData[metric.key];
+               const enemyValue = isOurFaction ? comparisonData[metric.key] : value;
+               const difference = enemyValue - ourValue;
+
+               if (difference !== 0) {
+                   const sign = isOurFaction ? (difference > 0 ? '-' : '+') : (difference > 0 ? '+' : '-');
+                   const absValue = Math.abs(difference);
+                   const colorClass = isOurFaction ? 
+                       (difference > 0 ? 'comparison-negative' : 'comparison-positive') :
+                       (difference > 0 ? 'comparison-positive' : 'comparison-negative');
+                   
+                   let formattedDiff;
+                   if (type === 'totals') {
+                       formattedDiff = formatNumber(Math.round(absValue));
+                   } else {
+                       formattedDiff = Math.round(absValue).toString();
+                   }
+                   
+                   comparisonHtml = `<span class="comparison-score ${colorClass}">(${sign}${formattedDiff})</span>`;
+               }
+           }
+           
+           statDiv.innerHTML = `
+               <div class="avg-stat-label">${metric.label}</div>
+               <div class="avg-stat-value">${formattedValue}${comparisonHtml}</div>
+           `;
+           container.appendChild(statDiv);
+       });
+   }
+
+   function showStats(faction, type) {
+       // Update tab buttons
+       const factionPrefix = faction === 'our' ? 'our' : 'enemy';
+       const tabBtns = document.querySelectorAll(`#${factionPrefix}Stats .tab-btn, .faction-avg-section.${faction}-faction-avg .tab-btn`);
+       tabBtns.forEach(btn => btn.classList.remove('active'));
+       event.target.classList.add('active');
+
+       // Show/hide appropriate grids
+       const averagesGrid = document.getElementById(`${factionPrefix}Averages`);
+       const totalsGrid = document.getElementById(`${factionPrefix}Totals`);
+
+       if (type === 'averages') {
+           averagesGrid.style.display = 'grid';
+           totalsGrid.style.display = 'none';
+       } else {
+           averagesGrid.style.display = 'none';
+           totalsGrid.style.display = 'grid';
+       }
+   }
 
    function populateFilters() {
        const ourList = document.getElementById('ourMembers');
@@ -525,12 +844,6 @@
        displayTable();
    }
 
-   function formatNumber(num) {
-       if (typeof num !== 'number') return num;
-       // Use European formatting: period as thousands separator, comma as decimal
-       return num.toLocaleString('de-DE');
-   }
-
    function createTableRow(player) {
        const row = document.createElement('tr');
        row.className = player.faction_type === 'our' ? 'our-faction' : 'enemy-faction';
@@ -542,11 +855,11 @@
            <td>${formatNumber(player.age)}</td>
            <td>${formatNumber(player.life)}</td>
            <td>${formatNumber(player.attacks_won)}</td>
-           <td>${player.win_loss_ratio.toFixed(2).replace('.', ',')}</td>
+           <td>${player.win_loss_ratio.toFixed(2)}</td>
            <td>${formatNumber(player.elo_rating)}</td>
            <td>${formatNumber(player.best_damage_made)}</td>
            <td>${formatNumber(player.xanax_taken)}</td>
-           <td>${player.avg_xanax_per_day.toFixed(2).replace('.', ',')}</td>
+           <td>${player.avg_xanax_per_day.toFixed(2)}</td>
            <td>${formatNumber(player.donator_days)}</td>
            <td>${formatNumber(player.energy_drinks_drunk)}</td>
            <td>${formatNumber(player.current_activity_streak)}</td>
@@ -615,6 +928,7 @@
    document.addEventListener('DOMContentLoaded', () => {
        populateFilters();
        displayTable();
+       displayFactionStats();
 
        document.querySelectorAll('.intel-table th[data-column]').forEach(header => {
            header.addEventListener('click', () => handleSort(header.dataset.column));
