@@ -2,10 +2,10 @@ import pandas as pd
 import re
 
 
-def format_number_american(num):
-    """Format numbers with American standards: comma as thousands separator, period as decimal"""
+def format_number_european(num):
+    """Format numbers with European standards: period as thousands separator, comma as decimal"""
     if isinstance(num, (int, float)):
-        return f"{num:,.2f}"
+        return f"{num:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
     return str(num)
 
 
@@ -75,13 +75,13 @@ def prepare_chain_display_data(complete_chain_data):
     # Format member names with links
     df["Member"] = df["Member"].apply(format_member_link)
 
-    # Format numbers for display using American formatting
-    df["Respect"] = df["War_Respect"].apply(lambda x: f"{int(round(x)):,}")  # Use war respect for display
-    df["Attacks"] = df["Attacks"].apply(lambda x: f"{int(round(x)):,}")
-    df["Best"] = df["Best"].apply(format_number_american)
-    df["Avg"] = df["Avg"].apply(format_number_american)
-    df["Saves"] = df["Saves"].apply(lambda x: f"{int(round(x)):,}")  # Format saves as integer
-    df["Save_Score"] = df["Save_Score"].apply(format_number_american)  # Format save score with decimals
+    # Format numbers for display using European formatting
+    df["Respect"] = df["War_Respect"].apply(lambda x: f"{int(round(x)):,}".replace(',', '.'))  # Use war respect for display
+    df["Attacks"] = df["Attacks"].apply(lambda x: f"{int(round(x)):,}".replace(',', '.'))
+    df["Best"] = df["Best"].apply(format_number_european)
+    df["Avg"] = df["Avg"].apply(format_number_european)
+    df["Saves"] = df["Saves"].apply(lambda x: f"{int(round(x)):,}".replace(',', '.'))  # Format saves as integer
+    df["Save_Score"] = df["Save_Score"].apply(format_number_european)  # Format save score with decimals
 
     # Select columns for display - include saves data that was merged in main.py
     new_cols = ['Member', 'Respect', 'Best', 'Avg', 'Attacks', 'War', 'Outside', 'Saves', 'Save_Score', 'Leave', 'Hosp', 'Mug', 'Retal', 'Overseas', 'Draw', 'Assist', 'Escape', 'Loss']
@@ -96,7 +96,7 @@ def create_totals_row(total_respect, total_attacks, total_best, avg_respect, raw
     def format_total_with_percent(value, total):
         value_int = int(round(value))
         percent = (value / total * 100) if total > 0 else 0.0
-        return f'<div data-sort="{value_int}"><strong>{value_int:,}</strong><div style="font-size: 10px; color: #aaa"><strong>{percent:.2f}%</strong></div></div>'
+        return f'<div data-sort="{value_int}"><strong>{value_int:,}</strong><div style="font-size: 10px; color: #aaa"><strong>{percent:.2f}%</strong></div></div>'.replace(',', '.')
 
     # Calculate war attacks (excluding outside attacks)
     total_war_attacks = raw_totals['War']
@@ -107,14 +107,14 @@ def create_totals_row(total_respect, total_attacks, total_best, avg_respect, raw
 
     totals_row = {
         'Member': '<strong>TOTALS</strong>',
-        'Respect': f'<strong>{int(round(total_respect)):,}</strong>',
-        'Best': f'<strong>{format_number_american(total_best)}</strong>',
-        'Avg': f'<strong>{format_number_american(avg_respect)}</strong>',
-        'Attacks': f'<strong>{int(round(total_attacks)):,}</strong>',
+        'Respect': f'<strong>{int(round(total_respect)):,}</strong>'.replace(',', '.'),
+        'Best': f'<strong>{format_number_european(total_best)}</strong>',
+        'Avg': f'<strong>{format_number_european(avg_respect)}</strong>',
+        'Attacks': f'<strong>{int(round(total_attacks)):,}</strong>'.replace(',', '.'),
         'War': format_total_with_percent(raw_totals['War'], total_attacks),  # War vs total attacks
         'Outside': format_total_with_percent(raw_totals['Outside'], total_attacks),  # Outside vs total attacks
-        'Saves': f'<strong>{int(round(total_saves)):,}</strong>',
-        'Save_Score': f'<strong>{format_number_american(total_save_score)}</strong>',
+        'Saves': f'<strong>{int(round(total_saves)):,}</strong>'.replace(',', '.'),
+        'Save_Score': f'<strong>{format_number_european(total_save_score)}</strong>',
         'Leave': format_total_with_percent(raw_totals['Leave'], total_war_attacks),  # Leave vs war attacks
         'Hosp': format_total_with_percent(raw_totals['Hosp'], total_war_attacks),  # Hosp vs war attacks
         'Mug': format_total_with_percent(raw_totals['Mug'], total_war_attacks),  # Mug vs war attacks
@@ -156,6 +156,11 @@ def create_chain_html_table(df, totals_row):
 def generate_chain_report_content(complete_chain_data):
     """Main function to generate chain report content"""
     print("Generating chain report content...")
+    
+    # Check if complete_chain_data is None or empty (no chain data available)
+    if complete_chain_data is None or complete_chain_data.empty:
+        print("No chain data available - returning None for chain report content")
+        return None
     
     # Prepare display data
     df, total_respect, total_attacks, total_best, avg_respect, raw_totals = prepare_chain_display_data(complete_chain_data)

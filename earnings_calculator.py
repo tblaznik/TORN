@@ -18,7 +18,7 @@ def format_member_link(cell):
     if match:
         torn_id = match.group(1)
         # Extract clean name from the dirty format
-        name = re.sub(r'\[\d+\]', '', cell).strip()
+        name = re.sub(r'\[\d+]', '', cell).strip()
         # Handle duplicated names like "RipTheJackerRIPTHEJACKER"
         words = name.split()
         if len(words) >= 2 and words[0].lower() == words[1].lower():
@@ -206,6 +206,11 @@ def calculate_earnings_content(complete_chain_data, total_caches=4209000000.00):
     
     print("Generating earnings content...")
     
+    # Check if complete_chain_data is None or empty (no data available)
+    if complete_chain_data is None or complete_chain_data.empty:
+        print("No chain data available - returning None for earnings content")
+        return None
+    
     # Calculate summary statistics
     summary = calculate_earnings_summary(complete_chain_data, total_caches)
     
@@ -244,3 +249,4 @@ def calculate_earnings_content(complete_chain_data, total_caches=4209000000.00):
         'table_html': html_table,
         'summary': formatted_summary
     }
+    

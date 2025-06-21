@@ -23,6 +23,11 @@ class TornReportGenerator:
         self.complete_chain_data = None
         self.intel_data = None
         
+        # Data availability flags
+        self.war_available = False
+        self.chain_available = False
+        self.saves_available = False
+        
         # Templates
         self.templates = {}
     
@@ -51,6 +56,12 @@ class TornReportGenerator:
         """Fetch war data from API"""
         print("=== LOADING WAR DATA ===")
         
+        # Check if war_id is None
+        if self.war_id is None:
+            print("War ID is None - war hasn't started yet")
+            self.war_available = False
+            return True  # Not a failure, just no war yet
+        
         # Get faction info if not provided
         if not self.faction_id:
             user_data = self.make_api_request("user/?selections=profile", "v1")
@@ -59,7 +70,7 @@ class TornReportGenerator:
                 print(f"Found faction ID: {self.faction_id}")
             else:
                 print("Could not determine faction ID")
-                return None
+                return False
         
         # Get specific war data
         war_data = self.make_api_request(f"torn/{self.war_id}?selections=rankedwarreport", "v1")
@@ -81,13 +92,15 @@ class TornReportGenerator:
                     'our_faction': our_faction,
                     'factions': factions
                 }
+                self.war_available = True
                 print("War data loaded successfully")
                 return True
             else:
                 print(f"Faction {self.faction_id} not in this war")
         
         print("Failed to load war data")
-        return False
+        self.war_available = False
+        return True  # Not a critical failure
     
     def load_chain_data(self):
         """Load chain report CSV"""
@@ -96,7 +109,8 @@ class TornReportGenerator:
         files = [f for f in os.listdir('.') if f.endswith('.csv') and 'Chain Report' in f]
         if not files:
             print("No Chain Report CSV file found.")
-            return False
+            self.chain_available = False
+            return True  # Not a failure, just no data
         
         try:
             df = pd.read_csv(files[0], sep=';', skiprows=1, encoding='utf-8')
@@ -105,24 +119,28 @@ class TornReportGenerator:
                 "Hosp", "War", "Assist", "Retal", "Overseas", "Draw", "Escape", "Loss"
             ]
             
-            # Convert numbers properly handling American formatting
-            def convert_american_number(value_str):
+            # Convert numbers properly handling European formatting
+            def convert_european_number(value_str):
                 value_str = str(value_str).strip()
                 if not value_str or value_str == 'nan':
                     return 0.0
-                return float(value_str.replace(',', ''))
+                # European format: . as thousands separator, , as decimal separator
+                value_str = value_str.replace('.', '').replace(',', '.')
+                return float(value_str)
             
             # Convert numeric columns
             for col in df.columns[1:]:
-                df[col] = df[col].apply(convert_american_number)
+                df[col] = df[col].apply(convert_european_number)
             
             self.chain_data = df
+            self.chain_available = True
             print(f"Chain data loaded: {len(df)} members")
             return True
             
         except Exception as e:
             print(f"Error loading chain data: {e}")
-            return False
+            self.chain_available = False
+            return True  # Not a critical failure
     
     def load_saves_data(self):
         """Load saves CSV"""
@@ -131,17 +149,30 @@ class TornReportGenerator:
         saves_df = None
         if os.path.exists('saves.xlsx'):
             print("Reading saves from XLSX file...")
-            saves_df = pd.read_excel('saves.xlsx')
+            try:
+                saves_df = pd.read_excel('saves.xlsx')
+                self.saves_available = True
+            except Exception as e:
+                print(f"Error reading saves XLSX: {e}")
+                self.saves_available = False
         elif os.path.exists('saves.csv'):
             print("Reading saves from CSV file...")
-            saves_df = pd.read_csv('saves.csv', sep=';', encoding='utf-8')
+            try:
+                saves_df = pd.read_csv('saves.csv', sep=';', encoding='utf-8')
+                self.saves_available = True
+            except Exception as e:
+                print(f"Error reading saves CSV: {e}")
+                self.saves_available = False
+        else:
+            print("No saves file found.")
+            self.saves_available = False
         
         if saves_df is not None:
             print(f"Saves data loaded: {len(saves_df)} rows")
             self.saves_data = saves_df
             return True
         else:
-            print("No saves file found. Will use empty save data.")
+            print("Using empty save data.")
             self.saves_data = pd.DataFrame(columns=['Member', 'Saves', 'Save_Score'])
             return True
     
@@ -149,22 +180,25 @@ class TornReportGenerator:
         """Merge chain data with war data and saves data to create complete dataset"""
         print("=== CREATING COMPLETE CHAIN DATA ===")
         
-        if self.chain_data is None or self.war_data is None:
-            print("Missing required data for chain completion")
-            return False
+        if not self.chain_available:
+            print("No chain data available - skipping chain data creation")
+            return True
         
         df = self.chain_data.copy()
         
-        # Extract war respect data from API
-        war_members = self.war_data['our_faction'].get('members', {})
+        # Extract war respect data from API if available
         war_respect_data = {}
-        
-        for member_id, member_data in war_members.items():
-            member_name = member_data.get('name', f'ID_{member_id}')
-            war_respect = member_data.get('score', 0)
-            war_respect_data[member_name] = war_respect
-        
-        print(f"Got war respect data for {len(war_respect_data)} members")
+        if self.war_available and self.war_data:
+            war_members = self.war_data['our_faction'].get('members', {})
+            
+            for member_id, member_data in war_members.items():
+                member_name = member_data.get('name', f'ID_{member_id}')
+                war_respect = member_data.get('score', 0)
+                war_respect_data[member_name] = war_respect
+            
+            print(f"Got war respect data for {len(war_respect_data)} members")
+        else:
+            print("No war data available - using total respect as fallback")
         
         # Clean member names and match with war data
         def clean_member_name(name):
@@ -192,11 +226,11 @@ class TornReportGenerator:
             
             # Try to find match in war data
             found_match = False
-            if clean_name in war_respect_data:
+            if war_respect_data and clean_name in war_respect_data:
                 df.at[i, 'War_Respect'] = war_respect_data[clean_name]
                 matches_found += 1
                 found_match = True
-            else:
+            elif war_respect_data:
                 # Try case-insensitive matching
                 for war_name in war_respect_data.keys():
                     if clean_name.lower() == war_name.lower():
@@ -210,13 +244,14 @@ class TornReportGenerator:
                 df.at[i, 'War_Respect'] = df.at[i, 'Respect']
                 print(f"NO MATCH: {member_name_original} -> using total respect as fallback")
         
-        print(f"Successfully matched {matches_found}/{len(df)} members with war data")
+        if war_respect_data:
+            print(f"Successfully matched {matches_found}/{len(df)} members with war data")
         
         # Calculate outside attacks
         df["Outside"] = df["Attacks"] - df["War"]
         
         # Merge with saves data if available
-        if self.saves_data is not None and not self.saves_data.empty:
+        if self.saves_available and self.saves_data is not None and not self.saves_data.empty:
             # Clean member names in saves data for matching
             self.saves_data['Clean_Member'] = self.saves_data['Member'].apply(clean_member_name)
             df['Clean_Member'] = df['Member'].apply(clean_member_name)
@@ -364,13 +399,22 @@ class TornReportGenerator:
             print("Intel report generation skipped or failed")
         
         # Generate war report content
-        war_content = generate_war_report_content(self.war_data)
+        if self.war_available:
+            war_content = generate_war_report_content(self.war_data)
+        else:
+            war_content = None
         
         # Generate chain report content  
-        chain_content = generate_chain_report_content(self.complete_chain_data)
+        if self.chain_available:
+            chain_content = generate_chain_report_content(self.complete_chain_data)
+        else:
+            chain_content = None
         
         # Generate earnings content
-        earnings_content = calculate_earnings_content(self.complete_chain_data, total_caches=4209000000.00)
+        if self.chain_available and (self.saves_available or not self.saves_data.empty):
+            earnings_content = calculate_earnings_content(self.complete_chain_data, total_caches=4209000000.00)
+        else:
+            earnings_content = None
         
         return {
             'intel': intel_content,
@@ -397,12 +441,27 @@ class TornReportGenerator:
         
         # Save war report
         war_html = self.templates['war_report']
-        # Replace war-specific placeholders
-        war_html = war_html.replace('{{WAR_ID}}', str(self.war_id))
-        war_html = war_html.replace('{{TABLE_HTML}}', report_contents['war']['table_html'])
-        war_html = war_html.replace('{{WAR_START}}', report_contents['war']['war_start'])
-        war_html = war_html.replace('{{WAR_END}}', report_contents['war']['war_end'])
-        war_html = war_html.replace('{{WAR_DURATION}}', report_contents['war']['war_duration'])
+        if report_contents['war'] is not None:
+            # Replace war-specific placeholders
+            war_html = war_html.replace('{{WAR_ID}}', str(self.war_id))
+            war_html = war_html.replace('{{TABLE_HTML}}', report_contents['war']['table_html'])
+            war_html = war_html.replace('{{WAR_START}}', report_contents['war']['war_start'])
+            war_html = war_html.replace('{{WAR_END}}', report_contents['war']['war_end'])
+            war_html = war_html.replace('{{WAR_DURATION}}', report_contents['war']['war_duration'])
+        else:
+            # Show "war hasn't started" message
+            no_war_message = '''
+            <div class="war-info">
+                <h3>War Status</h3>
+                <p><strong>Status:</strong> War hasn't started yet</p>
+                <p>War data will be available once the ranked war begins.</p>
+            </div>
+            '''
+            war_html = war_html.replace('{{WAR_ID}}', 'N/A')
+            war_html = war_html.replace('{{TABLE_HTML}}', no_war_message)
+            war_html = war_html.replace('{{WAR_START}}', 'N/A')
+            war_html = war_html.replace('{{WAR_END}}', 'N/A')
+            war_html = war_html.replace('{{WAR_DURATION}}', 'N/A')
         
         with open("site/war_report.html", "w", encoding="utf-8") as f:
             f.write(war_html)
@@ -410,7 +469,19 @@ class TornReportGenerator:
         
         # Save chain report
         chain_html = self.templates['chain_report']
-        chain_html = chain_html.replace('{{CHAIN_TABLE}}', report_contents['chain']['table_html'])
+        if report_contents['chain'] is not None:
+            chain_html = chain_html.replace('{{CHAIN_TABLE}}', report_contents['chain']['table_html'])
+        else:
+            no_chain_message = '''
+            <div class="header">
+                <h1>Chain Report</h1>
+            </div>
+            <div style="text-align: center; padding: 40px; background: linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(45, 45, 45, 0.6) 100%); border: 2px solid #556B2F; border-radius: 15px; margin: 20px 0;">
+                <h3 style="color: #FFD700; margin-bottom: 20px;">No Chain Report Available</h3>
+                <p style="color: #d4c5a0;">Please upload a Chain Report CSV file to view chain statistics.</p>
+            </div>
+            '''
+            chain_html = chain_html.replace('{{CHAIN_TABLE}}', no_chain_message)
         
         with open("site/chain_report.html", "w", encoding="utf-8") as f:
             f.write(chain_html)
@@ -418,10 +489,31 @@ class TornReportGenerator:
         
         # Save earnings report
         earnings_html = self.templates['earnings_report']
-        for key, value in report_contents['earnings']['summary'].items():
-            placeholder = '{{' + key.upper() + '}}'
-            earnings_html = earnings_html.replace(placeholder, str(value))
-        earnings_html = earnings_html.replace('{{EARNINGS_TABLE}}', report_contents['earnings']['table_html'])
+        if report_contents['earnings'] is not None:
+            for key, value in report_contents['earnings']['summary'].items():
+                placeholder = '{{' + key.upper() + '}}'
+                earnings_html = earnings_html.replace(placeholder, str(value))
+            earnings_html = earnings_html.replace('{{EARNINGS_TABLE}}', report_contents['earnings']['table_html'])
+        else:
+            no_earnings_message = '''
+            <div class="header">
+                <h1>Earnings Estimate</h1>
+            </div>
+            <div style="text-align: center; padding: 40px; background: linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(45, 45, 45, 0.6) 100%); border: 2px solid #DAA520; border-radius: 15px; margin: 20px 0;">
+                <h3 style="color: #FFD700; margin-bottom: 20px;">Data Not Available</h3>
+                <p style="color: #d4c5a0;">Earnings calculations require both Chain Report and Saves data.</p>
+                <p style="color: #d4c5a0;">Chain Available: ''' + ('Yes' if self.chain_available else 'No') + '''</p>
+                <p style="color: #d4c5a0;">Saves Available: ''' + ('Yes' if self.saves_available else 'No') + '''</p>
+            </div>
+            '''
+            # Replace all placeholders with N/A
+            placeholders = ['{{TOTAL_CACHES}}', '{{TAX_AMOUNT}}', '{{TOTAL_PAYOUT}}', '{{TOTAL_HITS}}', 
+                          '{{TOTAL_SCORE}}', '{{AVG_SCORE_HIT}}', '{{TOTAL_SAVES}}', '{{TOTAL_SAVE_SCORE}}', 
+                          '{{SAVE_PAY}}', '{{PAY_HIT}}', '{{PAY_SCORE}}', '{{RESPECT_WEIGHT}}', '{{HIT_WEIGHT}}', 
+                          '{{MOD_SCORE}}', '{{MOD_HIT}}', '{{RESPECT_POOL}}', '{{HIT_POOL}}', '{{TOTAL_MEMBERS}}']
+            for placeholder in placeholders:
+                earnings_html = earnings_html.replace(placeholder, 'N/A')
+            earnings_html = earnings_html.replace('{{EARNINGS_TABLE}}', no_earnings_message)
         
         with open("site/earnings_report.html", "w", encoding="utf-8") as f:
             f.write(earnings_html)
@@ -477,21 +569,18 @@ class TornReportGenerator:
         
         # Load all other data
         if not self.load_war_data():
-            print("Failed to load war data. Exiting.")
-            return False
+            print("Failed to load war data. Continuing...")
             
         if not self.load_chain_data():
-            print("Failed to load chain data. Exiting.")
-            return False
+            print("Failed to load chain data. Continuing...")
             
         if not self.load_saves_data():
-            print("Failed to load saves data. Exiting.")
-            return False
+            print("Failed to load saves data. Continuing...")
         
-        # Create complete dataset
-        if not self.create_complete_chain_data():
-            print("Failed to create complete chain data. Exiting.")
-            return False
+        # Create complete dataset only if chain data is available
+        if self.chain_available:
+            if not self.create_complete_chain_data():
+                print("Failed to create complete chain data. Continuing...")
         
         # Load templates
         if not self.load_templates():
@@ -510,13 +599,20 @@ class TornReportGenerator:
         print("War Report: war_report.html - Performance analysis")
         print("Chain Report: chain_report.html - Attack breakdown")
         print("Earnings: earnings_report.html - Payout calculations")
+        
+        # Display data availability status
+        print(f"\nData Availability:")
+        print(f"War Data: {'Available' if self.war_available else 'Not Available (war hasn\'t started)'}")
+        print(f"Chain Data: {'Available' if self.chain_available else 'Not Available (no CSV file)'}")
+        print(f"Saves Data: {'Available' if self.saves_available else 'Not Available (no saves file)'}")
+        
         return True
 
 
 def main():
     API_KEY = "XrSNtZr7UKlaOXFT"
     FACTION_ID = 40959
-    WAR_ID = 26833
+    WAR_ID = None  # Set to None when war hasn't started yet
 
     print("=== EPIC MAFIA WAR INTELLIGENCE SYSTEM ===")
     print("Collecting comprehensive intelligence data...")

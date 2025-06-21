@@ -391,7 +391,7 @@
             text-align: center;
             font-weight: 600;
             font-size: 0.9em;
-            border-right: 3px solid rgba(68, 68, 68, 0.5);
+            border-right: 3px solid #d4c5a0;
             cursor: pointer;
             user-select: none;
             text-transform: uppercase;
@@ -425,8 +425,8 @@
         
         .intel-table td {
             padding: 12px 8px;
-            border-bottom: 2px solid rgba(68, 68, 68, 0.3);
-            border-right: 2px solid rgba(68, 68, 68, 0.3);
+            border-bottom: 2px solid #d4c5a0;
+            border-right: 2px solid #d4c5a0;
             font-size: 0.9em;
             text-align: center;
             transition: background-color 0.2s ease;
@@ -564,7 +564,7 @@
         </div>
         
         <div class="controls">
-            <h3>Intelligence Filters</h3>
+            <h3>Member Filters</h3>
             
             <div class="control-row">
                 <div class="control-group">
@@ -579,7 +579,7 @@
                 </div>
                 
                 <div class="control-group">
-                    <label for="enemyMembers">Enemy Members</label>
+                    <label for="enemyMembers">Enemy Faction Members</label>
                     <div id="enemyMembers" class="member-list">
                         <!-- Will be populated by JavaScript -->
                     </div>
@@ -5933,7 +5933,7 @@
 
            // Calculate comparison if data is provided
            let comparisonHtml = '';
-           if (comparisonData && metric.key !== 'win_loss_ratio' && metric.key !== 'avg_xanax_per_day') {
+               if (comparisonData && !(type === 'totals' && (metric.key === 'win_loss_ratio' || metric.key === 'avg_xanax_per_day'))) {
                const ourValue = isOurFaction ? value : comparisonData[metric.key];
                const enemyValue = isOurFaction ? comparisonData[metric.key] : value;
                const difference = enemyValue - ourValue;
@@ -5945,12 +5945,14 @@
                        (difference > 0 ? 'comparison-negative' : 'comparison-positive') :
                        (difference > 0 ? 'comparison-positive' : 'comparison-negative');
                    
-                   let formattedDiff;
-                   if (type === 'totals') {
-                       formattedDiff = formatNumber(Math.round(absValue));
-                   } else {
-                       formattedDiff = Math.round(absValue).toString();
-                   }
+                let formattedDiff;
+                if (type === 'totals') {
+                    formattedDiff = formatNumber(Math.round(absValue));
+                } else if (metric.key === 'win_loss_ratio' || metric.key === 'avg_xanax_per_day') {
+                    formattedDiff = absValue.toFixed(2);
+                } else {
+                    formattedDiff = Math.round(absValue).toString();
+                }
                    
                    comparisonHtml = `<span class="comparison-score ${colorClass}">(${sign}${formattedDiff})</span>`;
                }

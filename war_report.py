@@ -402,6 +402,11 @@ def generate_war_report_content(war_data):
     """Main function to generate war report content"""
     print("Generating war report content...")
     
+    # Check if war_data is None (war hasn't started)
+    if war_data is None:
+        print("War hasn't started yet - returning None for war report content")
+        return None
+    
     # Process raw war data
     processed_data = process_war_data(war_data)
     
@@ -413,3 +418,4 @@ def generate_war_report_content(war_data):
     
     print("War report content generated successfully")
     return html_content
+    
