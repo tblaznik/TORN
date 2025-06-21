@@ -1,112 +1,33 @@
 import requests
 import json
-from datetime import datetime, timezone, timedelta
 import pandas as pd
-import numpy as np
-import statistics
-from chain_report_module import generate_chain_report
-from earnings_module import generate_earnings_report
+import os
+import re
+from datetime import datetime, timezone, timedelta
+from war_report import generate_war_report_content
+from chain_report import generate_chain_report_content
+from earnings_calculator import calculate_earnings_content
+from intel_report import *
 
 
-class TornWarReport:
+class TornReportGenerator:
     def __init__(self, api_key, faction_id=None, war_id=None):
         self.api_key = api_key
         self.faction_id = faction_id
         self.war_id = war_id
         
-    def format_number_american(self, num):
-        """Format numbers with AMERICAN standards: comma as thousands separator, period as decimal"""
-        if isinstance(num, (int, float)):
-            return f"{num:,.2f}"
-        return str(num)
-    
-    def convert_to_tct(self, timestamp):
-        """Take API timestamp and subtract 2 hours, then display"""
-        if timestamp:
-            dt = datetime.fromtimestamp(timestamp)
-            # Subtract 2 hours
-            tct_dt = dt - timedelta(hours=2)
-            return tct_dt.strftime('%Y-%m-%d %H:%M:%S TCT')
-        return "Unknown"
-    
-    def format_duration_hms(self, hours):
-        """Format duration as HH:MM:SS"""
-        if hours:
-            total_seconds = int(hours * 3600)
-            hours_part = total_seconds // 3600
-            minutes_part = (total_seconds % 3600) // 60
-            seconds_part = total_seconds % 60
-            return f"{hours_part:02d}:{minutes_part:02d}:{seconds_part:02d}"
-        return "00:00:00"
-    
-    def calculate_battle_stats(self, attacks, duration_hours):
-        """Calculate hits per minute"""
-        if attacks and duration_hours and duration_hours > 0:
-            hits_per_min = attacks / (duration_hours * 60)
-            return f"{hits_per_min:.4f}"  # American decimal format
-        return "0.0000"
-    
-    def calculate_avg_hit_score(self, score, attacks):
-        """Calculate average score per hit"""
-        if score and attacks and attacks > 0:
-            avg = round(score / attacks, 2)
-            return self.format_number_american(avg)
-        return "0.00"
-    
-    # Advanced Metrics Functions
-    def calculate_efficiency_score(self, score, duration_hours):
-        """Score per minute (combines attack frequency + effectiveness)"""
-        if duration_hours and duration_hours > 0:
-            return score / (duration_hours * 60)
-        return 0.0
-    
-    def calculate_attack_frequency(self, attacks, duration_hours):
-        """Attacks per hour"""
-        if duration_hours and duration_hours > 0:
-            return attacks / duration_hours
-        return 0.0
-    
-    def calculate_performance_vs_level(self, score, level):
-        """Score per level - shows who's punching above their weight"""
-        if level and level > 0:
-            return score / level
-        return 0.0
-    
-    def calculate_faction_stats(self, member_stats, faction_name):
-        """Calculate advanced faction-wide statistics"""
-        faction_members = [stats for stats in member_stats.values() if stats['faction'] == faction_name]
-        if not faction_members:
-            return {}
+        # Data storage
+        self.war_data = None
+        self.chain_data = None
+        self.saves_data = None
+        self.complete_chain_data = None
+        self.intel_data = None
         
-        # Get all scores for statistical analysis
-        scores = [member['score'] for member in faction_members if member['attacks'] > 0]
-        attacks = [member['attacks'] for member in faction_members if member['attacks'] > 0]
-        
-        if not scores:
-            return {}
-        
-        # Calculate statistics
-        avg_score = statistics.mean(scores)
-        score_std_dev = statistics.stdev(scores) if len(scores) > 1 else 0
-        
-        # Participation rate (members who attacked vs total members)
-        total_members = len([m for m in member_stats.values() if m['faction'] == faction_name])
-        participating_members = len(scores)
-        participation_rate = (participating_members / total_members) * 100 if total_members > 0 else 0
-        
-        # Consistency rating (lower std dev relative to mean = more consistent)
-        consistency_rating = (score_std_dev / avg_score) * 100 if avg_score > 0 else 0
-        
-        return {
-            'avg_score': avg_score,
-            'score_std_dev': score_std_dev,
-            'participation_rate': participation_rate,
-            'consistency_rating': consistency_rating,
-            'total_members': total_members,
-            'participating_members': participating_members
-        }
-        
+        # Templates
+        self.templates = {}
+    
     def make_api_request(self, endpoint, api_version="v1"):
+        """Make API request to Torn"""
         if api_version == "v1":
             url = f"https://api.torn.com/{endpoint}&key={self.api_key}"
         else:
@@ -125,25 +46,12 @@ class TornWarReport:
         except Exception as e:
             print(f"API request failed: {e}")
             return None
-        
-    def get_market_price(self, item_id):
-        print(f"Getting market price for item ID: {item_id}")
-        url = f"https://api.torn.com/v2/market/{item_id}?key={self.api_key}&selections=itemmarket"
-        try:
-            response = requests.get(url)
-            print(f"Response status code: {response.status_code}")
-            response.raise_for_status()
-            data = response.json()
-            if 'error' in data:
-                print(f"API Error: {data['error']}")
-                return None
-            return data['itemmarket']['item'].get('average_price', 0)
-        except Exception as e:
-            print(f"Failed to get market price: {e}")
-            return None
     
-    def get_faction_info(self):
-        print("Getting faction info...")
+    def load_war_data(self):
+        """Fetch war data from API"""
+        print("=== LOADING WAR DATA ===")
+        
+        # Get faction info if not provided
         if not self.faction_id:
             user_data = self.make_api_request("user/?selections=profile", "v1")
             if user_data and 'faction' in user_data:
@@ -153,484 +61,477 @@ class TornWarReport:
                 print("Could not determine faction ID")
                 return None
         
-        faction_data = self.make_api_request(f"faction/{self.faction_id}?selections=basic", "v1")
-        if faction_data:
-            print(f"Faction name: {faction_data.get('name', 'Unknown')}")
-        return faction_data
-
-    def get_specific_war_data(self):
-        print(f"Getting rankedwarreport for war ID: {self.war_id}")
-        
+        # Get specific war data
         war_data = self.make_api_request(f"torn/{self.war_id}?selections=rankedwarreport", "v1")
         
         if war_data and 'rankedwarreport' in war_data:
             report = war_data['rankedwarreport']
-            print(f"Got war report data")
-            
             factions = report.get('factions', {})
-            print(f"Factions in war: {list(factions.keys())}")
             
             if str(self.faction_id) in factions:
                 print(f"Found our faction {self.faction_id}")
                 our_faction = factions[str(self.faction_id)]
-                
                 war_info = report.get('war', {})
-                return {
+                
+                self.war_data = {
                     'war_id': self.war_id,
                     'war_info': report,
                     'start': war_info.get('start', 0),
                     'end': war_info.get('end', 0),
-                    'our_faction': our_faction
+                    'our_faction': our_faction,
+                    'factions': factions
                 }
+                print("War data loaded successfully")
+                return True
             else:
                 print(f"Faction {self.faction_id} not in this war")
         
-        print(f"Failed to get war data")
-        return None
-
-    def get_war_respect_data(self):
-        """Get war respect data for merging with chain report"""
-        print("Getting war respect data for earnings calculations...")
+        print("Failed to load war data")
+        return False
+    
+    def load_chain_data(self):
+        """Load chain report CSV"""
+        print("=== LOADING CHAIN DATA ===")
         
-        war_data = self.get_specific_war_data()
-        if not war_data:
-            return None
+        files = [f for f in os.listdir('.') if f.endswith('.csv') and 'Chain Report' in f]
+        if not files:
+            print("No Chain Report CSV file found.")
+            return False
         
-        our_faction_data = war_data.get('our_faction', {})
-        war_members = our_faction_data.get('members', {})
+        try:
+            df = pd.read_csv(files[0], sep=';', skiprows=1, encoding='utf-8')
+            df.columns = [
+                "Member", "Respect", "Best", "Avg", "Attacks", "Leave", "Mug",
+                "Hosp", "War", "Assist", "Retal", "Overseas", "Draw", "Escape", "Loss"
+            ]
+            
+            # Convert numbers properly handling American formatting
+            def convert_american_number(value_str):
+                value_str = str(value_str).strip()
+                if not value_str or value_str == 'nan':
+                    return 0.0
+                return float(value_str.replace(',', ''))
+            
+            # Convert numeric columns
+            for col in df.columns[1:]:
+                df[col] = df[col].apply(convert_american_number)
+            
+            self.chain_data = df
+            print(f"Chain data loaded: {len(df)} members")
+            return True
+            
+        except Exception as e:
+            print(f"Error loading chain data: {e}")
+            return False
+    
+    def load_saves_data(self):
+        """Load saves CSV"""
+        print("=== LOADING SAVES DATA ===")
         
+        saves_df = None
+        if os.path.exists('saves.xlsx'):
+            print("Reading saves from XLSX file...")
+            saves_df = pd.read_excel('saves.xlsx')
+        elif os.path.exists('saves.csv'):
+            print("Reading saves from CSV file...")
+            saves_df = pd.read_csv('saves.csv', sep=';', encoding='utf-8')
+        
+        if saves_df is not None:
+            print(f"Saves data loaded: {len(saves_df)} rows")
+            self.saves_data = saves_df
+            return True
+        else:
+            print("No saves file found. Will use empty save data.")
+            self.saves_data = pd.DataFrame(columns=['Member', 'Saves', 'Save_Score'])
+            return True
+    
+    def create_complete_chain_data(self):
+        """Merge chain data with war data and saves data to create complete dataset"""
+        print("=== CREATING COMPLETE CHAIN DATA ===")
+        
+        if self.chain_data is None or self.war_data is None:
+            print("Missing required data for chain completion")
+            return False
+        
+        df = self.chain_data.copy()
+        
+        # Extract war respect data from API
+        war_members = self.war_data['our_faction'].get('members', {})
         war_respect_data = {}
         
         for member_id, member_data in war_members.items():
             member_name = member_data.get('name', f'ID_{member_id}')
-            war_respect = member_data.get('score', 0)  # This is the WAR-only respect
-            war_attacks = member_data.get('attacks', 0)
-            
-            # Store with member name as key for merging
-            war_respect_data[member_name] = {
-                'war_respect': war_respect,
-                'war_attacks': war_attacks,
-                'member_id': member_id
-            }
+            war_respect = member_data.get('score', 0)
+            war_respect_data[member_name] = war_respect
         
         print(f"Got war respect data for {len(war_respect_data)} members")
-        return war_respect_data
-
-    def generate_war_earnings_data(self):
-        print("STARTING WAR EARNINGS REPORT GENERATION")
         
-        faction_info = self.get_faction_info()
-        if not faction_info:
-            return None
-        
-        war_data = self.get_specific_war_data()
-        
-        if not war_data:
-            return None
-        
-        war_start = war_data.get('start', 0)
-        war_end = war_data.get('end', 0)
-        war_duration_hours = (war_end - war_start) / 3600
-        our_faction_data = war_data.get('our_faction', {})
-
-        war_respect = war_data['war_info']['factions']['40959']['rewards']['respect']
-        war_items = war_data['war_info']['factions']['40959']['rewards'].get('items', [])
-        print(war_items)
-        for id,items in war_items.items():
-            print(f"Item ID: {id}, Items: {items}")
-            avg_price = self.get_market_price(id)
-            print(f"Average market price for item ID {id}: {self.format_number_american(avg_price) if avg_price else 'N/A'}")
-        item_df = pd.DataFrame.from_dict(war_items, orient='index').reset_index()
-        
-        print(item_df)
-        
-        # Get all factions in the war
-        all_factions = war_data['war_info'].get('factions', {})
-        print(f"All factions in war: {list(all_factions.keys())}")
-        
-        # Find enemy faction (the one that's not us)
-        enemy_faction_data = None
-        enemy_faction_id = None
-        for faction_id, faction_data in all_factions.items():
-            if str(faction_id) != str(self.faction_id):
-                enemy_faction_data = faction_data
-                enemy_faction_id = faction_id
-                break
-        
-        if enemy_faction_data:
-            print(f"Enemy faction: {enemy_faction_data.get('name', f'ID_{enemy_faction_id}')} (ID: {enemy_faction_id})")
-        
-        print(f"War period: {self.convert_to_tct(war_start)} to {self.convert_to_tct(war_end)}")
-        print(f"Our faction score: {self.format_number_american(our_faction_data.get('score', 0))}")
-        if enemy_faction_data:
-            print(f"Enemy faction score: {self.format_number_american(enemy_faction_data.get('score', 0))}")
-        
-        war_members = our_faction_data.get('members', {})
-        enemy_members = enemy_faction_data.get('members', {}) if enemy_faction_data else {}
-        print(f"Found {len(war_members)} our members, {len(enemy_members)} enemy members")
-        
-        member_stats = {}
-        total_attacks = 0
-        total_score = 0
-        enemy_total_attacks = 0
-        enemy_total_score = 0
-        
-        # Process our faction members
-        for member_id, member_data in war_members.items():
-            member_name = member_data.get('name', f'ID_{member_id}')
-            member_level = member_data.get('level', 0)
-            member_attacks = member_data.get('attacks', 0)
-            member_score = member_data.get('score', 0)
+        # Clean member names and match with war data
+        def clean_member_name(name):
+            # Remove ID brackets first
+            clean = re.sub(r'\[\d+\]', '', name).strip()
             
-            total_attacks += member_attacks
-            total_score += member_score
+            # Handle duplicated names like "JlambJLAMB" -> "Jlamb"
+            if len(clean) > 0:
+                mid = len(clean) // 2
+                first_half = clean[:mid]
+                second_half = clean[mid:]
+                
+                if first_half.upper() == second_half:
+                    return first_half
             
-            avg_score_hit = round(member_score / member_attacks, 2) if member_attacks > 0 else 0
-            
-            # Calculate advanced metrics
-            efficiency_score = self.calculate_efficiency_score(member_score, war_duration_hours)
-            attack_frequency = self.calculate_attack_frequency(member_attacks, war_duration_hours)
-            performance_vs_level = self.calculate_performance_vs_level(member_score, member_level)
-            
-            member_stats[member_id] = {
-                'name': member_name,
-                'level': member_level,
-                'attacks': member_attacks,
-                'score': member_score,
-                'avg_score_hit': avg_score_hit,
-                'faction': 'Our Faction',
-                'faction_id': self.faction_id,
-                'efficiency_score': efficiency_score,
-                'attack_frequency': attack_frequency,
-                'performance_vs_level': performance_vs_level
-            }
+            return clean
         
-        # Process enemy faction members
-        for member_id, member_data in enemy_members.items():
-            member_name = member_data.get('name', f'ID_{member_id}')
-            member_level = member_data.get('level', 0)
-            member_attacks = member_data.get('attacks', 0)
-            member_score = member_data.get('score', 0)
-            
-            enemy_total_attacks += member_attacks
-            enemy_total_score += member_score
-            
-            avg_score_hit = round(member_score / member_attacks, 2) if member_attacks > 0 else 0
-            
-            # Calculate advanced metrics
-            efficiency_score = self.calculate_efficiency_score(member_score, war_duration_hours)
-            attack_frequency = self.calculate_attack_frequency(member_attacks, war_duration_hours)
-            performance_vs_level = self.calculate_performance_vs_level(member_score, member_level)
-            
-            member_stats[f"enemy_{member_id}"] = {
-                'name': member_name,
-                'level': member_level,
-                'attacks': member_attacks,
-                'score': member_score,
-                'avg_score_hit': avg_score_hit,
-                'faction': enemy_faction_data.get('name', 'Enemy Faction') if enemy_faction_data else 'Enemy Faction',
-                'faction_id': enemy_faction_id,
-                'efficiency_score': efficiency_score,
-                'attack_frequency': attack_frequency,
-                'performance_vs_level': performance_vs_level
-            }
+        # Add war respect column
+        df['War_Respect'] = 0.0
+        matches_found = 0
         
-        print(f"Processed {total_attacks} our attacks with {self.format_number_american(total_score)} our score")
-        print(f"Processed {enemy_total_attacks} enemy attacks with {self.format_number_american(enemy_total_score)} enemy score")
+        for i, row in df.iterrows():
+            member_name_original = row['Member']
+            clean_name = clean_member_name(member_name_original)
+            
+            # Try to find match in war data
+            found_match = False
+            if clean_name in war_respect_data:
+                df.at[i, 'War_Respect'] = war_respect_data[clean_name]
+                matches_found += 1
+                found_match = True
+            else:
+                # Try case-insensitive matching
+                for war_name in war_respect_data.keys():
+                    if clean_name.lower() == war_name.lower():
+                        df.at[i, 'War_Respect'] = war_respect_data[war_name]
+                        matches_found += 1
+                        found_match = True
+                        break
+            
+            if not found_match:
+                # Fallback: use total respect if not found in war data
+                df.at[i, 'War_Respect'] = df.at[i, 'Respect']
+                print(f"NO MATCH: {member_name_original} -> using total respect as fallback")
         
-        # Calculate faction-wide statistics
-        our_faction_stats = self.calculate_faction_stats(member_stats, 'Our Faction')
-        enemy_faction_stats = self.calculate_faction_stats(member_stats, enemy_faction_data.get('name', 'Enemy Faction') if enemy_faction_data else 'Enemy Faction')
+        print(f"Successfully matched {matches_found}/{len(df)} members with war data")
+        
+        # Calculate outside attacks
+        df["Outside"] = df["Attacks"] - df["War"]
+        
+        # Merge with saves data if available
+        if self.saves_data is not None and not self.saves_data.empty:
+            # Clean member names in saves data for matching
+            self.saves_data['Clean_Member'] = self.saves_data['Member'].apply(clean_member_name)
+            df['Clean_Member'] = df['Member'].apply(clean_member_name)
+            
+            # Merge on cleaned names
+            merged_df = df.merge(self.saves_data[['Clean_Member', 'Saves', 'Save_Score']], 
+                               on='Clean_Member', how='left')
+            
+            # Fill NaN values with 0 for members who didn't save
+            merged_df['Saves'] = merged_df['Saves'].fillna(0)
+            merged_df['Save_Score'] = merged_df['Save_Score'].fillna(0)
+            
+            df = merged_df.drop('Clean_Member', axis=1)
+            print(f"Merged saves data: {df['Saves'].sum()} total saves")
+        else:
+            # Add empty save columns
+            df['Saves'] = 0
+            df['Save_Score'] = 0
+            print("No saves data to merge")
+        
+        self.complete_chain_data = df
+        print(f"Complete chain data created: {len(df)} members")
+        return True
+    
+    def collect_intel_data(self):
+        """Collect war intelligence data"""
+        print("=== COLLECTING WAR INTELLIGENCE ===")
+        
+        # Check if JSON data already exists
+        json_file_path = 'site/war_intel_data.json'
+        
+        # Prompt user if data exists
+        if os.path.exists(json_file_path):
+            print(f"\nFound existing intel data: {json_file_path}")
+            file_size = os.path.getsize(json_file_path) / 1024  # KB
+            print(f"File size: {file_size:.1f} KB")
+            
+            choice = input("\nDo you want to re-download intel data? This will take time for ~200 players. (Y/n): ").strip().upper()
+            
+            if choice == 'Y' or choice == 'YES':
+                print("\nRe-downloading intel data...")
+                return self._collect_fresh_intel_data()
+            else:
+                print("Using existing intel data...")
+                return True
+        else:
+            print(f"\nNo existing intel data found at {json_file_path}")
+            print("Need to collect intel data first...")
+            
+            choice = input("Do you want to collect intel data now? (Y/n): ").strip().upper()
+            if choice == 'Y' or choice == 'YES':
+                return self._collect_fresh_intel_data()
+            else:
+                print("Skipping intel collection...")
+                return True
+    
+    def _collect_fresh_intel_data(self):
+        """Actually collect the intel data"""
+        try:
+            # Initialize intel collector
+            collector = IntelCollector(self.api_key, self.faction_id)
+            
+            # Get our faction members
+            if not collector.get_our_faction_members():
+                print("Failed to get faction members for intel collection")
+                return False
+            
+            # Load enemy intel if available
+            if not collector.load_enemy_members_from_xlsx():
+                print("No enemy intel file found. Continuing with our faction only.")
+            
+            # Collect all intel
+            self.intel_data = collector.collect_all_intel()
+            
+            # Save intel data
+            collector.save_intel_to_file()
+            
+            # Show summary
+            summary = collector.get_intel_summary()
+            print("\n=== INTEL COLLECTION SUMMARY ===")
+            for key, value in summary.items():
+                print(f"{key}: {value}")
+            
+            return True
+            
+        except Exception as e:
+            print(f"Error collecting intel data: {e}")
+            return False
+    
+    def load_templates(self):
+        """Load all HTML templates"""
+        print("=== LOADING TEMPLATES ===")
+        
+        template_files = {
+            'index': 'index_template.html',
+            'war_report': 'war_report_template.html',
+            'chain_report': 'chain_report_template.html',
+            'earnings_report': 'earnings_report_template.html',
+            'intel_report': 'intel_template.html',
+            'methodology': 'methodology_template.html'
+        }
+        
+        for name, filename in template_files.items():
+            try:
+                with open(os.path.join('templates', filename), 'r', encoding='utf-8') as f:
+                    self.templates[name] = f.read()
+                print(f"Loaded template: {filename}")
+            except FileNotFoundError:
+                print(f"Template not found: {filename}")
+                self.templates[name] = self.get_fallback_template(name)
+        
+        return True
+    
+    def get_fallback_template(self, template_name):
+        """Provide fallback templates if files don't exist"""
+        fallbacks = {
+            'index': '''<!DOCTYPE html>
+<html><head><title>Torn Reports</title></head>
+<body><h1>Torn Reports</h1>
+<ul>
+<li><a href="intel_report.html">War Intel</a></li>
+<li><a href="war_report.html">War Report</a></li>
+<li><a href="chain_report.html">Chain Report</a></li>
+<li><a href="earnings_report.html">Earnings Report</a></li>
+<li><a href="methodology.html">Methodology</a></li>
+</ul></body></html>''',
+            'methodology': '''<!DOCTYPE html>
+<html><head><title>Methodology</title></head>
+<body><h1>Methodology</h1>
+<p>Calculation explanations will go here.</p>
+<a href="index.html">Back to Index</a>
+</body></html>'''
+        }
+        return fallbacks.get(template_name, '<html><body><h1>Template Missing</h1></body></html>')
+    
+    def generate_all_reports(self):
+        """Generate content for all reports"""
+        print("=== GENERATING REPORTS ===")
+        
+        # Generate war intel content first (most important)
+        try:
+            intel_content = generate_intel_report_content()
+        except:
+            intel_content = None
+            print("Intel report generation skipped or failed")
+        
+        # Generate war report content
+        war_content = generate_war_report_content(self.war_data)
+        
+        # Generate chain report content  
+        chain_content = generate_chain_report_content(self.complete_chain_data)
+        
+        # Generate earnings content
+        earnings_content = calculate_earnings_content(self.complete_chain_data, total_caches=4209000000.00)
         
         return {
-            'war_info': war_data,
-            'member_stats': member_stats,
-            'total_attacks': total_attacks + enemy_total_attacks,
-            'total_score': total_score + enemy_total_score,
-            'our_attacks': total_attacks,
-            'our_score': total_score,
-            'enemy_attacks': enemy_total_attacks,
-            'enemy_score': enemy_total_score,
-            'enemy_faction_name': enemy_faction_data.get('name', 'Enemy Faction') if enemy_faction_data else 'Enemy Faction',
-            'war_start': war_start,
-            'war_end': war_end,
-            'war_duration_hours': war_duration_hours,
-            'our_faction_stats': our_faction_stats,
-            'enemy_faction_stats': enemy_faction_stats
+            'intel': intel_content,
+            'war': war_content,
+            'chain': chain_content,
+            'earnings': earnings_content
         }
     
-    def create_report_dataframe(self):
-        data = self.generate_war_earnings_data()
-        if not data:
-            return None, None, None
+    def save_html_files(self, report_contents):
+        """Fill templates and save HTML files"""
+        print("=== SAVING HTML FILES ===")
         
-        # Calculate totals and averages for comparison
-        our_total_attacks = sum(stats['attacks'] for stats in data['member_stats'].values() if stats['faction'] == 'Our Faction')
-        enemy_total_attacks = sum(stats['attacks'] for stats in data['member_stats'].values() if stats['faction'] != 'Our Faction')
+        # Create site directory if it doesn't exist
+        os.makedirs('site', exist_ok=True)
         
-        # Calculate faction averages for comparison
-        our_members = [stats for stats in data['member_stats'].values() if stats['faction'] == 'Our Faction' and stats['attacks'] > 0]
-        enemy_members = [stats for stats in data['member_stats'].values() if stats['faction'] != 'Our Faction' and stats['attacks'] > 0]
+        # Save index page
+        with open("site/index.html", "w", encoding="utf-8") as f:
+            f.write(self.templates['index'])
+        print("Saved: index.html")
         
-        our_avg_score = statistics.mean([m['score'] for m in our_members]) if our_members else 0
-        enemy_avg_score = statistics.mean([m['score'] for m in enemy_members]) if enemy_members else 0
+        # Save war intel report (generate with embedded data)
+        self._generate_intel_html()
+        print("Saved: intel_report.html")
         
-        our_rows = []
-        enemy_rows = []
+        # Save war report
+        war_html = self.templates['war_report']
+        # Replace war-specific placeholders
+        war_html = war_html.replace('{{WAR_ID}}', str(self.war_id))
+        war_html = war_html.replace('{{TABLE_HTML}}', report_contents['war']['table_html'])
+        war_html = war_html.replace('{{WAR_START}}', report_contents['war']['war_start'])
+        war_html = war_html.replace('{{WAR_END}}', report_contents['war']['war_end'])
+        war_html = war_html.replace('{{WAR_DURATION}}', report_contents['war']['war_duration'])
         
-        for member_id, stats in data['member_stats'].items():
-            if stats['attacks'] > 0:  # Only show members who participated
-                # Calculate percentages
-                if stats['faction'] == 'Our Faction':
-                    hit_percentage = (stats['attacks'] / our_total_attacks) * 100 if our_total_attacks > 0 else 0
-                    score_percentage = (stats['score'] / data['our_score']) * 100 if data['our_score'] > 0 else 0
-                    # Performance comparison (above/below faction average)
-                    performance_vs_avg = ((stats['score'] - our_avg_score) / our_avg_score) * 100 if our_avg_score > 0 else 0
-                else:
-                    hit_percentage = (stats['attacks'] / enemy_total_attacks) * 100 if enemy_total_attacks > 0 else 0
-                    score_percentage = (stats['score'] / data['enemy_score']) * 100 if data['enemy_score'] > 0 else 0
-                    # Performance comparison (above/below faction average)
-                    performance_vs_avg = ((stats['score'] - enemy_avg_score) / enemy_avg_score) * 100 if enemy_avg_score > 0 else 0
-                
-                row = {
-                    'Members': f'<a href="https://www.torn.com/profiles.php?XID={member_id.replace("enemy_", "")}" target="_blank" style="color: #ffffff; text-decoration: none;">{stats["name"]}</a>',
-                    'Level': stats['level'],
-                    'Attacks': stats['attacks'],
-                    'Hit %': f"{hit_percentage:.2f}%",  # American format
-                    'Score': self.format_number_american(stats['score']),
-                    'Score %': f"{score_percentage:.2f}%",  # American format
-                    'Avg score/hit': self.format_number_american(stats['avg_score_hit']),
-                    'Efficiency': self.format_number_american(stats['efficiency_score']),
-                    'Att/Hr': self.format_number_american(stats['attack_frequency']),
-                    'Score/Lvl': self.format_number_american(stats['performance_vs_level']),
-                    'vs Avg': f"{performance_vs_avg:+.1f}%"  # American format
-                }
-                
-                if stats['faction'] == 'Our Faction':
-                    our_rows.append(row)
-                else:
-                    enemy_rows.append(row)
+        with open("site/war_report.html", "w", encoding="utf-8") as f:
+            f.write(war_html)
+        print("Saved: war_report.html")
         
-        if not our_rows and not enemy_rows:
-            return None, None, None, data
+        # Save chain report
+        chain_html = self.templates['chain_report']
+        chain_html = chain_html.replace('{{CHAIN_TABLE}}', report_contents['chain']['table_html'])
         
-        # Create separate DataFrames
-        our_df = pd.DataFrame(our_rows) if our_rows else pd.DataFrame()
-        enemy_df = pd.DataFrame(enemy_rows) if enemy_rows else pd.DataFrame()
+        with open("site/chain_report.html", "w", encoding="utf-8") as f:
+            f.write(chain_html)
+        print("Saved: chain_report.html")
         
-        # Sort both by score descending (need to parse American format for sorting)
-        if not our_df.empty:
-            our_df['_sort_score'] = our_df['Score'].str.replace(',', '').astype(float)
-            our_df = our_df.sort_values('_sort_score', ascending=False)
-            our_df = our_df.drop('_sort_score', axis=1)
-            
-        if not enemy_df.empty:
-            enemy_df['_sort_score'] = enemy_df['Score'].str.replace(',', '').astype(float)
-            enemy_df = enemy_df.sort_values('_sort_score', ascending=False)
-            enemy_df = enemy_df.drop('_sort_score', axis=1)
+        # Save earnings report
+        earnings_html = self.templates['earnings_report']
+        for key, value in report_contents['earnings']['summary'].items():
+            placeholder = '{{' + key.upper() + '}}'
+            earnings_html = earnings_html.replace(placeholder, str(value))
+        earnings_html = earnings_html.replace('{{EARNINGS_TABLE}}', report_contents['earnings']['table_html'])
         
-        return our_df, enemy_df, data
-    
-    def create_styled_html_report(self, our_df, enemy_df, war_data):
-        """Create a styled HTML table report using templates with American formatting and TCT times"""
+        with open("site/earnings_report.html", "w", encoding="utf-8") as f:
+            f.write(earnings_html)
+        print("Saved: earnings_report.html")
         
-        # War info with TCT times and duration formatting
-        war_start = self.convert_to_tct(war_data['war_start'])
-        war_end = self.convert_to_tct(war_data['war_end'])
-        war_duration_formatted = self.format_duration_hms(war_data['war_duration_hours'])
-        
-        # Calculate battle stats with American formatting
-        our_hits_per_min = self.calculate_battle_stats(war_data['our_attacks'], war_data['war_duration_hours'])
-        our_avg_hit_score = self.calculate_avg_hit_score(war_data['our_score'], war_data['our_attacks'])
-        enemy_hits_per_min = self.calculate_battle_stats(war_data['enemy_attacks'], war_data['war_duration_hours'])
-        enemy_avg_hit_score = self.calculate_avg_hit_score(war_data['enemy_score'], war_data['enemy_attacks'])
-        
-        # Convert DataFrames to HTML tables
-        our_table_html = ""
-        enemy_table_html = ""
-        
-        if not our_df.empty:
-            our_table_html = our_df.to_html(
-                classes='war_report',
-                table_id='our_faction_table', 
-                index=False,
-                escape=False,
-                border=0
-            )
-        
-        if not enemy_df.empty:
-            enemy_table_html = enemy_df.to_html(
-                classes='war_report',
-                table_id='enemy_faction_table', 
-                index=False,
-                escape=False,
-                border=0
-            )
-        
-        # Add faction statistics to the stats boxes
-        our_stats = war_data.get('our_faction_stats', {})
-        enemy_stats = war_data.get('enemy_faction_stats', {})
-        
-        # Create combined table HTML with side-by-side layout and faction colors (EPIC Mafia = GREEN, Enemy = RED/ORANGE)
-        tables_html = f"""
-        <div class="tables-container">
-            <div class="faction-section">
-                <h3 style="background: linear-gradient(135deg, #2d5a2d, #4a8b4a); color: white; padding: 15px; border-radius: 8px;">EPIC Mafia</h3>
-                <div class="faction-stats our-stats" style="margin-bottom: 15px;">
-                    <div class="stat-box">
-                        <div class="stat-number">{war_data['our_attacks']:,}</div>
-                        <div class="stat-label">Our Attacks</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">{self.format_number_american(war_data['our_score'])}</div>
-                        <div class="stat-label">Our Score</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">{our_hits_per_min}</div>
-                        <div class="stat-label">Hits/Min</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">{our_avg_hit_score}</div>
-                        <div class="stat-label">Avg Hit Score</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">{our_stats.get('participation_rate', 0):.1f}%</div>
-                        <div class="stat-label">Participation</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">{our_stats.get('consistency_rating', 0):.1f}%</div>
-                        <div class="stat-label">Consistency</div>
-                    </div>
-                </div>
-                {our_table_html}
-            </div>
-            
-            <div class="faction-section">
-                <h3 style="background: linear-gradient(135deg, #cc4d1f, #e55a2b); color: white; padding: 15px; border-radius: 8px;">{war_data['enemy_faction_name']}</h3>
-                <div class="faction-stats enemy-stats" style="margin-bottom: 15px;">
-                    <div class="stat-box">
-                        <div class="stat-number">{war_data['enemy_attacks']:,}</div>
-                        <div class="stat-label">Enemy Attacks</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">{self.format_number_american(war_data['enemy_score'])}</div>
-                        <div class="stat-label">Enemy Score</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">{enemy_hits_per_min}</div>
-                        <div class="stat-label">Hits/Min</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">{enemy_avg_hit_score}</div>
-                        <div class="stat-label">Avg Hit Score</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">{enemy_stats.get('participation_rate', 0):.1f}%</div>
-                        <div class="stat-label">Participation</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">{enemy_stats.get('consistency_rating', 0):.1f}%</div>
-                        <div class="stat-label">Consistency</div>
-                    </div>
-                </div>
-                {enemy_table_html}
-            </div>
-        </div>
-        """
-        
-        # Load template file
+        # Save methodology
+        with open("site/methodology.html", "w", encoding="utf-8") as f:
+            f.write(self.templates['methodology'])
+        print("Saved: methodology.html")
+
+    def _generate_intel_html(self):
+        """Generate intel HTML with embedded data"""
+        json_file_path = 'site/war_intel_data.json'
+
+        if not os.path.exists(json_file_path):
+            print("No intel data found, creating placeholder intel report...")
+            with open("site/intel_report.html", "w", encoding="utf-8") as f:
+                f.write(self.templates['intel_report'])
+            return
+
         try:
-            with open('war_report_template.html', 'r', encoding='utf-8') as f:
-                template = f.read()
-        except FileNotFoundError:
-            print("Template file not found, creating basic template...")
-            template = self.get_default_template()
+            # Read the JSON data
+            with open(json_file_path, 'r', encoding='utf-8') as f:
+                intel_data = json.load(f)
+
+            # Convert the data to a JavaScript object string
+            intel_data_js = json.dumps(intel_data, indent=2, ensure_ascii=False)
+
+            # Base template
+            html_template = self.templates['intel_report']
+
+            # Simple replacement of the marker
+            html_content = html_template.replace('const intelData = {};', f'const intelData = {intel_data_js};')
+
+            # Write the final HTML file
+            with open("site/intel_report.html", "w", encoding="utf-8") as f:
+                f.write(html_content)
+            print("Saved: intel_report.html with intel data")
+
+        except Exception as e:
+            print(f"Error generating intel HTML: {e}")
+            with open("site/intel_report.html", "w", encoding="utf-8") as f:
+                f.write(self.templates['intel_report'])
+
+
+    def run(self):
+        """Main execution flow"""
+        print("Starting Torn Report Generator...")
         
-        # Replace placeholders with actual data
-        html = template.replace('{{WAR_ID}}', str(war_data['war_info']['war_id']))
-        html = html.replace('{{WAR_START}}', war_start)
-        html = html.replace('{{WAR_END}}', war_end)
-        html = html.replace('{{WAR_DURATION}}', war_duration_formatted)
-        html = html.replace('{{TABLE_HTML}}', tables_html)
+        # Collect intelligence data first (with prompt system)
+        if not self.collect_intel_data():
+            print("Intel data collection failed. Continuing without intelligence...")
         
-        return html
-    
-    def get_default_template(self):
-        """Fallback template if file not found"""
-        return """<!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>War Report</title>
-        </head>
-        <body>
-        <h1>War Report {{WAR_ID}}</h1>
-        <p>Period: {{WAR_START}} - {{WAR_END}}</p>
-        <p>Duration: {{WAR_DURATION}}</p>
-        {{TABLE_HTML}}
-        </body>
-        </html>"""
+        # Load all other data
+        if not self.load_war_data():
+            print("Failed to load war data. Exiting.")
+            return False
+            
+        if not self.load_chain_data():
+            print("Failed to load chain data. Exiting.")
+            return False
+            
+        if not self.load_saves_data():
+            print("Failed to load saves data. Exiting.")
+            return False
+        
+        # Create complete dataset
+        if not self.create_complete_chain_data():
+            print("Failed to create complete chain data. Exiting.")
+            return False
+        
+        # Load templates
+        if not self.load_templates():
+            print("Failed to load templates. Exiting.")
+            return False
+        
+        # Generate all reports
+        report_contents = self.generate_all_reports()
+        
+        # Save HTML files
+        self.save_html_files(report_contents)
+        
+        print("All reports generated successfully!")
+        print("\n=== STRATEGIC INTELLIGENCE READY ===")
+        print("War Intel: intel_report.html - CRITICAL for target selection")
+        print("War Report: war_report.html - Performance analysis")
+        print("Chain Report: chain_report.html - Attack breakdown")
+        print("Earnings: earnings_report.html - Payout calculations")
+        return True
+
 
 def main():
     API_KEY = "XrSNtZr7UKlaOXFT"
     FACTION_ID = 40959
     WAR_ID = 26833
 
-    print("Starting Torn War Report Generator...")
-
-    try:
-        reporter = TornWarReport(api_key=API_KEY, faction_id=FACTION_ID, war_id=WAR_ID)
-        
-        # First, get war respect data for the earnings module
-        print("\n=== GETTING WAR RESPECT DATA FOR EARNINGS ===")
-        war_respect_data = reporter.get_war_respect_data()
-        if war_respect_data:
-            # Save war respect data to CSV for the earnings module to use
-            war_df = pd.DataFrame.from_dict(war_respect_data, orient='index')
-            war_df.reset_index(inplace=True)
-            war_df.rename(columns={'index': 'Member'}, inplace=True)
-            war_df.to_csv('war_respect_data.csv', sep=';', index=False, encoding='utf-8')
-            print(f"✅ War respect data saved for {len(war_df)} members")
-        
-        # Generate war report
-        result = reporter.create_report_dataframe()
-
-        if result and len(result) == 3 and (not result[0].empty or not result[1].empty):
-            our_df, enemy_df, raw_data = result
-
-            html_report = reporter.create_styled_html_report(our_df, enemy_df, raw_data)
-            html_report = html_report.replace(
-                "<div class=\"header\">",
-                "<div class=\"header\">\n  <div style='text-align:right'><a href='https://epic-mafia.netlify.app/chain_report.html' style='color:#67e8f9;text-decoration:none;font-size:13px;'>→ Go to Chain Report</a></div>"
-            )
-
-            with open("war_report.html", "w", encoding="utf-8") as f:
-                f.write(html_report)
-
-            print("\n✅ Styled HTML war report saved to 'war_report.html'")
-        else:
-            print("Failed to generate war report")
-
-    except Exception as e:
-        print(f"Error generating war report: {e}")
-        import traceback
-        traceback.print_exc()
-
-    print("\nStarting Chain Report Generator...")
-    try:
-        generate_chain_report()
-    except Exception as e:
-        print(f"Error generating chain report: {e}")
-        import traceback
-        traceback.print_exc()
+    print("=== EPIC MAFIA WAR INTELLIGENCE SYSTEM ===")
+    print("Collecting comprehensive intelligence data...")
+    print("This includes personal stats, xanax usage, combat effectiveness, and more!")
     
-    print("\nStarting Earnings Report Generator...")
-    try:
-        generate_earnings_report()
-    except Exception as e:
-        print(f"Error generating earnings report: {e}")
-        import traceback
-        traceback.print_exc()
+    generator = TornReportGenerator(api_key=API_KEY, faction_id=FACTION_ID, war_id=WAR_ID)
+    success = generator.run()
+    
+    if success:
+        print("\nWAR INTELLIGENCE COLLECTION COMPLETE!")
+        print("Critical intel now available for strategic decision making.")
+        print("Check intel_report.html for comprehensive player analysis.")
+    else:
+        print("\nReport generation failed. Check the logs above.")
+
 
 if __name__ == "__main__":
     main()

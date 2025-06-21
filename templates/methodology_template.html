@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Methodology - EPIC Mafia War Reports</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;600;700&family=Crimson+Text:wght@400;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Oswald', sans-serif;
+            background: 
+                radial-gradient(ellipse at top, rgba(20, 20, 20, 0.9) 0%, rgba(0, 0, 0, 0.95) 100%),
+                linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+            color: #d4c5a0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 15% 25%, rgba(255, 140, 0, 0.06) 0%, transparent 40%),
+                radial-gradient(circle at 85% 75%, rgba(218, 165, 32, 0.04) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(45, 45, 45, 0.7) 100%);
+            border: 2px solid #FF8C00;
+            border-radius: 15px;
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #FF8C00, #DAA520, #FF8C00);
+        }
+        
+        .header h1 {
+            font-size: clamp(2.5em, 6vw, 4em);
+            font-weight: 700;
+            color: #d4c5a0;
+            text-shadow: 3px 3px 0px #FF8C00, 6px 6px 10px rgba(0, 0, 0, 0.8);
+            margin-bottom: 15px;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            color: #FF8C00;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+        
+        /* Back Button */
+        .back-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(45, 45, 45, 0.7) 100%);
+            border: 2px solid #FF8C00;
+            border-radius: 25px;
+            padding: 12px 20px;
+            color: #FF8C00;
+            text-decoration: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .back-button:hover {
+            background: linear-gradient(135deg, rgba(255, 140, 0, 0.1) 0%, rgba(255, 140, 0, 0.05) 100%);
+            box-shadow: 0 0 20px rgba(255, 140, 0, 0.3);
+            transform: scale(1.05);
+        }
+        
+        /* Section styling */
+        .section {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(45, 45, 45, 0.6) 100%);
+            margin-bottom: 40px;
+            padding: 30px;
+            border: 2px solid #8B0000;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #8B0000, #DC143C, #8B0000);
+        }
+        
+        .section:hover {
+            border-color: #DC143C;
+            box-shadow: 0 8px 25px rgba(139, 0, 0, 0.2);
+        }
+        
+        .section h2 {
+            color: #DC143C;
+            margin-top: 0;
+            border-bottom: 2px solid rgba(220, 20, 60, 0.3);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .section h3 {
+            color: #FFD700;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .section p {
+            color: #d4c5a0;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .section ul {
+            color: #CCCCCC;
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .section li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .section li strong {
+            color: #FFD700;
+        }
+        
+        /* Formula styling */
+        .formula {
+            background: linear-gradient(135deg, rgba(10, 10, 10, 0.8) 0%, rgba(20, 20, 20, 0.6) 100%);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #DC143C;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            color: #DC143C;
+            backdrop-filter: blur(5px);
+        }
+        
+        /* Example styling */
+        .example {
+            background: linear-gradient(135deg, rgba(10, 10, 10, 0.8) 0%, rgba(20, 20, 20, 0.6) 100%);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #FFD700;
+            margin: 20px 0;
+            backdrop-filter: blur(5px);
+        }
+        
+        .example strong {
+            color: #FFD700;
+        }
+        
+        /* Note styling */
+        .note {
+            background: linear-gradient(135deg, rgba(45, 45, 45, 0.8) 0%, rgba(60, 60, 60, 0.6) 100%);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #FF8C00;
+            margin: 20px 0;
+            color: #FFD700;
+            backdrop-filter: blur(5px);
+        }
+        
+        .note strong {
+            color: #FF8C00;
+        }
+        
+        /* Calculation steps */
+        .calculation-step {
+            margin: 15px 0;
+            padding: 15px;
+            background: linear-gradient(135deg, rgba(51, 51, 51, 0.6) 0%, rgba(68, 68, 68, 0.4) 100%);
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .step-number {
+            color: #DC143C;
+            font-weight: 700;
+        }
+        
+        /* Table styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(45, 45, 45, 0.6) 100%);
+            border-radius: 10px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(68, 68, 68, 0.5);
+        }
+        
+        th {
+            background: linear-gradient(135deg, rgba(68, 68, 68, 0.6) 0%, rgba(85, 85, 85, 0.4) 100%);
+            color: #DC143C;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        td {
+            color: #d4c5a0;
+        }
+        
+        /* Metric explanation styling */
+        .metric-explanation {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(51, 51, 51, 0.6) 0%, rgba(68, 68, 68, 0.4) 100%);
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .metric-name {
+            font-weight: 700;
+            color: #FFD700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .metric-explanation div:last-child {
+            color: #CCCCCC;
+            line-height: 1.5;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                letter-spacing: 3px;
+            }
+            
+            .metric-explanation {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .back-button {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin-bottom: 20px;
+                display: inline-block;
+            }
+            
+            table, th, td {
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-button">← Back</a>
+    
+    <div class="container">
+        <div class="header">
+            <h1>📋 Methodology</h1>
+            <p>Detailed explanations of all formulas and calculations used in the war reports</p>
+        </div>
+
+        <div class="section">
+            <h2>Earnings Calculations</h2>
+            
+            <h3>Basic Setup</h3>
+            <div class="calculation-step">
+                <span class="step-number">Step 1:</span> Calculate total payout after tax
+            </div>
+            <div class="formula">
+Total Payout = Total Caches - (Total Caches × Tax Rate)
+Tax Rate = 5%
+            </div>
+            
+            <div class="calculation-step">
+                <span class="step-number">Step 2:</span> Calculate modified totals
+            </div>
+            <div class="formula">
+Modified Score = War Respect Total + Save Score Total
+Modified Hits = War Hits Total + Saves Total
+            </div>
+            
+            <h3>Pool Distribution</h3>
+            <p>The total payout is split between two pools using a 60/30 weight system:</p>
+            <div class="formula">
+Score Pool = Total Payout × (60/90) = 66.67% of payout
+Hit Pool = Total Payout × (30/90) = 33.33% of payout
+            </div>
+            
+            <h3>Pay Rates</h3>
+            <div class="formula">
+Pay per Score Point = Score Pool ÷ Modified Score Total
+Pay per Hit = Hit Pool ÷ Modified Hits Total
+            </div>
+            
+            <h3>Individual Member Earnings</h3>
+            <div class="formula">
+Member Earnings = (War Hits × Pay per Hit) + ((War Respect + Save Score) × Pay per Score Point)
+            </div>
+            
+            <div class="example">
+                <strong>Example:</strong><br>
+                Member has 50 war hits, 25.000 war respect, 5 saves worth 600 save score<br>
+                Total Score = 25.000 + 600 = 25.600<br>
+                Earnings = (50 × $8.500) + (25.600 × $0,75) = $425.000 + $19.200 = $444.200
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>War Report Metrics</h2>
+            
+            <div class="metric-explanation">
+                <div class="metric-name">Efficiency Score</div>
+                <div>Score earned per minute during the war. Calculated as Total Score ÷ War Duration (minutes)</div>
+            </div>
+            
+            <div class="metric-explanation">
+                <div class="metric-name">Attack Frequency</div>
+                <div>Number of attacks per hour. Calculated as Total Attacks ÷ War Duration (hours)</div>
+            </div>
+            
+            <div class="metric-explanation">
+                <div class="metric-name">Score/Level Ratio</div>
+                <div>Performance relative to player level. Higher values indicate "punching above weight class"</div>
+            </div>
+            
+            <div class="metric-explanation">
+                <div class="metric-name">vs Average</div>
+                <div>Performance compared to faction average. Positive % = above average, Negative % = below average</div>
+            </div>
+            
+            <div class="metric-explanation">
+                <div class="metric-name">Participation Rate</div>
+                <div>Percentage of faction members who made at least one attack during the war</div>
+            </div>
+            
+            <div class="metric-explanation">
+                <div class="metric-name">Consistency Rating</div>
+                <div>Faction performance consistency. Lower percentages indicate more consistent performance across members</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Chain Report Calculations</h2>
+            
+            <h3>War vs Outside Attacks</h3>
+            <div class="formula">
+Outside Attacks = Total Attacks - War Attacks
+            </div>
+            
+            <h3>War Respect vs Total Respect</h3>
+            <p>War respect data is fetched directly from the Torn API's ranked war report, representing only respect earned during the specific war. This is different from the total respect shown in chain reports, which includes respect from all sources.</p>
+            
+            <div class="note">
+                <strong>Important:</strong> All earnings calculations use WAR RESPECT only, not total respect from the chain report.
+            </div>
+            
+            <h3>Attack Type Percentages</h3>
+            <p>Different attack types use different denominators for percentage calculations:</p>
+            
+            <table>
+                <tr>
+                    <th>Attack Type</th>
+                    <th>Percentage Base</th>
+                    <th>Explanation</th>
+                </tr>
+                <tr>
+                    <td>War, Outside</td>
+                    <td>Total Attacks</td>
+                    <td>Shows how attacks were split between war and outside</td>
+                </tr>
+                <tr>
+                    <td>Leave, Hosp, Mug, etc.</td>
+                    <td>War Attacks</td>
+                    <td>Shows breakdown of war attack types only</td>
+                </tr>
+            </table>
+            
+            <h3>🆘 Save Integration</h3>
+            <p>Save data is merged from a separate CSV/Excel file and includes:</p>
+            <ul>
+                <li><strong>Saves:</strong> Number of members saved during the war</li>
+                <li><strong>Save Score:</strong> Respect equivalent earned from saves (typically Save Count × 120% of average score/hit)</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Data Sources</h2>
+            
+            <table>
+                <tr>
+                    <th>Data Type</th>
+                    <th>Source</th>
+                    <th>Format</th>
+                </tr>
+                <tr>
+                    <td>War Performance</td>
+                    <td>Torn API - Ranked War Report</td>
+                    <td>JSON via API</td>
+                </tr>
+                <tr>
+                    <td>Chain Statistics</td>
+                    <td>Chain Report CSV</td>
+                    <td>Semicolon-delimited CSV</td>
+                </tr>
+                <tr>
+                    <td>Save Data</td>
+                    <td>Saves CSV/Excel</td>
+                    <td>CSV or XLSX file</td>
+                </tr>
+            </table>
+            
+            <div class="note">
+                <strong>Note:</strong> All data is processed using European number formatting (period as thousands separator, comma as decimal separator) for consistency with local formatting standards.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Technical Notes</h2>
+            
+            <h3>Member Name Matching</h3>
+            <p>Member data is matched across sources using cleaned names:</p>
+            <ul>
+                <li>ID brackets [123456] are removed</li>
+                <li>Duplicated names like "JohnJOHN" are cleaned to "John"</li>
+                <li>Case-insensitive matching is used as fallback</li>
+            </ul>
+            
+            <h3>Calculation Precision</h3>
+            <p>All calculations maintain full precision throughout the process, with rounding only applied for final display. This ensures accuracy in complex multi-step calculations.</p>
+            
+            <h3>Time Zone</h3>
+            <p>All war times are displayed in TCT (Torn City Time), which is UTC-2.</p>
+        </div>
+    </div>
+</body>
+</html>

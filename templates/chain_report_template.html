@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='UTF-8'>
+  <title>Chain Report</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;600;700&family=Crimson+Text:wght@400;600&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Oswald', sans-serif;
+      background: 
+        radial-gradient(ellipse at top, rgba(20, 20, 20, 0.9) 0%, rgba(0, 0, 0, 0.95) 100%),
+        linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+      color: #d4c5a0;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 15% 25%, rgba(85, 107, 47, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 85% 75%, rgba(107, 142, 35, 0.06) 0%, transparent 40%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1600px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(45, 45, 45, 0.7) 100%);
+      border: 2px solid #556B2F;
+      border-radius: 15px;
+      backdrop-filter: blur(15px);
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #556B2F, #6B8E23, #556B2F);
+    }
+    
+    .header h1 {
+      font-size: clamp(2.5em, 6vw, 4em);
+      font-weight: 700;
+      color: #d4c5a0;
+      text-shadow: 3px 3px 0px #556B2F, 6px 6px 10px rgba(0, 0, 0, 0.8);
+      margin-bottom: 15px;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+    }
+    
+    /* Back Button */
+    .back-button {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(45, 45, 45, 0.7) 100%);
+      border: 2px solid #FF8C00;
+      border-radius: 25px;
+      padding: 12px 20px;
+      color: #FF8C00;
+      text-decoration: none;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+    
+    .back-button:hover {
+      background: linear-gradient(135deg, rgba(255, 140, 0, 0.1) 0%, rgba(255, 140, 0, 0.05) 100%);
+      box-shadow: 0 0 20px rgba(255, 140, 0, 0.3);
+      transform: scale(1.05);
+    }
+    
+    /* Chain Table */
+    table.war_report {
+      width: 100%;
+      border-collapse: collapse;
+      background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(45, 45, 45, 0.7) 100%);
+      color: #d4c5a0;
+      border-radius: 15px;
+      overflow: hidden;
+      backdrop-filter: blur(15px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      margin-bottom: 40px;
+    }
+    
+    table.war_report th {
+      padding: 15px 8px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.9em;
+      border-bottom: 2px solid rgba(85, 107, 47, 0.4);
+      border-right: 1px solid rgba(68, 68, 68, 0.5);
+      cursor: pointer;
+      user-select: none;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    /* Header section color coding */
+    table.war_report th:nth-child(1),  /* Member */
+    table.war_report th:nth-child(2),  /* Respect */
+    table.war_report th:nth-child(3),  /* Best */
+    table.war_report th:nth-child(4),  /* Avg */
+    table.war_report th:nth-child(5) { /* Attacks */
+      background: linear-gradient(135deg, rgba(103, 126, 234, 0.4) 0%, rgba(118, 75, 162, 0.3) 100%);
+    }
+    
+    table.war_report th:nth-child(6),  /* War */
+    table.war_report th:nth-child(7) { /* Outside */
+      background: linear-gradient(135deg, rgba(240, 147, 251, 0.4) 0%, rgba(245, 87, 108, 0.3) 100%);
+    }
+    
+    table.war_report th:nth-child(8),  /* Saves */
+    table.war_report th:nth-child(9) { /* Save Score */
+      background: linear-gradient(135deg, rgba(255, 140, 0, 0.4) 0%, rgba(218, 165, 32, 0.3) 100%);
+    }
+    
+    table.war_report th:nth-child(10),  /* Leave */
+    table.war_report th:nth-child(11),  /* Hosp */
+    table.war_report th:nth-child(12),  /* Mug */
+    table.war_report th:nth-child(13),  /* Retal */
+    table.war_report th:nth-child(14),  /* Overseas */
+    table.war_report th:nth-child(15),  /* Draw */
+    table.war_report th:nth-child(16),  /* Assist */
+    table.war_report th:nth-child(17),  /* Escape */
+    table.war_report th:nth-child(18) { /* Loss */
+      background: linear-gradient(135deg, rgba(79, 172, 254, 0.4) 0%, rgba(0, 242, 254, 0.3) 100%);
+    }
+    
+    table.war_report th:last-child {
+      border-right: none;
+    }
+    
+    table.war_report th:hover {
+      background: linear-gradient(135deg, rgba(218, 165, 32, 0.2) 0%, rgba(255, 215, 0, 0.1) 100%);
+    }
+    
+    table.war_report th::after {
+      content: ' ↕';
+      font-size: 0.8em;
+      opacity: 0.6;
+    }
+    
+    table.war_report th.sort-asc::after {
+      content: ' ↑';
+      opacity: 1;
+    }
+    
+    table.war_report th.sort-desc::after {
+      content: ' ↓';
+      opacity: 1;
+    }
+    
+    table.war_report td {
+      padding: 10px 8px;
+      border-bottom: 1px solid rgba(68, 68, 68, 0.3);
+      border-right: 1px solid rgba(68, 68, 68, 0.3);
+      font-size: 0.9em;
+      text-align: center;
+      transition: background-color 0.2s ease;
+    }
+    
+    table.war_report td:last-child {
+      border-right: none;
+    }
+    
+    table.war_report tr:nth-child(even) {
+      background-color: rgba(51, 51, 51, 0.3);
+    }
+    
+    table.war_report tr:hover {
+      background-color: rgba(107, 142, 35, 0.1);
+    }
+    
+    table.war_report td a {
+      color: #FFD700;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    table.war_report td a:hover {
+      color: #FFF;
+      text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+    }
+    
+    /* Totals row styling */
+    table.war_report .totals-row {
+      background-color: rgba(85, 107, 47, 0.2) !important;
+    }
+    
+    table.war_report .totals-row:hover {
+      background-color: rgba(85, 107, 47, 0.2) !important;
+    }
+    
+    table.war_report .totals-cell {
+      background: rgba(85, 107, 47, 0.2) !important;
+      color: #d4c5a0;
+      font-weight: 700;
+      border-bottom: 2px solid rgba(85, 107, 47, 0.5);
+      padding: 15px 8px;
+      text-align: center;
+      cursor: default !important;
+    }
+    
+    table.war_report .totals-cell::after {
+      content: '' !important;
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .header h1 {
+        letter-spacing: 3px;
+      }
+      
+      table.war_report th,
+      table.war_report td {
+        padding: 8px 4px;
+        font-size: 0.8em;
+      }
+      
+      .back-button {
+        position: relative;
+        top: 0;
+        right: 0;
+        margin-bottom: 20px;
+        display: inline-block;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back-button">← Back</a>
+  
+  <div class="container">
+    <div class="header">
+      <h1>⛓️ Chain Report</h1>
+    </div>
+    {{CHAIN_TABLE}}
+  </div>
+
+  <script>
+    function sortTable(columnIndex) {
+      const table = document.querySelector('table.war_report');
+      if (!table) return;
+      
+      const tbody = table.querySelector('tbody');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      const header = table.querySelectorAll('th')[columnIndex];
+      
+      const actualHeaders = table.querySelectorAll('thead tr:first-child th');
+      const actualHeader = actualHeaders[columnIndex];
+      
+      let isAscending = !actualHeader.classList.contains('sort-asc');
+      
+      actualHeaders.forEach(th => {
+        th.classList.remove('sort-asc', 'sort-desc');
+      });
+      
+      actualHeader.classList.add(isAscending ? 'sort-asc' : 'sort-desc');
+      
+      const dataRows = rows.filter(row => !row.textContent.includes('TOTALS'));
+      
+      dataRows.sort((a, b) => {
+        let aValue = a.cells[columnIndex].textContent.trim();
+        let bValue = b.cells[columnIndex].textContent.trim();
+        
+        const aDiv = a.cells[columnIndex].querySelector('div[data-sort]');
+        const bDiv = b.cells[columnIndex].querySelector('div[data-sort]');
+        if (aDiv && bDiv) {
+          aValue = parseFloat(aDiv.getAttribute('data-sort')) || 0;
+          bValue = parseFloat(bDiv.getAttribute('data-sort')) || 0;
+          return isAscending ? aValue - bValue : bValue - aValue;
+        }
+        
+        if (aValue.match(/^[\d,]+\.?\d*$/)) {
+          aValue = parseFloat(aValue.replace(/,/g, '')) || 0;
+          bValue = parseFloat(bValue.replace(/,/g, '')) || 0;
+          return isAscending ? aValue - bValue : bValue - aValue;
+        }
+        
+        if (aValue.includes('%')) {
+          aValue = parseFloat(aValue.replace('%', '')) || 0;
+          bValue = parseFloat(bValue.replace('%', '')) || 0;
+          return isAscending ? aValue - bValue : bValue - aValue;
+        }
+        
+        return isAscending ? 
+          aValue.localeCompare(bValue) : 
+          bValue.localeCompare(aValue);
+      });
+      
+      tbody.innerHTML = '';
+      dataRows.forEach(row => tbody.appendChild(row));
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function() {
+        const headers = document.querySelectorAll('table.war_report thead tr:first-child th');
+        headers.forEach((header, index) => {
+          header.addEventListener('click', () => sortTable(index));
+        });
+      }, 100);
+    });
+  </script>
+</body>
+</html>

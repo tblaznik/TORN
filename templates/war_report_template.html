@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>War Report</title>
+    <meta charset="UTF-8">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;600;700&family=Crimson+Text:wght@400;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Oswald', sans-serif;
+            background: 
+                radial-gradient(ellipse at top, rgba(20, 20, 20, 0.9) 0%, rgba(0, 0, 0, 0.95) 100%),
+                linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+            color: #d4c5a0;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 15% 25%, rgba(139, 0, 0, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 85% 75%, rgba(139, 0, 0, 0.08) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(45, 45, 45, 0.7) 100%);
+            border: 2px solid #8B0000;
+            border-radius: 15px;
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #8B0000, #DC143C, #8B0000);
+        }
+        
+        .header h1 {
+            font-size: clamp(2.5em, 6vw, 4em);
+            font-weight: 700;
+            color: #d4c5a0;
+            text-shadow: 3px 3px 0px #8B0000, 6px 6px 10px rgba(0, 0, 0, 0.8);
+            margin-bottom: 15px;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            color: #8B0000;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+        
+        .war-info {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(45, 45, 45, 0.6) 100%);
+            border: 2px solid #DC143C;
+            border-radius: 15px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .war-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #DC143C, #8B0000, #DC143C);
+        }
+        
+        .war-info h3 {
+            margin: 0 0 15px 0;
+            color: #DC143C;
+            font-size: 1.4em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .war-info p {
+            margin-bottom: 8px;
+            color: #d4c5a0;
+            font-size: 1.1em;
+        }
+        
+        .war-info strong {
+            color: #FFD700;
+        }
+        
+        /* Tables Container */
+        .tables-container {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            margin-bottom: 40px;
+        }
+        
+        .faction-section {
+            flex: 1;
+        }
+        
+        .faction-section h3 {
+            color: #d4c5a0;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 1.6em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .faction-section h3.our-faction {
+            background: linear-gradient(135deg, rgba(139, 0, 0, 0.3) 0%, rgba(220, 20, 60, 0.2) 100%);
+            border: 2px solid #8B0000;
+        }
+        
+        .faction-section h3.enemy-faction {
+            background: linear-gradient(135deg, rgba(85, 107, 47, 0.3) 0%, rgba(107, 142, 35, 0.2) 100%);
+            border: 2px solid #556B2F;
+        }
+        
+        /* Faction Stats */
+        .faction-stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(45, 45, 45, 0.6) 100%);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .our-stats {
+            border: 1px solid rgba(139, 0, 0, 0.3);
+        }
+        
+        .enemy-stats {
+            border: 1px solid rgba(85, 107, 47, 0.3);
+        }
+        
+        .stat-box {
+            text-align: center;
+            margin: 5px;
+        }
+        
+        .stat-number {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #d4c5a0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+        
+        .stat-label {
+            color: #999;
+            font-size: 0.9em;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* War Tables */
+        table.war_report {
+            width: 100%;
+            border-collapse: collapse;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(45, 45, 45, 0.7) 100%);
+            color: #d4c5a0;
+            border-radius: 15px;
+            overflow: hidden;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        }
+        
+        table.war_report th {
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.95em;
+            border-bottom: 2px solid rgba(139, 0, 0, 0.3);
+            border-right: 1px solid rgba(68, 68, 68, 0.5);
+            cursor: pointer;
+            user-select: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+        
+        #our_faction_table th {
+            background: linear-gradient(135deg, rgba(139, 0, 0, 0.4) 0%, rgba(220, 20, 60, 0.3) 100%);
+            color: #d4c5a0;
+        }
+        
+        #enemy_faction_table th {
+            background: linear-gradient(135deg, rgba(85, 107, 47, 0.4) 0%, rgba(107, 142, 35, 0.3) 100%);
+            color: #d4c5a0;
+        }
+        
+        table.war_report th:last-child {
+            border-right: none;
+        }
+        
+        table.war_report th:hover {
+            background: linear-gradient(135deg, rgba(218, 165, 32, 0.2) 0%, rgba(255, 215, 0, 0.1) 100%);
+        }
+        
+        table.war_report th::after {
+            content: ' ↕';
+            font-size: 0.8em;
+            opacity: 0.6;
+        }
+        
+        table.war_report th.sort-asc::after {
+            content: ' ↑';
+            opacity: 1;
+        }
+        
+        table.war_report th.sort-desc::after {
+            content: ' ↓';
+            opacity: 1;
+        }
+        
+        table.war_report td {
+            padding: 12px 10px;
+            border-bottom: 1px solid rgba(68, 68, 68, 0.3);
+            border-right: 1px solid rgba(68, 68, 68, 0.3);
+            font-size: 0.95em;
+            text-align: center;
+            transition: background-color 0.2s ease;
+        }
+        
+        table.war_report td:last-child {
+            border-right: none;
+        }
+        
+        table.war_report tr:nth-child(even) {
+            background-color: rgba(51, 51, 51, 0.3);
+        }
+        
+        table.war_report tr:hover {
+            background-color: rgba(218, 165, 32, 0.1);
+        }
+        
+        table.war_report td a {
+            color: #FFD700;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        table.war_report td a:hover {
+            color: #FFF;
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+        }
+        
+        /* Back Button */
+        .back-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(45, 45, 45, 0.7) 100%);
+            border: 2px solid #FF8C00;
+            border-radius: 25px;
+            padding: 12px 20px;
+            color: #FF8C00;
+            text-decoration: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .back-button:hover {
+            background: linear-gradient(135deg, rgba(255, 140, 0, 0.1) 0%, rgba(255, 140, 0, 0.05) 100%);
+            box-shadow: 0 0 20px rgba(255, 140, 0, 0.3);
+            transform: scale(1.05);
+        }
+        
+        /* Explanations */
+        .explanations {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(45, 45, 45, 0.6) 100%);
+            border: 2px solid #FF8C00;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 40px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .explanations::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #FF8C00, #DAA520, #FF8C00);
+        }
+        
+        .explanations h3 {
+            margin-top: 0;
+            color: #FF8C00;
+            border-bottom: 2px solid rgba(255, 140, 0, 0.3);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            font-size: 1.6em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .explanation-item {
+            margin-bottom: 20px;
+        }
+        
+        .explanation-term {
+            color: #FFD700;
+            font-weight: 600;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .explanation-desc {
+            color: #CCCCCC;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 1200px) {
+            .tables-container {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                letter-spacing: 3px;
+            }
+            
+            .faction-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            table.war_report th,
+            table.war_report td {
+                padding: 8px 6px;
+                font-size: 0.85em;
+            }
+            
+            .back-button {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin-bottom: 20px;
+                display: inline-block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-button">← Back</a>
+    
+    <div class="container">
+        <div class="header">
+            <h1>⚔️ War Report</h1>
+            <p>War ID: {{WAR_ID}}</p>
+        </div>
+        
+        <div class="war-info">
+            <h3>Combat Period</h3>
+            <p><strong>Period:</strong> {{WAR_START}} to {{WAR_END}}</p>
+            <p><strong>Duration:</strong> {{WAR_DURATION}}</p>
+        </div>
+        
+        {{TABLE_HTML}}
+
+        <div class="explanations">
+            <h3>Column Explanations</h3>
+            
+            <div class="explanation-item">
+                <div class="explanation-term">Members</div>
+                <div class="explanation-desc">Player names linked to their Torn profiles. Click to view their profile page.</div>
+            </div>
+            
+            <div class="explanation-item">
+                <div class="explanation-term">Level</div>
+                <div class="explanation-desc">Current player level in Torn. Higher levels generally indicate more experienced players.</div>
+            </div>
+            
+            <div class="explanation-item">
+                <div class="explanation-term">Attacks</div>
+                <div class="explanation-desc">Total number of attacks made during this war. Higher numbers show more active participation.</div>
+            </div>
+            
+            <div class="explanation-item">
+                <div class="explanation-term">Hit %</div>
+                <div class="explanation-desc">Percentage of faction's total attacks made by this player. Shows relative activity level within the faction.</div>
+            </div>
+            
+            <div class="explanation-item">
+                <div class="explanation-term">Score</div>
+                <div class="explanation-desc">Total war points earned by this player. Points are awarded based on attack success and target difficulty.</div>
+            </div>
+            
+            <div class="explanation-item">
+                <div class="explanation-term">Score %</div>
+                <div class="explanation-desc">Percentage of faction's total score earned by this player. Shows relative contribution to faction's war effort.</div>
+            </div>
+            
+            <div class="explanation-item">
+                <div class="explanation-term">Avg score/hit</div>
+                <div class="explanation-desc">Average points earned per attack (Score ÷ Attacks). Higher values indicate better target selection or attack success.</div>
+            </div>
+            
+            <div class="explanation-item">
+                <div class="explanation-term">Efficiency</div>
+                <div class="explanation-desc">Score per minute during war (Score ÷ War Duration in minutes). Measures overall point generation rate.</div>
+            </div>
+            
+            <div class="explanation-item">
+                <div class="explanation-term">Att/Hr</div>
+                <div class="explanation-desc">Attack frequency (Attacks ÷ War Duration in hours). Shows how actively the player participated throughout the war.</div>
+            </div>
+            
+            <div class="explanation-item">
+                <div class="explanation-term">Score/Lvl</div>
+                <div class="explanation-desc">Performance vs level ratio (Score ÷ Level). Higher values indicate players punching above their weight class.</div>
+            </div>
+            
+            <div class="explanation-item">
+                <div class="explanation-term">vs Avg</div>
+                <div class="explanation-desc">Performance compared to faction average. Positive % = above average performance, Negative % = below average performance.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function sortTableById(tableId, columnIndex) {
+            const table = document.getElementById(tableId);
+            if (!table) return;
+            
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const header = table.querySelectorAll('th')[columnIndex];
+            
+            let isAscending = !header.classList.contains('sort-asc');
+            
+            table.querySelectorAll('th').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+            });
+            
+            header.classList.add(isAscending ? 'sort-asc' : 'sort-desc');
+            
+            rows.sort((a, b) => {
+                let aValue = a.cells[columnIndex].textContent.trim();
+                let bValue = b.cells[columnIndex].textContent.trim();
+                
+                if (aValue.match(/^[\d,]+\.?\d*$/)) {
+                    aValue = parseFloat(aValue.replace(/,/g, '')) || 0;
+                    bValue = parseFloat(bValue.replace(/,/g, '')) || 0;
+                    return isAscending ? aValue - bValue : bValue - aValue;
+                }
+                
+                if (aValue.includes('%')) {
+                    aValue = parseFloat(aValue.replace('%', '')) || 0;
+                    bValue = parseFloat(bValue.replace('%', '')) || 0;
+                    return isAscending ? aValue - bValue : bValue - aValue;
+                }
+                
+                return isAscending ? 
+                    aValue.localeCompare(bValue) : 
+                    bValue.localeCompare(aValue);
+            });
+            
+            rows.forEach(row => tbody.appendChild(row));
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const ourHeaders = document.querySelectorAll('#our_faction_table th');
+            const enemyHeaders = document.querySelectorAll('#enemy_faction_table th');
+            
+            ourHeaders.forEach((header, index) => {
+                header.addEventListener('click', () => sortTableById('our_faction_table', index));
+            });
+            
+            enemyHeaders.forEach((header, index) => {
+                header.addEventListener('click', () => sortTableById('enemy_faction_table', index));
+            });
+        });
+    </script>
+</body>
+</html>

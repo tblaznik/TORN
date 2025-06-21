@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>EPIC Mafia - War Intelligence</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;600;700&family=Crimson+Text:wght@400;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Oswald', sans-serif;
+            background: 
+                radial-gradient(ellipse at top, rgba(20, 20, 20, 0.9) 0%, rgba(0, 0, 0, 0.95) 100%),
+                linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+            color: #d4c5a0;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Atmospheric background elements */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 15% 25%, rgba(139, 0, 0, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 75%, rgba(139, 0, 0, 0.05) 0%, transparent 40%),
+                linear-gradient(45deg, transparent 30%, rgba(20, 20, 20, 0.3) 50%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Main Header */
+        .header {
+            text-align: center;
+            padding: 80px 0 60px 0;
+            position: relative;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #8B0000, transparent);
+        }
+        
+        .header h1 {
+            font-size: clamp(3em, 8vw, 6em);
+            font-weight: 700;
+            color: #d4c5a0;
+            text-shadow: 
+                3px 3px 0px #8B0000,
+                6px 6px 10px rgba(0, 0, 0, 0.8);
+            margin-bottom: 20px;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+        }
+        
+        .subtitle {
+            font-size: 1.4em;
+            color: #8B0000;
+            font-weight: 300;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            opacity: 0.9;
+        }
+        
+        /* Reports Navigation */
+        .reports-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            max-width: 800px;
+            margin: 80px auto;
+        }
+        
+        .report-item {
+            position: relative;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(45, 45, 45, 0.6) 100%);
+            border-left: 4px solid transparent;
+            border-radius: 0 15px 15px 0;
+            padding: 30px 40px;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+        
+        .report-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.02) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .report-item:hover::before {
+            opacity: 1;
+        }
+        
+        .intel-report {
+            border-left-color: #8B0000;
+            box-shadow: 0 5px 20px rgba(139, 0, 0, 0.2);
+        }
+        
+        .intel-report:hover {
+            border-left-color: #DC143C;
+            transform: translateX(10px);
+            box-shadow: 
+                -5px 5px 30px rgba(139, 0, 0, 0.4),
+                0 0 20px rgba(220, 20, 60, 0.2);
+        }
+        
+        .war-report {
+            border-left-color: #8B0000;
+            box-shadow: 0 5px 20px rgba(139, 0, 0, 0.2);
+        }
+        
+        .war-report:hover {
+            border-left-color: #DC143C;
+            transform: translateX(10px);
+            box-shadow: 
+                -5px 5px 30px rgba(139, 0, 0, 0.4),
+                0 0 20px rgba(220, 20, 60, 0.2);
+        }
+        
+        .chain-report {
+            border-left-color: #556B2F;
+            box-shadow: 0 5px 20px rgba(85, 107, 47, 0.2);
+        }
+        
+        .chain-report:hover {
+            border-left-color: #6B8E23;
+            transform: translateX(10px);
+            box-shadow: 
+                -5px 5px 30px rgba(85, 107, 47, 0.4),
+                0 0 20px rgba(107, 142, 35, 0.2);
+        }
+        
+        .earnings-report {
+            border-left-color: #DAA520;
+            box-shadow: 0 5px 20px rgba(218, 165, 32, 0.2);
+        }
+        
+        .earnings-report:hover {
+            border-left-color: #FFD700;
+            transform: translateX(10px);
+            box-shadow: 
+                -5px 5px 30px rgba(218, 165, 32, 0.4),
+                0 0 20px rgba(255, 215, 0, 0.2);
+        }
+        
+        .report-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: inherit;
+            width: 100%;
+        }
+        
+        .report-icon {
+            font-size: 2.5em;
+            margin-right: 25px;
+            transition: transform 0.4s ease;
+        }
+        
+        .intel-report .report-icon { color: #DC143C; }
+        .war-report .report-icon { color: #DC143C; }
+        .chain-report .report-icon { color: #6B8E23; }
+        .earnings-report .report-icon { color: #FFD700; }
+        
+        .report-item:hover .report-icon {
+            transform: scale(1.2);
+        }
+        
+        .report-content h3 {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: #d4c5a0;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .report-content p {
+            font-size: 1em;
+            color: #999;
+            font-weight: 300;
+            line-height: 1.4;
+        }
+        
+        /* Methodology Section */
+        .methodology {
+            text-align: center;
+            margin: 80px auto 60px auto;
+            max-width: 600px;
+        }
+        
+        .methodology-link {
+            display: inline-block;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(45, 45, 45, 0.7) 100%);
+            border: 1px solid #FF8C00;
+            border-radius: 25px;
+            padding: 20px 40px;
+            color: #FF8C00;
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: 400;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .methodology-link:hover {
+            background: linear-gradient(135deg, rgba(255, 140, 0, 0.1) 0%, rgba(255, 140, 0, 0.05) 100%);
+            box-shadow: 0 0 30px rgba(255, 140, 0, 0.3);
+            transform: scale(1.05);
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px 0;
+            color: #666;
+            border-top: 1px solid rgba(102, 102, 102, 0.2);
+            margin-top: 60px;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 60px 0 40px 0;
+            }
+            
+            .header h1 {
+                letter-spacing: 4px;
+            }
+            
+            .subtitle {
+                font-size: 1.1em;
+                letter-spacing: 3px;
+            }
+            
+            .reports-nav {
+                margin: 60px auto;
+                gap: 20px;
+            }
+            
+            .report-item {
+                padding: 25px 30px;
+            }
+            
+            .report-item:hover {
+                transform: translateX(5px);
+            }
+            
+            .report-icon {
+                font-size: 2em;
+                margin-right: 20px;
+            }
+            
+            .report-content h3 {
+                font-size: 1.5em;
+            }
+        }
+        
+        /* Subtle entrance animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .header {
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+        
+        .report-item {
+            animation: fadeInUp 0.6s ease both;
+        }
+        
+        .report-item:nth-child(1) { animation-delay: 0.4s; }
+        .report-item:nth-child(2) { animation-delay: 0.6s; }
+        .report-item:nth-child(3) { animation-delay: 0.8s; }
+        .report-item:nth-child(4) { animation-delay: 1.0s; }
+        
+        .methodology {
+            animation: fadeInUp 0.6s ease 1.2s both;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>EPIC MAFIA</h1>
+        </div>
+        
+        <nav class="reports-nav">
+            <div class="report-item intel-report">
+                <a href="intel_report.html" class="report-link">
+                    <div class="report-icon">🔍</div>
+                    <div class="report-content">
+                        <h3>War Intel</h3>
+                        <p>Comprehensive intelligence analysis of all faction members including combat stats, substance usage, and strategic vulnerabilities</p>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="report-item war-report">
+                <a href="war_report.html" class="report-link">
+                    <div class="report-icon">⚔️</div>
+                    <div class="report-content">
+                        <h3>War Report</h3>
+                        <p>War reports with additional calculations for performance analysis</p>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="report-item chain-report">
+                <a href="chain_report.html" class="report-link">
+                    <div class="report-icon">⛓️</div>
+                    <div class="report-content">
+                        <h3>Chain Report</h3>
+                        <p>Chain report with outside hits, saves and percentages</p>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="report-item earnings-report">
+                <a href="earnings_report.html" class="report-link">
+                    <div class="report-icon">💵</div>
+                    <div class="report-content">
+                        <h3>Earnings Estimate</h3>
+                        <p>Individual earnings and payout calculations</p>
+                    </div>
+                </a>
+            </div>
+        </nav>
+        
+        <div class="methodology">
+            <a href="methodology.html" class="methodology-link">Methodology</a>
+        </div>
+        
+        <div class="footer">
+            <p>EPIC Mafia Territorial Operations | Torn City Networks</p>
+        </div>
+    </div>
+</body>
+</html>

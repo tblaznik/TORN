@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Earnings Estimate</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;600;700&family=Crimson+Text:wght@400;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Oswald', sans-serif;
+            background: 
+                radial-gradient(ellipse at top, rgba(20, 20, 20, 0.9) 0%, rgba(0, 0, 0, 0.95) 100%),
+                linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+            color: #d4c5a0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 15% 25%, rgba(218, 165, 32, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 75%, rgba(255, 215, 0, 0.05) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(45, 45, 45, 0.7) 100%);
+            border: 2px solid #DAA520;
+            border-radius: 15px;
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #DAA520, #FFD700, #DAA520);
+        }
+        
+        .header h1 {
+            font-size: clamp(2.5em, 6vw, 4em);
+            font-weight: 700;
+            color: #d4c5a0;
+            text-shadow: 3px 3px 0px #DAA520, 6px 6px 10px rgba(0, 0, 0, 0.8);
+            margin-bottom: 15px;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+        }
+        
+        /* Back Button */
+        .back-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(45, 45, 45, 0.7) 100%);
+            border: 2px solid #FF8C00;
+            border-radius: 25px;
+            padding: 12px 20px;
+            color: #FF8C00;
+            text-decoration: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .back-button:hover {
+            background: linear-gradient(135deg, rgba(255, 140, 0, 0.1) 0%, rgba(255, 140, 0, 0.05) 100%);
+            box-shadow: 0 0 20px rgba(255, 140, 0, 0.3);
+            transform: scale(1.05);
+        }
+        
+        /* Summary Stats Grid */
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(45, 45, 45, 0.6) 100%);
+            border: 2px solid #DAA520;
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #DAA520, #FFD700, #DAA520);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            border-color: #FFD700;
+            box-shadow: 0 8px 25px rgba(218, 165, 32, 0.2);
+        }
+        
+        .stat-card:hover::before {
+            background: linear-gradient(90deg, #FFD700, #DAA520, #FFD700);
+        }
+        
+        .stat-card h3 {
+            margin-top: 0;
+            color: #FFD700;
+            border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(68, 68, 68, 0.3);
+        }
+        
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+        
+        .stat-label {
+            color: #CCCCCC;
+            font-weight: 400;
+        }
+        
+        .stat-value {
+            color: #d4c5a0;
+            font-weight: 600;
+        }
+        
+        /* Earnings Table */
+        table.earnings_report {
+            width: 100%;
+            border-collapse: collapse;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(45, 45, 45, 0.7) 100%);
+            color: #d4c5a0;
+            border-radius: 15px;
+            overflow: hidden;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            margin-bottom: 40px;
+        }
+        
+        table.earnings_report th {
+            background: linear-gradient(135deg, rgba(218, 165, 32, 0.4) 0%, rgba(255, 215, 0, 0.3) 100%);
+            color: #d4c5a0;
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.95em;
+            border-bottom: 2px solid rgba(218, 165, 32, 0.4);
+            border-right: 1px solid rgba(68, 68, 68, 0.5);
+            cursor: pointer;
+            user-select: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+        
+        table.earnings_report th:last-child {
+            border-right: none;
+        }
+        
+        table.earnings_report th:hover {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(218, 165, 32, 0.1) 100%);
+        }
+        
+        table.earnings_report th::after {
+            content: ' ↕';
+            font-size: 0.8em;
+            opacity: 0.6;
+        }
+        
+        table.earnings_report th.sort-asc::after {
+            content: ' ↑';
+            opacity: 1;
+        }
+        
+        table.earnings_report th.sort-desc::after {
+            content: ' ↓';
+            opacity: 1;
+        }
+        
+        table.earnings_report td {
+            padding: 12px 10px;
+            border-bottom: 1px solid rgba(68, 68, 68, 0.3);
+            border-right: 1px solid rgba(68, 68, 68, 0.3);
+            font-size: 0.95em;
+            text-align: center;
+            transition: background-color 0.2s ease;
+        }
+        
+        table.earnings_report td:last-child {
+            border-right: none;
+        }
+        
+        table.earnings_report tr:nth-child(even) {
+            background-color: rgba(51, 51, 51, 0.3);
+        }
+        
+        table.earnings_report tr:hover {
+            background-color: rgba(218, 165, 32, 0.1);
+        }
+        
+        table.earnings_report td a {
+            color: #FFD700;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        table.earnings_report td a:hover {
+            color: #FFF;
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+        }
+        
+        /* Calculations Section */
+        .calculations {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(45, 45, 45, 0.6) 100%);
+            border: 2px solid #FF8C00;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 40px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .calculations::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #FF8C00, #DAA520, #FF8C00);
+        }
+        
+        .calculations h3 {
+            margin-top: 0;
+            color: #FF8C00;
+            border-bottom: 2px solid rgba(255, 140, 0, 0.3);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            font-size: 1.6em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .calc-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(68, 68, 68, 0.3);
+        }
+        
+        .calc-row:last-child {
+            border-bottom: none;
+        }
+        
+        .calc-label {
+            color: #CCCCCC;
+            font-weight: 400;
+        }
+        
+        .calc-value {
+            color: #d4c5a0;
+            font-weight: 600;
+        }
+        
+        .calc-formula {
+            color: #FFD700;
+            font-size: 1em;
+            font-style: italic;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                letter-spacing: 3px;
+            }
+            
+            .summary-stats {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            table.earnings_report th,
+            table.earnings_report td {
+                padding: 8px 6px;
+                font-size: 0.85em;
+            }
+            
+            .back-button {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin-bottom: 20px;
+                display: inline-block;
+            }
+            
+            .calc-row {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-button">← Back</a>
+    
+    <div class="container">
+        <div class="header">
+            <h1>💵 Earnings Estimate</h1>
+        </div>
+        
+        <div class="summary-stats">
+            <div class="stat-card">
+                <h3>Cache Information</h3>
+                <div class="stat-row">
+                    <span class="stat-label">Total Caches:</span>
+                    <span class="stat-value">{{TOTAL_CACHES}}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Tax (5%):</span>
+                    <span class="stat-value">{{TAX_AMOUNT}}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Total Payout:</span>
+                    <span class="stat-value">{{TOTAL_PAYOUT}}</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>Chain Statistics</h3>
+                <div class="stat-row">
+                    <span class="stat-label">Total War Hits:</span>
+                    <span class="stat-value">{{TOTAL_HITS}}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Total War Score:</span>
+                    <span class="stat-value">{{TOTAL_SCORE}}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Avg Score/Hit:</span>
+                    <span class="stat-value">{{AVG_SCORE_HIT}}</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>🆘 Save Information</h3>
+                <div class="stat-row">
+                    <span class="stat-label">Total Saves:</span>
+                    <span class="stat-value">{{TOTAL_SAVES}}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Save Score:</span>
+                    <span class="stat-value">{{TOTAL_SAVE_SCORE}}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Save Pay:</span>
+                    <span class="stat-value">{{SAVE_PAY}}</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>Pay Rates</h3>
+                <div class="stat-row">
+                    <span class="stat-label">Pay per Hit:</span>
+                    <span class="stat-value">{{PAY_HIT}}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Pay per Score:</span>
+                    <span class="stat-value">{{PAY_SCORE}}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Distribution:</span>
+                    <span class="stat-value">{{RESPECT_WEIGHT}}/{{HIT_WEIGHT}}</span>
+                </div>
+            </div>
+        </div>
+
+        {{EARNINGS_TABLE}}
+
+        <div class="calculations">
+            <h3>Calculation Details</h3>
+            
+            <div class="calc-row">
+                <span class="calc-label">Modified Score (War + Saves):</span>
+                <span class="calc-value">{{MOD_SCORE}}</span>
+            </div>
+            
+            <div class="calc-row">
+                <span class="calc-label">Modified Hits (War + Bonus):</span>
+                <span class="calc-value">{{MOD_HIT}}</span>
+            </div>
+            
+            <div class="calc-row">
+                <span class="calc-label">Score Pool ({{RESPECT_WEIGHT}}%):</span>
+                <span class="calc-value">{{RESPECT_POOL}}</span>
+            </div>
+            
+            <div class="calc-row">
+                <span class="calc-label">Hit Pool ({{HIT_WEIGHT}}%):</span>
+                <span class="calc-value">{{HIT_POOL}}</span>
+            </div>
+            
+            <div class="calc-formula">
+                <strong>Formula:</strong> Member Earnings = (War Hits × {{PAY_HIT}}) + ((War Respect + Save Score) × {{PAY_SCORE}})
+            </div>
+            
+            <div style="margin-top: 15px;">
+                <div class="calc-formula">
+                    <strong>Total Members:</strong> {{TOTAL_MEMBERS}}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function sortTable(columnIndex) {
+            const table = document.querySelector('table.earnings_report');
+            if (!table) return;
+            
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const header = table.querySelectorAll('th')[columnIndex];
+            
+            let isAscending = !header.classList.contains('sort-asc');
+            
+            table.querySelectorAll('th').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+            });
+            
+            header.classList.add(isAscending ? 'sort-asc' : 'sort-desc');
+            
+            rows.sort((a, b) => {
+                let aValue = a.cells[columnIndex].textContent.trim();
+                let bValue = b.cells[columnIndex].textContent.trim();
+                
+                if (aValue.includes('$')) {
+                    aValue = parseFloat(aValue.replace(/[$,]/g, '')) || 0;
+                    bValue = parseFloat(bValue.replace(/[$,]/g, '')) || 0;
+                    return isAscending ? aValue - bValue : bValue - aValue;
+                }
+                
+                if (aValue.includes('%')) {
+                    aValue = parseFloat(aValue.replace('%', '')) || 0;
+                    bValue = parseFloat(bValue.replace('%', '')) || 0;
+                    return isAscending ? aValue - bValue : bValue - aValue;
+                }
+                
+                if (aValue.match(/^[\d,]+\.?\d*$/)) {
+                    aValue = parseFloat(aValue.replace(/,/g, '')) || 0;
+                    bValue = parseFloat(bValue.replace(/,/g, '')) || 0;
+                    return isAscending ? aValue - bValue : bValue - aValue;
+                }
+                
+                return isAscending ? 
+                    aValue.localeCompare(bValue) : 
+                    bValue.localeCompare(aValue);
+            });
+            
+            rows.forEach(row => tbody.appendChild(row));
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const headers = document.querySelectorAll('table.earnings_report th');
+            headers.forEach((header, index) => {
+                header.addEventListener('click', () => sortTable(index));
+            });
+        });
+    </script>
+</body>
+</html>
